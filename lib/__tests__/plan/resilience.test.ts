@@ -14,7 +14,19 @@ import { runOptimizerWithContext } from "../../optimizer";
 import { computeCaptainSynthesisInput } from "../../captain";
 import { synthesizeCaptainPick } from "../../captain/synthesis";
 
-const ctx = { analysis: { currentGw: 20 } } as unknown as AnalysisContext;
+const ctx = {
+  analysis: {
+    currentGw: 20,
+    rankedSquad: [],
+    picks: [],
+    weakest3: [],
+    bank: 1.5,
+    chipsRemaining: { wildcard: 0, freeHit: 0, benchBoost: 0, tripleCaptain: 0 },
+  },
+  managerProfile: {
+    entry: { playerFirstName: "Test", playerLastName: "Mgr", name: "Test FC", summaryOverallRank: 1000 },
+  },
+} as unknown as AnalysisContext;
 const fakeOpt = { primaryRecommendation: { type: "FREE" } } as unknown as OptimizerResult;
 const fakeCap = { captain: { player: { player: { webName: "X" } } } } as unknown as CaptainResult;
 const tcAdvice: TripleCaptainAdvice = { recommended: true, targetGw: 22, targetPlayer: "X", peakScore: 12, baselineScore: 5, reasoning: "DGW" };
@@ -47,6 +59,16 @@ describe("runGameweekPlan — composition", () => {
     expect(plan.alerts).toHaveLength(0);
     expect(plan.currentGw).toBe(20);
   });
+
+  it("includes display fields (squad, bank, chips, manager) from the shared context", async () => {
+    const plan = await runGameweekPlan(1, { freeTransfers: 1 });
+    expect(Array.isArray(plan.squad)).toBe(true);
+    expect(plan.bank).toBe(1.5);
+    expect(plan.chipsRemaining).toBeDefined();
+    expect(plan.manager.name).toBe("Test Mgr");
+    expect(plan.manager.overallRank).toBe(1000);
+    expect(plan.manager.teamName).toBe("Test FC");
+  });
 });
 
 describe("runGameweekPlan — partial failure isolation", () => {
@@ -56,6 +78,17 @@ describe("runGameweekPlan — partial failure isolation", () => {
     expect(plan.transfers).toBeNull();
     expect(plan.captaincy).toBe(fakeCap);
     expect(plan.alerts.some((a) => /transfer optimizer failed/i.test(a))).toBe(true);
+  });
+
+  it("display fields survive even when both pipelines fail", async () => {
+    vi.mocked(runOptimizerWithContext).mockRejectedValue(new Error("opt"));
+    vi.mocked(synthesizeCaptainPick).mockRejectedValue(new Error("cap"));
+    const plan = await runGameweekPlan(1, { freeTransfers: 1 });
+    expect(plan.transfers).toBeNull();
+    expect(plan.captaincy).toBeNull();
+    expect(plan.bank).toBe(1.5); // from the shared context, not the fan-out
+    expect(plan.manager.teamName).toBe("Test FC");
+    expect(Array.isArray(plan.squad)).toBe(true);
   });
 
   it("captain synthesis fails → transfers survive with one alert", async () => {

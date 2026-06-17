@@ -167,6 +167,7 @@ export interface Player {
   id: number;
   webName: string;
   teamId: number;
+  teamCode: number;
   teamName: string;
   teamShortName: string;
   position: Position;

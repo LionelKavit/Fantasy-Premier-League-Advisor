@@ -1,4 +1,4 @@
-import type { GameweekPlan } from "./types";
+import type { GameweekPlan, SquadPlayerView, AnalysisContext } from "./types";
 import type { CaptainSynthesisInput, CaptainResult } from "../captain/types";
 import { buildAnalysisContext } from "./context";
 import { runOptimizerWithContext } from "../optimizer";
@@ -53,14 +53,70 @@ export async function runGameweekPlan(
     alerts.push(`Captain pipeline failed: ${errMsg(capSettled.reason)}`);
   }
 
+  const entry = ctx.managerProfile.entry;
+
   return {
     teamId,
     currentGw: ctx.analysis.currentGw,
     transfers,
     captaincy,
+    squad: buildSquadView(ctx, captaincy),
+    bank: ctx.analysis.bank,
+    chipsRemaining: ctx.analysis.chipsRemaining,
+    manager: {
+      name: `${entry.playerFirstName} ${entry.playerLastName}`.trim(),
+      overallRank: entry.summaryOverallRank,
+      teamName: entry.name,
+    },
     alerts,
     generatedAt: new Date().toISOString(),
   };
+}
+
+// Project the shared analysis into the lean per-player views the pitch needs,
+// in pick-slot order, with recommendation flags resolved server-side. Sourced
+// from the shared context so it is present even when a sub-pipeline failed.
+function buildSquadView(
+  ctx: AnalysisContext,
+  captaincy: CaptainResult | null
+): SquadPlayerView[] {
+  const scoredById = new Map(
+    ctx.analysis.rankedSquad.map((sp) => [sp.player.id, sp])
+  );
+  const captainId = captaincy?.captain.player.player.id ?? null;
+  const viceId = captaincy?.viceCaptain?.player.player.id ?? null;
+  const weakIds = new Set(
+    ctx.analysis.weakest3.map((w) => w.player.player.id)
+  );
+
+  return [...ctx.analysis.picks]
+    .sort((a, b) => a.position - b.position)
+    .map((pick) => {
+      const sp = scoredById.get(pick.element);
+      const p = sp?.player;
+      return {
+        id: pick.element,
+        webName: p?.webName ?? "Unknown",
+        teamShortName: p?.teamShortName ?? "UNK",
+        teamCode: p?.teamCode ?? 0,
+        position: p?.position ?? "MID",
+        pickSlot: pick.position,
+        isStarting: pick.position <= 11,
+        price: p?.price ?? 0,
+        score: sp?.score.total ?? 0,
+        form: p?.form ?? 0,
+        pointsPerGame: p?.pointsPerGame ?? 0,
+        epNext: p?.epNext ?? null,
+        availability: {
+          status: p?.availability.status ?? "available",
+          chanceOfPlayingNext: p?.availability.chanceOfPlayingNext ?? null,
+          news: p?.availability.news ?? "",
+        },
+        isCaptainRec: pick.element === captainId,
+        isViceRec: pick.element === viceId,
+        isWeakSpot: weakIds.has(pick.element),
+      };
+    });
 }
 
 function errMsg(reason: unknown): string {

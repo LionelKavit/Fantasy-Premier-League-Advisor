@@ -63,6 +63,7 @@ function normalizePlayer(raw: FplPlayerRaw, teams: Team[]): Player {
     id: raw.id,
     webName: raw.web_name,
     teamId: raw.team,
+    teamCode: raw.team_code,
     teamName: team?.name ?? "Unknown",
     teamShortName: team?.short_name ?? "UNK",
     position: POSITION_MAP[raw.element_type] ?? "MID",

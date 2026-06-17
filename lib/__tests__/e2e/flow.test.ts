@@ -137,6 +137,27 @@ describe("end-to-end: request → pipelines → personalized GameweekPlan", () =
     expect(xiIds.has(plan.captaincy!.captain.player.player.id)).toBe(true);
   });
 
+  it("returns the full squad for the pitch (15 players, slot order, flags, teamCode)", async () => {
+    const plan = await runGameweekPlan(1, { freeTransfers: 1 });
+    expect(plan.squad).toHaveLength(15);
+    expect(plan.squad.filter((p) => p.isStarting)).toHaveLength(11);
+    expect(plan.squad.filter((p) => !p.isStarting)).toHaveLength(4);
+    // pick-slot order
+    expect(plan.squad.map((p) => p.pickSlot)).toEqual(Array.from({ length: 15 }, (_, i) => i + 1));
+    // every player carries a teamCode for shirt rendering
+    expect(plan.squad.every((p) => typeof p.teamCode === "number")).toBe(true);
+    // FPL-familiar stats present for the token metric bar
+    expect(plan.squad.every((p) => typeof p.form === "number" && typeof p.pointsPerGame === "number")).toBe(true);
+    expect(plan.squad.every((p) => p.epNext === null || typeof p.epNext === "number")).toBe(true);
+    // captain flag resolves onto the squad
+    const capId = plan.captaincy!.captain.player.player.id;
+    expect(plan.squad.find((p) => p.id === capId)?.isCaptainRec).toBe(true);
+    // meta present
+    expect(plan.bank).toBeGreaterThanOrEqual(0);
+    expect(plan.chipsRemaining).toBeDefined();
+    expect(plan.manager.teamName).toBeTruthy();
+  });
+
   it("recommends transfers that target the manager's own weak spots", async () => {
     const plan = await runGameweekPlan(1, { freeTransfers: 1 });
     const weakIds = new Set(
