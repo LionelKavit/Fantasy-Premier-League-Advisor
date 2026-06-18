@@ -106,6 +106,9 @@ describe("runScoutConversation (streaming agentic loop)", () => {
     expect(call.messages[2]).toMatchObject({ role: "user", content: "follow up" });
     expect(call.system).toMatch(/only/i);
     expect(call.system).toMatch(/fantasy premier league/i);
+    // Formatting rules: no tables, and complement (don't restate) the panels.
+    expect(call.system).toMatch(/markdown tables/i);
+    expect(call.system).toMatch(/restate/i);
     expect(Array.isArray(call.tools)).toBe(true);
   });
 });

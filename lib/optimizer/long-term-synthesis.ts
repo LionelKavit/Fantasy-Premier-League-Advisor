@@ -90,5 +90,5 @@ ${JSON.stringify(
   )}
 
 ## Instructions
-Write 2–4 sentences of plain-English LONG-TERM strategy: which upcoming transfer to make and WHEN (using the timing), how to sequence chips, and any restructure worth saving toward. Be specific with player names and gameweeks. Do NOT restate this week's single transfer — focus on the multi-week plan. Return ONLY the prose, no preamble, no JSON.`;
+The transfer horizon and chip windows are ALREADY shown as a chart and timeline on screen. Write 2–4 sentences of plain-English LONG-TERM insight the chart can't convey: the strategic logic behind the timing (why buy now vs wait — what fixture swing or price trend drives it), how to sequence the chips and what that decision hinges on, and the main risk to the plan. Be specific with player names and gameweeks, but explain the WHY rather than re-listing the moves. Do NOT restate this week's single transfer. Return ONLY the prose, no preamble, no JSON.`;
 }

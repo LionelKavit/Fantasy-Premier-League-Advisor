@@ -43,6 +43,9 @@ function dispatch(line: string, handlers: AskHandlers, acc: { text: string }): v
       }
       break;
     case "tool":
+      // Text streamed before a tool call is preamble ("Let me check…"); drop it
+      // so the resolved answer holds only the final post-tool response.
+      acc.text = "";
       if (event.name) handlers.onTool?.(event.name);
       break;
     case "error":

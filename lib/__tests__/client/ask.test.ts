@@ -25,12 +25,12 @@ function stubFetch(res: Response | (() => never)) {
 const PARAMS = { teamId: 1, freeTransfers: 1, messages: [{ role: "user" as const, content: "hi" }] };
 
 describe("streamAsk", () => {
-  it("dispatches token / tool events and resolves with the accumulated answer", async () => {
+  it("forwards all tokens but resolves only the post-tool answer (drops preamble)", async () => {
     stubFetch(
       streamResponse([
-        '{"type":"token","text":"Hello "}\n',
+        '{"type":"token","text":"Let me check… "}\n',
         '{"type":"tool","name":"get_plan"}\n',
-        '{"type":"token","text":"world"}\n',
+        '{"type":"token","text":"Captain Haaland."}\n',
         '{"type":"done"}\n',
       ])
     );
@@ -40,9 +40,11 @@ describe("streamAsk", () => {
       onToken: (t) => tokens.push(t),
       onTool: (n) => tools.push(n),
     });
-    expect(tokens).toEqual(["Hello ", "world"]);
+    // Every token is still forwarded for the live view…
+    expect(tokens).toEqual(["Let me check… ", "Captain Haaland."]);
     expect(tools).toEqual(["get_plan"]);
-    expect(answer).toBe("Hello world");
+    // …but the resolved (committed) answer drops the pre-tool preamble.
+    expect(answer).toBe("Captain Haaland.");
   });
 
   it("buffers a JSON line split across chunk boundaries", async () => {

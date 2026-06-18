@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Send, Sparkles, Loader2 } from "lucide-react";
 import { streamAsk, type AskMessage } from "@/lib/client/ask";
+import { Markdown } from "@/components/ui/Markdown";
 import { cn } from "@/lib/utils";
 
 const SUGGESTIONS = [
@@ -60,7 +61,12 @@ export function AskTheScout({
       { teamId, freeTransfers, messages: next },
       {
         onToken: (t) => setStreamingText((prev) => prev + t),
-        onTool: (name) => setActiveTool(name),
+        // A tool call means the prior text was just preamble — clear it so the
+        // committed answer is only the final post-tool response.
+        onTool: (name) => {
+          setActiveTool(name);
+          setStreamingText("");
+        },
         onError: (m) => {
           errorMsg = m;
         },
@@ -183,14 +189,15 @@ function Bubble({
     <div className={cn("flex", isUser ? "justify-end" : "justify-start")}>
       <div
         className={cn(
-          "max-w-[85%] whitespace-pre-wrap rounded-lg px-3 py-2 text-sm leading-relaxed",
+          "max-w-[85%] rounded-lg px-3 py-2 text-sm leading-relaxed",
           // User bubble uses the brighter brand purple so the manager's own
           // message reads distinctly against the card (#2d0032); white text on
           // #963cff clears WCAG AA. Assistant stays on muted.
-          isUser ? "bg-fpl-light-purple text-white" : "bg-muted text-foreground"
+          isUser ? "whitespace-pre-wrap bg-fpl-light-purple text-white" : "bg-muted text-foreground"
         )}
       >
-        {text}
+        {/* User text is shown verbatim; the Scout's reply renders Markdown. */}
+        {isUser ? text : <Markdown>{text}</Markdown>}
         {streaming && <span className="ml-0.5 inline-block animate-pulse">▍</span>}
       </div>
     </div>

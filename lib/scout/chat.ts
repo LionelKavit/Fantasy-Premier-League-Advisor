@@ -2,6 +2,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { llm, DEFAULT_MODEL } from "../llm/client";
 import type { ScoutContext } from "./context";
 import { SCOUT_TOOLS, runScoutTool } from "./tools";
+import { buildScoutSystemPrompt } from "./system-prompt";
 
 export interface ScoutTurn {
   role: "user" | "assistant";
@@ -16,20 +17,6 @@ export interface ScoutConversationResult {
 
 const MAX_TOOL_ROUNDS = 5;
 const MAX_TOKENS = 1024;
-
-function buildSystemPrompt(sc: ScoutContext, freeTransfers: number): string {
-  const a = sc.ctx.analysis;
-  const manager = sc.ctx.managerProfile.entry.name;
-  return `You are "The Scout", the in-app Fantasy Premier League (FPL) assistant for the manager of "${manager}".
-
-Scope: answer ONLY questions about this FPL team, players, transfers, captaincy, chips, fixtures and strategy. If asked anything unrelated to FPL, politely decline in one sentence and steer back to their team.
-
-Grounding: never invent prices, scores, projections, ownership or transfer legality. Call the tools to get real numbers. Call get_plan first when the user asks for general advice. Use simulate_transfer / simulate_captain for any "should I…" or "what if…" question — and make clear these are hypotheticals, not executed moves.
-
-Current situation: GW${a.currentGw}, £${a.bank.toFixed(1)}m in the bank, ${freeTransfers} free transfer(s) available.
-
-Be concise and concrete. Reference specific players, gameweeks and numbers. Use plain English, not JSON.`;
-}
 
 /**
  * Stream one round and forward token deltas to `onToken`. Returns the round's
@@ -68,7 +55,7 @@ export async function runScoutConversation(params: {
 }): Promise<ScoutConversationResult> {
   const { sc, freeTransfers, onToken, onTool } = params;
   const maxRounds = params.maxToolRounds ?? MAX_TOOL_ROUNDS;
-  const system = buildSystemPrompt(sc, freeTransfers);
+  const system = buildScoutSystemPrompt(sc, freeTransfers);
 
   const messages: Anthropic.MessageParam[] = params.messages.map((m) => ({
     role: m.role,

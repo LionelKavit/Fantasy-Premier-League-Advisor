@@ -128,7 +128,9 @@ ${JSON.stringify(chipRecommendations.map(c => ({
 ## Instructions
 Evaluate conflicts between recommendations. Consider the manager's risk tolerance. Sequence chip usage optimally. Output JSON matching the OptimizerResult schema exactly.
 
-In the narrativeSummary, where relevant, explicitly weave in the restructure options (a sell-to-fund chain to reach a stronger target) and the hit verdict (whether a points hit is worth taking) — don't cover only the single transfer.
+The narrativeSummary is shown ALONGSIDE the structured recommendation — the chosen transfer, restructure chain, hit verdict and captain are already displayed as chips and rows on screen. So do NOT restate which move to make. Instead, in 2-4 sentences, give the INSIGHT the numbers don't show: why this option beats the alternatives, the key trade-off or risk being accepted, and context such as recent form vs underlying stats, fixture swing, ownership/template, or timing. Add reasoning, not a summary.
+
+For hitVerdict.reasoning: explain the judgement (is the points hit worth it and why), not just the verdict.
 
 For secondaryRecommendation: suggest a plan for next week if applicable (e.g. a WAIT-timed horizon transfer, or rolling for 2 FTs).
 
