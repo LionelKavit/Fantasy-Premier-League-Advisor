@@ -6,6 +6,7 @@ import type {
   SingleTransferResult,
   HitTransferResult,
 } from "./types";
+import { llm } from "../llm/client";
 
 export async function synthesizeRecommendation(
   inputs: SynthesisInput
@@ -23,27 +24,7 @@ export async function synthesizeRecommendation(
 
   try {
     const prompt = buildPrompt(inputs);
-
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 4096,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Claude API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const text = data.content?.[0]?.text ?? "";
+    const text = await llm.complete({ prompt, maxTokens: 4096 });
 
     const parsed = parseOptimizerResult(text, inputs);
     if (parsed) return parsed;
@@ -147,6 +128,8 @@ ${JSON.stringify(chipRecommendations.map(c => ({
 ## Instructions
 Evaluate conflicts between recommendations. Consider the manager's risk tolerance. Sequence chip usage optimally. Output JSON matching the OptimizerResult schema exactly.
 
+In the narrativeSummary, where relevant, explicitly weave in the restructure options (a sell-to-fund chain to reach a stronger target) and the hit verdict (whether a points hit is worth taking) — don't cover only the single transfer.
+
 For secondaryRecommendation: suggest a plan for next week if applicable (e.g. a WAIT-timed horizon transfer, or rolling for 2 FTs).
 
 ## Output Schema
@@ -218,6 +201,7 @@ function parseOptimizerResult(
       alerts,
       confidence: validateConfidence(raw.confidence),
       narrativeSummary: raw.narrativeSummary,
+      longTermNarrative: null, // set by runOptimizerWithContext (parallel call)
       generatedAt: new Date().toISOString(),
     };
   } catch {
@@ -366,6 +350,7 @@ function buildFailSafe(inputs: SynthesisInput): OptimizerResult {
     confidence: "low",
     narrativeSummary:
       "Automated recommendation without AI synthesis. Review manually.",
+    longTermNarrative: null, // set by runOptimizerWithContext (parallel call)
     generatedAt: new Date().toISOString(),
   };
 }

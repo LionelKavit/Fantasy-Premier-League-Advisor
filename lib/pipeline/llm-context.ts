@@ -1,6 +1,7 @@
 import type { Player, TeamSetPieceNotes } from "../types";
 import type { LlmContextSignals } from "./types";
 import { LLM_SIGNAL_RANGES } from "../config";
+import { llm } from "../llm/client";
 
 const DEFAULT_SIGNALS: LlmContextSignals = {
   rotationRisk: 0,
@@ -85,28 +86,7 @@ export async function batchComputeLlmContext(
     });
 
     const prompt = buildPrompt(playerContexts);
-
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 4096,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Claude API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const text =
-      data.content?.[0]?.text ?? "";
+    const text = await llm.complete({ prompt, maxTokens: 4096 });
 
     const parsed = parseResponse(text, players);
     for (const [id, signals] of parsed) {

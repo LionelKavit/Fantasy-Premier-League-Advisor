@@ -65,8 +65,9 @@ export function PlayerToken({
   return (
     <div
       className={cn(
-        // Frosted translucent card so the pitch shows through (not an opaque tile).
-        "relative w-[64px] overflow-hidden rounded-md border bg-white/10 shadow-sm backdrop-blur-sm sm:w-[84px]",
+        // Frosted translucent card so the pitch shows through; /15 gives the shirt
+        // a touch more backing so kits pop without losing the frosted look.
+        "relative w-[64px] overflow-hidden rounded-md border bg-white/15 shadow-sm backdrop-blur-sm sm:w-[84px]",
         isTransferOut
           ? "border-[#e90052] ring-2 ring-[#e90052]/70"
           : player.isWeakSpot
@@ -140,7 +141,7 @@ export function PlayerToken({
           >
             {rating.toFixed(1)}
           </span>
-          <span className="ml-1 text-[9px] tabular-nums text-white/55">
+          <span className="ml-1 text-[9px] tabular-nums text-white/70">
             £{player.price.toFixed(1)}
           </span>
         </p>

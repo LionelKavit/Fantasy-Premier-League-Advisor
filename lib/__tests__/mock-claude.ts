@@ -1,30 +1,17 @@
 /**
- * Stubs the Claude `fetch` boundary so synthesis/LLM-context code can be tested
- * offline along its success, API-error, and parse-failure paths. Pair with
- * `afterEach(restoreClaude)` (or vi.unstubAllGlobals / vi.unstubAllEnvs).
+ * Stubs the LLM wrapper (`lib/llm/client`) so synthesis/LLM-context code can be
+ * tested offline along its success, API-error, and parse-failure paths. The
+ * no-key branch is still controlled by the env var (call-sites check
+ * `process.env.ANTHROPIC_API_KEY` before calling the wrapper), so `stubApiKey`/
+ * `clearApiKey` select that path. Pair with `afterEach(restoreClaude)`.
  */
 import { vi } from "vitest";
+import { llm } from "../llm/client";
+import type Anthropic from "@anthropic-ai/sdk";
 
-interface ResponseLike {
-  ok: boolean;
-  status: number;
-  json: () => Promise<unknown>;
-}
-
-function installFetch(impl: () => ResponseLike): void {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn(async () => impl() as unknown as Response)
-  );
-}
-
-/** Anthropic-shaped 200 whose single content block carries `text`. */
+/** `llm.complete` resolves with `text` (raw model output). */
 export function mockClaudeSuccess(text: string): void {
-  installFetch(() => ({
-    ok: true,
-    status: 200,
-    json: async () => ({ content: [{ type: "text", text }] }),
-  }));
+  vi.spyOn(llm, "complete").mockResolvedValue(text);
 }
 
 /** Convenience: serialize an object as the model's JSON reply. */
@@ -32,18 +19,32 @@ export function mockClaudeJson(payload: unknown): void {
   mockClaudeSuccess(JSON.stringify(payload));
 }
 
-/** Non-200 → code under test should hit its error/fail-safe path. */
+/** `llm.complete` rejects → code under test should hit its error/fail-safe path. */
 export function mockClaudeError(status = 401): void {
-  installFetch(() => ({
-    ok: false,
-    status,
-    json: async () => ({ error: "mocked error" }),
-  }));
+  vi.spyOn(llm, "complete").mockRejectedValue(
+    new Error(`Claude API error: ${status}`)
+  );
 }
 
-/** 200 with unparseable text → parse-failure/fail-safe path. */
+/** Resolves with unparseable text → parse-failure/fail-safe path. */
 export function mockClaudeMalformed(text = "this is not json"): void {
   mockClaudeSuccess(text);
+}
+
+/**
+ * Drives the agentic tool-use loop: `llm.createMessage` returns each supplied
+ * message in order (the last one repeats if the loop asks for more). Pass
+ * tool-use messages followed by a final end_turn text message.
+ */
+export function mockClaudeMessages(
+  messages: Anthropic.Messages.Message[]
+): ReturnType<typeof vi.spyOn> {
+  let i = 0;
+  return vi.spyOn(llm, "createMessage").mockImplementation(async () => {
+    const msg = messages[Math.min(i, messages.length - 1)];
+    i += 1;
+    return msg;
+  });
 }
 
 /** Set a dummy API key for success-path tests. */
@@ -56,8 +57,9 @@ export function clearApiKey(): void {
   vi.stubEnv("ANTHROPIC_API_KEY", "");
 }
 
-/** Restore globals and env stubbed by the helpers above. */
+/** Restore spies and env stubbed by the helpers above. */
 export function restoreClaude(): void {
+  vi.restoreAllMocks();
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 }

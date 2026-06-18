@@ -9,6 +9,7 @@ import { findRestructureOptions } from "./restructure";
 import { computeHorizon } from "./horizon";
 import { evaluateChipInteractions } from "./chip-interaction";
 import { synthesizeRecommendation } from "./synthesis";
+import { synthesizeLongTerm } from "./long-term-synthesis";
 import { detectGameweekFlags } from "../gameweek";
 import { fetchBootstrap, fetchFixtures, buildManagerProfile } from "../fpl-api";
 import { runSquadAnalysisPipeline } from "../pipeline";
@@ -86,19 +87,30 @@ export async function runOptimizerWithContext(
     tripleCaptainAdvice
   );
 
-  const result = await synthesizeRecommendation({
-    analysis,
-    managerProfile,
-    validTransfers,
-    singleResult,
-    hitResult,
-    restructureOptions,
-    horizon,
-    chipRecommendations,
-    freeTransfers,
-  });
+  // Weekly verdict and long-term verdict are two separate LLM calls, run concurrently.
+  const [result, longTermNarrative] = await Promise.all([
+    synthesizeRecommendation({
+      analysis,
+      managerProfile,
+      validTransfers,
+      singleResult,
+      hitResult,
+      restructureOptions,
+      horizon,
+      chipRecommendations,
+      freeTransfers,
+    }),
+    synthesizeLongTerm({
+      horizon,
+      chipRecommendations,
+      restructureOptions,
+      chipsRemaining: analysis.chipsRemaining,
+      currentGw: analysis.currentGw,
+      riskProfile: managerProfile.riskProfile,
+    }),
+  ]);
 
-  return result;
+  return { ...result, longTermNarrative };
 }
 
 export async function runOptimizerPipeline(

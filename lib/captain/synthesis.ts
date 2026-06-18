@@ -4,6 +4,7 @@ import type {
   CaptainCandidate,
 } from "./types";
 import { CAPTAIN_CONFIG } from "../config";
+import { llm } from "../llm/client";
 
 export async function synthesizeCaptainPick(
   inputs: CaptainSynthesisInput
@@ -21,27 +22,7 @@ export async function synthesizeCaptainPick(
 
   try {
     const prompt = buildPrompt(inputs);
-
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 2048,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Claude API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const text = data.content?.[0]?.text ?? "";
+    const text = await llm.complete({ prompt, maxTokens: 2048 });
 
     const parsed = parseResult(text, inputs);
     if (parsed) return parsed;

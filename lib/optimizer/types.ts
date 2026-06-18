@@ -92,6 +92,7 @@ export interface OptimizerResult {
   alerts: string[];
   confidence: "high" | "medium" | "low";
   narrativeSummary: string;
+  longTermNarrative: string | null;
   generatedAt: string;
 }
 

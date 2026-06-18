@@ -23,7 +23,7 @@ export function Header({
   return (
     <header className="bg-[#37003c] text-white">
       {/* Everything centred: team → stats → controls stack on one axis */}
-      <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 py-4 text-center">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-4 py-4 text-center">
         {/* Team / manager */}
         <div className="leading-tight">
           <div className="text-lg font-extrabold">{plan.manager.teamName}</div>
@@ -68,12 +68,13 @@ export function Header({
             ))}
           </div>
           <Button
+            variant="ghost"
             size="sm"
-            className="rounded-full bg-[#00ff87] text-[#37003c] hover:brightness-105"
+            className="rounded-full border border-white/30 text-white hover:bg-white/10"
             onClick={onReanalyze}
             disabled={busy}
           >
-            <RefreshCw className={cn("size-3.5", busy && "animate-spin")} />
+            <RefreshCw className={cn("size-3.5 text-fpl-green", busy && "animate-spin")} />
             Re-analyze
           </Button>
           <Button
