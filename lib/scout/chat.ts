@@ -31,29 +31,42 @@ Current situation: GW${a.currentGw}, £${a.bank.toFixed(1)}m in the bank, ${free
 Be concise and concrete. Reference specific players, gameweeks and numbers. Use plain English, not JSON.`;
 }
 
-function textOf(content: Anthropic.ContentBlock[]): string {
-  return content
-    .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("\n")
-    .trim();
+/**
+ * Stream one round and forward token deltas to `onToken`. Returns the round's
+ * accumulated text and the completed message (for tool-use inspection).
+ */
+async function streamRound(
+  params: Anthropic.Messages.MessageCreateParamsNonStreaming,
+  onToken?: (text: string) => void
+): Promise<{ text: string; message: Anthropic.Messages.Message }> {
+  const { textStream, finalMessage } = llm.stream(params);
+  let text = "";
+  for await (const delta of textStream) {
+    text += delta;
+    onToken?.(delta);
+  }
+  const message = await finalMessage();
+  return { text, message };
 }
 
 /**
- * Runs the stateless agentic tool-use loop for one assistant reply. The full
- * conversation history is supplied by the caller (client-held); grounding comes
- * from the cached `ScoutContext`. Tool errors are fed back as tool results so
- * the model can recover rather than aborting the turn. `onText` receives text
- * as each round produces it, enabling progressive streaming to the client.
+ * Runs the stateless agentic tool-use loop for one assistant reply, streaming
+ * token-by-token. The full conversation history is supplied by the caller
+ * (client-held); grounding comes from the cached `ScoutContext`. Tool errors are
+ * fed back as tool results so the model can recover rather than aborting. Every
+ * round streams via `llm.stream`: `onToken` receives text deltas as they arrive,
+ * `onTool` fires before each tool runs (drives a status chip), then the
+ * completed message is inspected for `tool_use`.
  */
 export async function runScoutConversation(params: {
   sc: ScoutContext;
   freeTransfers: number;
   messages: ScoutTurn[];
-  onText?: (chunk: string) => void;
+  onToken?: (text: string) => void;
+  onTool?: (name: string) => void;
   maxToolRounds?: number;
 }): Promise<ScoutConversationResult> {
-  const { sc, freeTransfers, onText } = params;
+  const { sc, freeTransfers, onToken, onTool } = params;
   const maxRounds = params.maxToolRounds ?? MAX_TOOL_ROUNDS;
   const system = buildSystemPrompt(sc, freeTransfers);
 
@@ -65,33 +78,25 @@ export async function runScoutConversation(params: {
   const toolCalls: string[] = [];
 
   for (let round = 0; round < maxRounds; round++) {
-    const res = await llm.createMessage({
-      model: DEFAULT_MODEL,
-      max_tokens: MAX_TOKENS,
-      system,
-      tools: SCOUT_TOOLS,
-      messages,
-    });
+    const { text, message } = await streamRound(
+      { model: DEFAULT_MODEL, max_tokens: MAX_TOKENS, system, tools: SCOUT_TOOLS, messages },
+      onToken
+    );
 
-    const toolUses = res.content.filter(
+    const toolUses = message.content.filter(
       (b): b is Anthropic.ToolUseBlock => b.type === "tool_use"
     );
 
-    messages.push({ role: "assistant", content: res.content as Anthropic.ContentBlockParam[] });
+    messages.push({ role: "assistant", content: message.content as Anthropic.ContentBlockParam[] });
 
     if (toolUses.length === 0) {
-      const text = textOf(res.content);
-      if (text && onText) onText(text);
-      return { text, toolRounds: round, toolCalls };
+      return { text: text.trim(), toolRounds: round, toolCalls };
     }
-
-    // Stream any interim text the model emitted alongside its tool calls.
-    const interim = textOf(res.content);
-    if (interim && onText) onText(interim);
 
     const toolResults: Anthropic.ToolResultBlockParam[] = [];
     for (const tu of toolUses) {
       toolCalls.push(tu.name);
+      onTool?.(tu.name);
       const result = await runScoutTool(tu.name, tu.input, sc, { freeTransfers });
       toolResults.push({
         type: "tool_result",
@@ -103,15 +108,14 @@ export async function runScoutConversation(params: {
   }
 
   // Round cap hit while still calling tools — force a final answer without tools.
-  const forced = await llm.createMessage({
-    model: DEFAULT_MODEL,
-    max_tokens: MAX_TOKENS,
-    system,
-    messages,
-  });
-  const text =
-    textOf(forced.content) ||
-    "I couldn't fully resolve that — try narrowing the question to one player or transfer.";
-  if (onText) onText(text);
-  return { text, toolRounds: maxRounds, toolCalls };
+  const { text } = await streamRound(
+    { model: DEFAULT_MODEL, max_tokens: MAX_TOKENS, system, messages },
+    onToken
+  );
+  let finalText = text.trim();
+  if (!finalText) {
+    finalText = "I couldn't fully resolve that — try narrowing the question to one player or transfer.";
+    onToken?.(finalText);
+  }
+  return { text: finalText, toolRounds: maxRounds, toolCalls };
 }

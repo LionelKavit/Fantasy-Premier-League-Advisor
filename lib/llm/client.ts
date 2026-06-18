@@ -36,7 +36,31 @@ async function createMessage(
   return client().messages.create(params);
 }
 
+/**
+ * Normalized streaming handle — the small surface the agentic loop and tests
+ * depend on, rather than the SDK's `MessageStream` internals. Iterate
+ * `textStream` for token deltas; `finalMessage()` resolves to the completed
+ * message (including any `tool_use` blocks) once the stream ends.
+ */
+export interface LlmStream {
+  textStream: AsyncIterable<string>;
+  finalMessage: () => Promise<Anthropic.Messages.Message>;
+}
+
+/** Streaming variant of createMessage — adapts the SDK's `messages.stream`. */
+function stream(params: Anthropic.Messages.MessageCreateParamsNonStreaming): LlmStream {
+  const ms = client().messages.stream(params);
+  async function* textDeltas(): AsyncIterable<string> {
+    for await (const event of ms) {
+      if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+        yield event.delta.text;
+      }
+    }
+  }
+  return { textStream: textDeltas(), finalMessage: () => ms.finalMessage() };
+}
+
 // Exported as a single object so call-sites use `llm.complete(...)` and tests
 // can reliably `vi.spyOn(llm, "complete")` (a plain object property, no ESM
 // live-binding caveats).
-export const llm = { complete, createMessage, hasApiKey, DEFAULT_MODEL };
+export const llm = { complete, createMessage, stream, hasApiKey, DEFAULT_MODEL };

@@ -11,12 +11,13 @@ import { ScoutVerdict } from "@/components/panel/ScoutVerdict";
 import { AlertsCard } from "@/components/panel/AlertsCard";
 import { ThisWeekDetail } from "@/components/panel/ThisWeekDetail";
 import { LongTermDetail } from "@/components/panel/LongTermDetail";
+import { AskTheScout } from "@/components/panel/AskTheScout";
 import { Skeleton } from "@/components/states/Skeleton";
 import { ErrorCard } from "@/components/states/ErrorCard";
-import { cn } from "@/lib/utils";
+import type { AskMessage } from "@/lib/client/ask";
 
 type Status = "idle" | "loading" | "loaded" | "error";
-type Lens = "this-week" | "long-term";
+type Lens = "this-week" | "long-term" | "ask";
 
 const tabTrigger =
   "flex-1 whitespace-nowrap rounded-md px-2 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground data-[selected]:bg-fpl-green data-[selected]:text-fpl-purple disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-muted-foreground";
@@ -30,12 +31,14 @@ export default function Home() {
   const [plan, setPlan] = useState<GameweekPlan | null>(null);
   const [error, setError] = useState("");
   const [lens, setLens] = useState<Lens>("this-week");
+  const [chat, setChat] = useState<AskMessage[]>([]);
 
   const load = useCallback(async (id: string, ft: number) => {
     setManagerId(id);
     setFreeTransfers(ft);
     setStatus("loading");
     setError("");
+    setChat([]); // new analysis → fresh conversation (grounding context changed)
     try {
       const result = await fetchPlan(id, ft);
       setPlan(result);
@@ -118,7 +121,7 @@ export default function Home() {
         {/* Left: pitch + tab-aware prose + pinned alerts */}
         <div className="flex flex-col gap-4">
           <Pitch squad={plan.squad} transferOutIds={transferOutIds} />
-          <ScoutVerdict plan={plan} tab={lens} />
+          <ScoutVerdict plan={plan} tab={lens === "long-term" ? "long-term" : "this-week"} />
           <AlertsCard plan={plan} />
         </div>
 
@@ -135,14 +138,22 @@ export default function Home() {
               <TabsTrigger value="long-term" className={tabTrigger}>
                 Long Term
               </TabsTrigger>
-              <TabsTrigger value="ask" disabled className={cn(tabTrigger, "flex items-center justify-center gap-1")}>
+              <TabsTrigger value="ask" className={tabTrigger}>
                 Ask The Scout
-                <span className="rounded bg-muted px-1 text-[8px] uppercase tracking-wide">soon</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
 
-          {lens === "this-week" ? <ThisWeekDetail plan={plan} /> : <LongTermDetail plan={plan} />}
+          {lens === "this-week" && <ThisWeekDetail plan={plan} />}
+          {lens === "long-term" && <LongTermDetail plan={plan} />}
+          {lens === "ask" && (
+            <AskTheScout
+              teamId={Number(managerId)}
+              freeTransfers={freeTransfers}
+              messages={chat}
+              onMessagesChange={setChat}
+            />
+          )}
         </div>
       </div>
     </main>

@@ -1,7 +1,9 @@
+import { vi } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import type { AnalysisContext } from "../../plan/types";
 import type { ScoutContext } from "../../scout/context";
 import { buildScoutContext } from "../../scout/context";
+import { llm } from "../../llm/client";
 import {
   makeSquad,
   makePlayer,
@@ -85,4 +87,34 @@ function msg(
     stop_sequence: null,
     usage: { input_tokens: 1, output_tokens: 1 },
   } as unknown as Anthropic.Messages.Message;
+}
+
+export interface ScoutRound {
+  text?: string;
+  toolUses?: { id: string; name: string; input: Record<string, unknown> }[];
+}
+
+/**
+ * Spy on `llm.stream`, returning each round in turn (the last repeats). Each
+ * round yields its `text` in word-sized deltas, then resolves a final message
+ * carrying the text + any `tool_use` blocks — the normalized `{ textStream,
+ * finalMessage }` shape `runScoutConversation` consumes.
+ */
+export function mockScoutStream(rounds: ScoutRound[]): ReturnType<typeof vi.spyOn> {
+  let i = 0;
+  return vi.spyOn(llm, "stream").mockImplementation(() => {
+    const round = rounds[Math.min(i, rounds.length - 1)];
+    i += 1;
+    const text = round.text ?? "";
+    const content: Anthropic.ContentBlock[] = [];
+    if (text) content.push({ type: "text", text, citations: null } as Anthropic.TextBlock);
+    for (const tu of round.toolUses ?? []) {
+      content.push({ type: "tool_use", id: tu.id, name: tu.name, input: tu.input } as Anthropic.ToolUseBlock);
+    }
+    const final = msg(content, round.toolUses?.length ? "tool_use" : "end_turn");
+    async function* textStream(): AsyncIterable<string> {
+      for (const chunk of text.match(/\S+\s*/g) ?? []) yield chunk; // word-sized deltas
+    }
+    return { textStream: textStream(), finalMessage: async () => final };
+  });
 }
