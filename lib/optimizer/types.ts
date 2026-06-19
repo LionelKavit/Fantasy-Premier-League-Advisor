@@ -25,12 +25,17 @@ export interface TransferAction {
   breakEvenGw: number | null;
 }
 
+export type TransferHoldReason = "ep_unavailable" | "below_threshold" | "no_valid_targets";
+
 export interface SingleTransferResult {
   bestSingle: ValidTransfer | null;
   bestSecond: ValidTransfer | null;
   alternatives: ValidTransfer[];
   savingsOption: ValidTransfer | null;
   rollReason: string | null;
+  // Typed reason when no transfer is recommended (null when one is). Drives the
+  // deterministic ep-unavailable notice (transfer-ep-notice).
+  holdReason: TransferHoldReason | null;
 }
 
 export interface HitRecommendation {
@@ -94,6 +99,9 @@ export interface OptimizerResult {
   narrativeSummary: string;
   longTermNarrative: string | null;
   generatedAt: string;
+  // Deterministic, code-authored notice (not LLM) — set when transfers are held
+  // because ep_next is unavailable (transfer-ep-notice). Null in normal operation.
+  dataNotice: string | null;
 }
 
 export interface SynthesisInput {

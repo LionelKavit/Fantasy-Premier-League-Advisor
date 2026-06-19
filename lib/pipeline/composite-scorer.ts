@@ -13,6 +13,7 @@ import {
   NORMALIZATION_BOUNDS,
   PIPELINE_CONFIG,
   OPPONENT_ABSENCE_MULTIPLIER,
+  COMPOSITE_SQUASH,
 } from "../config";
 
 // Market signals are stored on ScoredPlayer for the synthesis/optimizer nodes but do not
@@ -39,6 +40,10 @@ export function computeCompositeScore(
   }
 
   const signalMap = buildSignalMap(stats, fixture, position);
+  // Anchor the composite on FPL's epNext (the backtest's dominant signal): inject
+  // it as a weighted category so the loop below includes it. `epNextSignal` already
+  // falls back to a neutral 0.5 when `ep_next` is null.
+  signalMap.epNext = market.epNextSignal;
   const weights = SCORING_WEIGHTS[position];
 
   const breakdown: Record<string, number> = {};
@@ -67,10 +72,11 @@ export function computeCompositeScore(
 
   const suspensionPenalty = stats.suspensionRisk * 0.05;
 
-  const total = Math.max(
-    0,
-    Math.min(1, baseScore + trendAdjustment + llmAdjustment - suspensionPenalty)
-  );
+  // Strictly-monotonic logistic squash (replaces the old hard clamp): keeps the full
+  // ranking of the signed-weighted raw score — no clamp-ties — while mapping to (0,1)
+  // for the "/10" display and downstream [0,1] consumers.
+  const raw = baseScore + trendAdjustment + llmAdjustment - suspensionPenalty;
+  const total = 1 / (1 + Math.exp(-(raw - COMPOSITE_SQUASH.center) / COMPOSITE_SQUASH.scale));
 
   return {
     total,
@@ -82,7 +88,9 @@ export function computeCompositeScore(
   };
 }
 
-function buildSignalMap(
+// Exported for the offline weight-training pipeline (composite-weight-training):
+// it needs the exact normalized signal-map values the weights multiply.
+export function buildSignalMap(
   stats: StatisticalSignals,
   fixture: FixtureSignals,
   position: Position

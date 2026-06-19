@@ -53,10 +53,12 @@ describe("validateTransfer", () => {
   });
 });
 
+// Set epNext so the projected-points edge (Δep) equals gw1 — the transfer-hold gate is
+// denominated in ep_next, so the test's gain doubles as the points edge it must clear.
 function vt(weakId: number, candId: number, gw1: number, gw5 = gw1, priceDelta = 0): ValidTransfer {
   return {
-    weakPlayer: makeScoredPlayer({ player: { id: weakId, webName: `W${weakId}` } }),
-    candidate: makeScoredPlayer({ player: { id: candId, webName: `C${candId}` } }),
+    weakPlayer: makeScoredPlayer({ player: { id: weakId, webName: `W${weakId}`, epNext: 2 } }),
+    candidate: makeScoredPlayer({ player: { id: candId, webName: `C${candId}`, epNext: 2 + gw1 } }),
     priceDelta,
     gw1Gain: gw1,
     gw5Gain: gw5,
@@ -73,10 +75,41 @@ describe("evaluateSingleTransfer", () => {
     expect(r.rollReason).toMatch(/no valid transfer targets/i);
   });
 
-  it("recommends ROLL when all gains are non-positive", () => {
+  it("recommends ROLL when no transfer clears the projected-points bar", () => {
+    // Best Δep is 0 (< the 1.5-pt free-transfer bar) → hold.
     const r = evaluateSingleTransfer([vt(1, 2, 0), vt(3, 4, -1)], mp, 1);
     expect(r.bestSingle).toBeNull();
-    expect(r.rollReason).toMatch(/no transfer improves/i);
+    expect(r.rollReason).toMatch(/below the .*bar/i);
+  });
+
+  it("recommends ROLL when a free transfer's edge is positive but below the bar", () => {
+    // Δep +1.0 beats holding in expectation but not the ~1.5-pt free-transfer opportunity cost.
+    const r = evaluateSingleTransfer([vt(1, 2, 1.0)], mp, 1);
+    expect(r.bestSingle).toBeNull();
+    expect(r.rollReason).toMatch(/below the .*free-transfer bar/i);
+  });
+
+  it("requires a hit transfer to out-project its 4-pt cost", () => {
+    // freeTransfers=0 → any move is a hit. Δep +3 < 4 → hold; Δep +5 > 4 → go.
+    expect(evaluateSingleTransfer([vt(1, 2, 3)], mp, 0).bestSingle).toBeNull();
+    expect(evaluateSingleTransfer([vt(1, 2, 5)], mp, 0).bestSingle?.candidate.player.id).toBe(2);
+  });
+
+  it("sets a typed holdReason for each hold path (transfer-ep-notice)", () => {
+    // recommended → null
+    expect(evaluateSingleTransfer([vt(1, 2, 5)], mp, 1).holdReason).toBeNull();
+    // below the bar → 'below_threshold'
+    expect(evaluateSingleTransfer([vt(1, 2, 1.0)], mp, 1).holdReason).toBe("below_threshold");
+    // no targets → 'no_valid_targets'
+    expect(evaluateSingleTransfer([], mp, 1).holdReason).toBe("no_valid_targets");
+    // ep_next missing on the best transfer → 'ep_unavailable'
+    const epNull: ValidTransfer = {
+      ...vt(1, 2, 5),
+      candidate: makeScoredPlayer({ player: { id: 2, webName: "C2", epNext: null } }),
+    };
+    const r = evaluateSingleTransfer([epNull], mp, 1);
+    expect(r.bestSingle).toBeNull();
+    expect(r.holdReason).toBe("ep_unavailable");
   });
 
   it("picks the best by gw1Gain with up to 3 alternatives", () => {
@@ -108,8 +141,8 @@ describe("evaluateSingleTransfer", () => {
   it("unlocks a second transfer using budget freed by the first (cascade)", () => {
     // Best single sells a £9.0m player for a £6.0m one → frees £3.0m.
     const bestSingle: ValidTransfer = {
-      weakPlayer: makeScoredPlayer({ player: { id: 1, teamId: 1, price: 9.0 } }),
-      candidate: makeScoredPlayer({ total: 0.8, player: { id: 2, teamId: 2, price: 6.0 } }),
+      weakPlayer: makeScoredPlayer({ player: { id: 1, teamId: 1, price: 9.0, epNext: 2 } }),
+      candidate: makeScoredPlayer({ total: 0.8, player: { id: 2, teamId: 2, price: 6.0, epNext: 8 } }),
       priceDelta: -3.0, gw1Gain: 5, gw5Gain: 5, scoreDiffPct: 50,
     };
     // Weak B's only target (£9.0m) is over budget at bank £1.0m, but affordable

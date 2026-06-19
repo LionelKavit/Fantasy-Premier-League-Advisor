@@ -8,6 +8,14 @@ import type {
 } from "./types";
 import { llm } from "../llm/client";
 
+// Deterministic, code-authored notice (transfer-ep-notice) — surfaced when the optimizer
+// held transfers because ep_next is unavailable, independent of the LLM narrative.
+const EP_UNAVAILABLE_NOTICE =
+  "Transfer recommendations are paused — FPL hasn't published expected points (ep_next) for the upcoming gameweek yet. They'll resume once projections are available.";
+function epDataNotice(singleResult: SingleTransferResult): string | null {
+  return singleResult.holdReason === "ep_unavailable" ? EP_UNAVAILABLE_NOTICE : null;
+}
+
 export async function synthesizeRecommendation(
   inputs: SynthesisInput
 ): Promise<OptimizerResult> {
@@ -205,6 +213,7 @@ function parseOptimizerResult(
       narrativeSummary: raw.narrativeSummary,
       longTermNarrative: null, // set by runOptimizerWithContext (parallel call)
       generatedAt: new Date().toISOString(),
+      dataNotice: epDataNotice(inputs.singleResult),
     };
   } catch {
     return null;
@@ -354,5 +363,6 @@ function buildFailSafe(inputs: SynthesisInput): OptimizerResult {
       "Automated recommendation without AI synthesis. Review manually.",
     longTermNarrative: null, // set by runOptimizerWithContext (parallel call)
     generatedAt: new Date().toISOString(),
+    dataNotice: epDataNotice(singleResult),
   };
 }

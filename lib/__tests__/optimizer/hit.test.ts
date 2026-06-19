@@ -20,7 +20,7 @@ function vt(weakId: number, candId: number, gw1: number, o: VtOpts = {}): ValidT
 }
 
 const noSingle: SingleTransferResult = {
-  bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null,
+  bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null, holdReason: null,
 };
 const counts = (m: Record<number, number> = {}) => new Map<number, number>(Object.entries(m).map(([k, v]) => [Number(k), v]));
 

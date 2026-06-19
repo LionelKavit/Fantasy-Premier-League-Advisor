@@ -17,7 +17,7 @@ import {
 import { stubApiKey, clearApiKey, mockClaudeMalformed, mockClaudeJson, restoreClaude } from "../mock-claude";
 
 const positions: Position[] = ["GK", "DEF", "MID", "FWD"];
-const noSingle: SingleTransferResult = { bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null };
+const noSingle: SingleTransferResult = { bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null, holdReason: null };
 const noHit: HitTransferResult = { singleHit: null, doubleHit: null };
 const counts = () => new Map<number, number>();
 

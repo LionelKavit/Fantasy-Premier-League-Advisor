@@ -1,6 +1,6 @@
 import type { GameweekPlan } from "@/lib/plan/types";
 import type { TransferAction, RestructureOption } from "@/lib/optimizer/types";
-import { ArrowRight, Crown, Repeat, Coins } from "lucide-react";
+import { ArrowRight, Crown, Repeat, Coins, Info } from "lucide-react";
 import { Section, ConfidenceBadge } from "./parts";
 import { CaptainRanking } from "./CaptainRanking";
 
@@ -58,6 +58,13 @@ export function ThisWeekDetail({ plan }: { plan: GameweekPlan }) {
               </span>
               <ConfidenceBadge confidence={transfers.confidence} />
             </div>
+            {/* Deterministic notice when transfers are held for missing ep_next (transfer-ep-notice) */}
+            {transfers.dataNotice && (
+              <p className="flex items-start gap-1.5 rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-xs text-amber-300">
+                <Info className="mt-0.5 size-3.5 shrink-0" />
+                <span>{transfers.dataNotice}</span>
+              </p>
+            )}
             {transfers.primaryRecommendation.transfers.map((t, i) => (
               <TransferLine key={i} out={t.weakPlayer.player.webName} inn={t.candidate.player.webName} />
             ))}

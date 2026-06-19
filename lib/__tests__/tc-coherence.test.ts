@@ -35,6 +35,7 @@ const emptySingle: SingleTransferResult = {
   alternatives: [],
   savingsOption: null,
   rollReason: null,
+  holdReason: null,
 };
 const emptyHit: HitTransferResult = { singleHit: null, doubleHit: null };
 

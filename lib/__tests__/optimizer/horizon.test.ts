@@ -10,15 +10,21 @@ const runFixtures = (gws: number[]) =>
 // Candidate clearly stronger than the weak player, both on team 1 (identical
 // fixtures), so the gain is positive every gameweek → BUY_NOW.
 function buyNowTransfer(): ValidTransfer {
+  // The data-fit composite is dominated by FPL's `epNext` projection, so a
+  // "clearly stronger" candidate is one that projects more points: high epNext +
+  // strong form, low price. (Raw goalThreat/bonus/value carry negative weights —
+  // they're per-point overvaluation corrections, not strength signals.)
   const candidate = makeScoredPlayer({
     total: 0.8,
     player: { id: 1, teamId: 1, minutes: 2000 },
-    statisticalSignals: makeStatisticalSignals({ goalThreat: 0.8, assistPotential: 0.5, formSignal: 9, bonusEfficiency: 30, valueScore: 1.2 }),
+    statisticalSignals: makeStatisticalSignals({ formSignal: 9, valueScore: 0.4 }),
+    marketSignals: { epNextSignal: 0.9 },
   });
   const weakPlayer = makeScoredPlayer({
     total: 0.3,
     player: { id: 2, teamId: 1, minutes: 2000 },
-    statisticalSignals: makeStatisticalSignals({ goalThreat: 0.01, assistPotential: 0.01, formSignal: 1, bonusEfficiency: 2, valueScore: 0.2 }),
+    statisticalSignals: makeStatisticalSignals({ formSignal: 1, valueScore: 0.4 }),
+    marketSignals: { epNextSignal: 0.1 },
   });
   return { weakPlayer, candidate, priceDelta: 0.5, gw1Gain: 0.5, gw5Gain: 0.5, scoreDiffPct: 50 };
 }

@@ -16,7 +16,7 @@ const rising: ValidTransfer = {
   priceDelta: 0, gw1Gain: 1, gw5Gain: 1, scoreDiffPct: 10,
 };
 const singleResult: SingleTransferResult = {
-  bestSingle: rising, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null,
+  bestSingle: rising, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null, holdReason: null,
 };
 const hitResult: HitTransferResult = { singleHit: null, doubleHit: null };
 
@@ -152,7 +152,7 @@ describe("synthesizeRecommendation — fail-safe", () => {
   it("recommends ROLL in the fail-safe when there is no best single", async () => {
     clearApiKey();
     const input = makeInput();
-    input.singleResult = { bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: "roll" };
+    input.singleResult = { bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: "roll", holdReason: null };
     const r = await synthesizeRecommendation(input);
     expect(r.primaryRecommendation.type).toBe("ROLL");
   });

@@ -2,6 +2,7 @@ import type { ManagerProfile } from "../types";
 import type { SquadAnalysisResult } from "../pipeline/types";
 import type { ValidTransfer, SingleTransferResult } from "./types";
 import { validateTransfer } from "./setup";
+import { TRANSFER_THRESHOLDS } from "../config";
 
 export function evaluateSingleTransfer(
   validTransfers: ValidTransfer[],
@@ -19,6 +20,7 @@ export function evaluateSingleTransfer(
       savingsOption: null,
       rollReason:
         "No valid transfer targets available within budget and squad constraints.",
+      holdReason: "no_valid_targets",
     };
   }
 
@@ -27,18 +29,37 @@ export function evaluateSingleTransfer(
     return b.gw5Gain - a.gw5Gain;
   });
 
-  const allNegative = sorted[0].gw1Gain <= 0;
-  if (allNegative) {
+  // Transfer-vs-hold gate (transfer-hold-threshold): only recommend the top transfer if its
+  // projected points gain clears the bar — a hit must beat its 4-pt cost; a free move must
+  // beat the free-transfer opportunity cost. Composite gw1Gain is a squashed 0–1 score with
+  // no "worth it" line, so the decision is denominated in `ep_next` (expected points). When
+  // ep_next is unavailable we HOLD — transfers chosen on the composite alone are negative-EV
+  // (squad-eval calibration), so we don't spend a transfer without FPL's projection.
+  const best = sorted[0];
+  const inEp = best.candidate.player.epNext;
+  const outEp = best.weakPlayer.player.epNext;
+  const deltaEp = inEp !== null && outEp !== null ? inEp - outEp : null;
+  const needsHit = freeTransfers < 1;
+  const epBar = needsHit ? TRANSFER_THRESHOLDS.hitCostEp : TRANSFER_THRESHOLDS.freeTransferEp;
+  const clearsThreshold = deltaEp !== null && deltaEp > epBar;
+
+  if (!clearsThreshold) {
+    const banked = freeTransfers + 1 > 2 ? 2 : freeTransfers + 1;
+    const reason =
+      deltaEp !== null
+        ? `Best available upgrade projects +${deltaEp.toFixed(1)} pts — below the ${epBar}-pt ${needsHit ? "hit" : "free-transfer"} bar to spend a transfer.`
+        : `No ep_next projection available to justify a transfer (composite alone doesn't reliably rank transfers).`;
     return {
       bestSingle: null,
       bestSecond: null,
       alternatives: [],
       savingsOption: findSavingsOption(validTransfers),
-      rollReason: `No transfer improves the current GW projection. Rolling transfer to bank ${freeTransfers + 1 > 2 ? 2 : freeTransfers + 1} free transfers next week.`,
+      rollReason: `${reason} Rolling to bank ${banked} free transfers next week.`,
+      holdReason: deltaEp === null ? "ep_unavailable" : "below_threshold",
     };
   }
 
-  const bestSingle = sorted[0];
+  const bestSingle = best;
   const alternatives = sorted.slice(1, 4);
 
   let bestSecond: ValidTransfer | null = null;
@@ -54,7 +75,7 @@ export function evaluateSingleTransfer(
 
   const savingsOption = findSavingsOption(validTransfers);
 
-  return { bestSingle, bestSecond, alternatives, savingsOption, rollReason: null };
+  return { bestSingle, bestSecond, alternatives, savingsOption, rollReason: null, holdReason: null };
 }
 
 function findBestSecond(
