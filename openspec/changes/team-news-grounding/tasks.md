@@ -32,3 +32,18 @@
 - [x] Source: **AllAboutFPL** (free, text-based). FFHub (membership-gated) and FFScout (image-based lineups) evaluated and excluded — no usable public text.
 - [ ] Add one more free, text-based predicted-lineup source for redundancy (AllAboutFPL is currently a single point of failure).
 - [ ] Fetch cadence (pre-deadline cron vs manual) — out of scope to build here; note the choice.
+
+---
+
+## As-built outcome (run 2026-06-19)
+
+**Implemented:**
+- `lib/news/team-news.ts` — AllAboutFPL adapter (discovers the GW post from the category index → fetches), `extractArticleText` (slices to the WordPress `entry-content` body, dodging the ~155K chars of leading nav/trending boilerplate), a hardened **compact** extraction pass (treats page text as untrusted data), FPL name→id matching (accents, initials, last-name), GW-keyed TTL cache, and `getCachedTeamNews` that degrades to `undefined` on any failure.
+- `lib/pipeline/llm-context.ts` — optional `teamNews` param; enriches the prompt with `predictedStart`/`teamNewsNote`; **anchors `rotationRisk = 1 − startProbability`** when present.
+- `lib/pipeline/index.ts` — fetches team news once per analysis and threads it in.
+
+**Verified:**
+- Unit: 8 tests (htmlToText, name-matching incl. accents/initials/cross-team, degradation w/o API key, lookup). Full suite **195 pass**.
+- **Real end-to-end smoke** on the archived GW20 AllAboutFPL post: all **20 teams matched**, accurate (Arsenal: Raya 90% starter, Calafiori 5% out, Gabriel 50% doubt), accented names (Ødegaard, Buendía) matched. Two bugs found+fixed via the smoke: (1) naive strip captured only nav boilerplate → fixed with `entry-content` slicing; (2) verbose 20-XI JSON blew the token budget → fixed with a compact surname-array schema.
+- No regression: base API serves cleanly, no console errors; the news layer correctly degrades to `undefined` in the offseason (no current-GW post). `tsc` / `eslint` 0 / `next build` clean.
+- The grounded-vs-floor lift is measurable via `squad-eval-captain-live` once live.

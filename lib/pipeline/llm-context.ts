@@ -2,6 +2,7 @@ import type { Player, TeamSetPieceNotes } from "../types";
 import type { LlmContextSignals } from "./types";
 import { LLM_SIGNAL_RANGES } from "../config";
 import { llm } from "../llm/client";
+import { playerNews, type TeamNews } from "../news/team-news";
 
 const DEFAULT_SIGNALS: LlmContextSignals = {
   rotationRisk: 0,
@@ -19,7 +20,8 @@ const DEFAULT_SIGNALS: LlmContextSignals = {
 export async function batchComputeLlmContext(
   players: Player[],
   teamSetPieceNotes: TeamSetPieceNotes[],
-  opponentPlayers: Player[]
+  opponentPlayers: Player[],
+  teamNews?: Map<number, TeamNews>
 ): Promise<Map<number, LlmContextSignals>> {
   const result = new Map<number, LlmContextSignals>();
 
@@ -65,6 +67,8 @@ export async function batchComputeLlmContext(
         }
       }
 
+      const tn = playerNews(teamNews, p.teamId, p.id);
+
       return {
         id: p.id,
         name: p.webName,
@@ -76,6 +80,9 @@ export async function batchComputeLlmContext(
         news: p.availability.news || "None",
         status: p.availability.status,
         chanceOfPlayingNext: p.availability.chanceOfPlayingNext,
+        // Grounded team news (team-news-grounding) — real predicted-lineup signal.
+        predictedStart: tn ? `${(tn.startProbability * 100).toFixed(0)}% (${tn.status})` : "unknown",
+        teamNewsNote: tn?.note || "None",
         setPieceNotes: teamNotes.join("; ") || "No notes",
         goalsScored: p.goalsScored,
         expectedGoals: p.expectedGoals,
@@ -97,6 +104,17 @@ export async function batchComputeLlmContext(
     for (const p of players) {
       if (!result.has(p.id)) result.set(p.id, { ...DEFAULT_SIGNALS });
     }
+
+    // Anchor rotationRisk on the grounded start probability (team-news-grounding):
+    // it is the most reliable, directly-sourced value, so it overrides the LLM's guess.
+    if (teamNews) {
+      for (const p of players) {
+        const tn = playerNews(teamNews, p.teamId, p.id);
+        if (!tn) continue;
+        const sig = result.get(p.id)!;
+        sig.rotationRisk = clamp(1 - tn.startProbability, ...LLM_SIGNAL_RANGES.rotationRisk);
+      }
+    }
   } catch (error) {
     console.error("[llm-context] API call failed, using defaults:", error);
     for (const p of players) result.set(p.id, { ...DEFAULT_SIGNALS });
@@ -117,6 +135,8 @@ function buildPrompt(
     news: string;
     status: string;
     chanceOfPlayingNext: number | null;
+    predictedStart: string;
+    teamNewsNote: string;
     setPieceNotes: string;
     goalsScored: number;
     expectedGoals: number;
@@ -128,7 +148,7 @@ function buildPrompt(
   const playerList = players
     .map(
       (p) =>
-        `- ID:${p.id} ${p.name} (${p.position}, ${p.team}): starts=${p.starts}, mins=${p.minutes}, form=${p.form}, news="${p.news}", status=${p.status}, chanceNext=${p.chanceOfPlayingNext ?? "null"}, setPieces="${p.setPieceNotes}", goals=${p.goalsScored}, xG=${p.expectedGoals}, threat=${p.threat}, creativity=${p.creativity}, opponentInjuries="${p.opponentInjuries}"`
+        `- ID:${p.id} ${p.name} (${p.position}, ${p.team}): starts=${p.starts}, mins=${p.minutes}, form=${p.form}, news="${p.news}", status=${p.status}, chanceNext=${p.chanceOfPlayingNext ?? "null"}, predictedStart=${p.predictedStart}, teamNews="${p.teamNewsNote}", setPieces="${p.setPieceNotes}", goals=${p.goalsScored}, xG=${p.expectedGoals}, threat=${p.threat}, creativity=${p.creativity}, opponentInjuries="${p.opponentInjuries}"`
     )
     .join("\n");
 

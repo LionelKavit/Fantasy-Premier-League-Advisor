@@ -14,6 +14,7 @@ import { computeTrendSignals } from "./trend-analyzer";
 import { computeFixtureSignals } from "./fixture-analyzer";
 import { computeMarketSignals } from "./market-dynamics";
 import { batchComputeLlmContext } from "./llm-context";
+import { getCachedTeamNews } from "../news/team-news";
 import { computeCompositeScore } from "./composite-scorer";
 import { rankSquad, identifyWeakest3, findCandidates } from "./squad-ranker";
 
@@ -76,11 +77,14 @@ export async function runSquadAnalysisPipeline(
 
   const allSquadAndCandidates = [...squadPlayers, ...candidatePool];
 
-  // Step 7: LLM context (batched)
+  // Step 7: LLM context (batched), grounded in real team news (team-news-grounding).
+  // News fetch degrades to undefined on any failure — strictly additive.
+  const teamNews = await getCachedTeamNews(currentGw, players, teams);
   const llmResults = await batchComputeLlmContext(
     allSquadAndCandidates,
     setPieceNotes,
-    players
+    players,
+    teamNews
   );
 
   // Step 8: Score squad players
