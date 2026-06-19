@@ -1,22 +1,87 @@
-import type { GameweekPlan, SquadPlayerView, AnalysisContext } from "./types";
+import type { GameweekPlan, SquadPlayerView, AnalysisContext, PlanInsights } from "./types";
 import type { CaptainSynthesisInput, CaptainResult } from "../captain/types";
-import { buildAnalysisContext } from "./context";
+import { getCachedAnalysisContext, buildLiteBaseContext } from "./context";
 import { runOptimizerWithContext } from "../optimizer";
 import { computeCaptainSynthesisInput } from "../captain";
 import { synthesizeCaptainPick } from "../captain/synthesis";
+import { CAPTAIN_CONFIG } from "../config";
 
-export async function runGameweekPlan(
+export interface PlanOptions {
+  freeTransfers: number;
+  captainHorizon?: number;
+}
+
+// ── Phase 1: base (deterministic, no LLM) ────────────────────────────────────
+// Everything the pitch needs — squad, meta, and the deterministic captain/vice
+// for the armband — without waiting on any synthesis. Fast (instant on a cached
+// context). `transfers`/`captaincy` are left null and filled by the insights
+// phase; the type already allows that.
+export async function runGameweekPlanBase(
   teamId: number,
-  options: { freeTransfers: number; captainHorizon?: number }
+  options: PlanOptions
 ): Promise<GameweekPlan> {
-  // One shared analysis pass — the expensive squad scoring runs once.
-  const ctx = await buildAnalysisContext(teamId);
+  const ctx = await buildLiteBaseContext(teamId);
+  const { captainId, viceId } = deterministicCaptainIds(ctx, options.captainHorizon);
+  const entry = ctx.managerProfile.entry;
 
+  return {
+    teamId,
+    currentGw: ctx.analysis.currentGw,
+    transfers: null,
+    captaincy: null,
+    squad: buildSquadView(ctx, { captainId, viceId }),
+    bank: ctx.analysis.bank,
+    chipsRemaining: ctx.analysis.chipsRemaining,
+    manager: {
+      name: `${entry.playerFirstName} ${entry.playerLastName}`.trim(),
+      overallRank: entry.summaryOverallRank,
+      teamName: entry.name,
+    },
+    alerts: [],
+    generatedAt: new Date().toISOString(),
+  };
+}
+
+// ── Phase 2: insights (the LLM syntheses) ────────────────────────────────────
+interface InsightsCacheEntry {
+  promise: Promise<PlanInsights>;
+  ts: number;
+}
+const INSIGHTS_TTL_MS = 10 * 60 * 1000;
+const insightsCache = new Map<string, InsightsCacheEntry>();
+
+export async function runGameweekPlanInsights(
+  teamId: number,
+  options: PlanOptions,
+  opts: { force?: boolean } = {}
+): Promise<PlanInsights> {
+  const ctx = await getCachedAnalysisContext(teamId);
+  const horizon = options.captainHorizon ?? CAPTAIN_CONFIG.horizonLengthDefault;
+  const key = `${teamId}:${ctx.analysis.currentGw}:${options.freeTransfers}:${horizon}`;
+
+  if (!opts.force) {
+    const hit = insightsCache.get(key);
+    if (hit && Date.now() - hit.ts < INSIGHTS_TTL_MS) return hit.promise;
+  }
+
+  const promise = computeInsights(ctx, options);
+  insightsCache.set(key, { promise, ts: Date.now() });
+  try {
+    return await promise;
+  } catch (e) {
+    insightsCache.delete(key); // don't cache failures
+    throw e;
+  }
+}
+
+// The LLM half: captain's deterministic phase (for TC advice), then the two
+// syntheses fanned out, with per-side failure isolation.
+async function computeInsights(
+  ctx: AnalysisContext,
+  options: PlanOptions
+): Promise<PlanInsights> {
   const alerts: string[] = [];
 
-  // Captain's deterministic phase (no LLM) runs first so its authoritative
-  // triple-captain advice can be injected into the optimizer's chip node.
-  // Guard it: a failure here must not kill the transfer side.
   let captainInput: CaptainSynthesisInput | null = null;
   try {
     captainInput = computeCaptainSynthesisInput(ctx, options.captainHorizon);
@@ -24,9 +89,6 @@ export async function runGameweekPlan(
     alerts.push(`Captain pipeline failed: ${errMsg(e)}`);
   }
 
-  // Fan out the two LLM syntheses concurrently; isolate per-side failures.
-  // The optimizer chip node defers to the captain's TC advice (coherence),
-  // while both expensive calls still overlap (parallelism).
   const [optSettled, capSettled] = await Promise.allSettled([
     runOptimizerWithContext(
       ctx,
@@ -38,8 +100,7 @@ export async function runGameweekPlan(
       : Promise.reject(new Error("captain deterministic phase failed")),
   ]);
 
-  const transfers =
-    optSettled.status === "fulfilled" ? optSettled.value : null;
+  const transfers = optSettled.status === "fulfilled" ? optSettled.value : null;
   if (optSettled.status === "rejected") {
     alerts.push(`Transfer optimizer failed: ${errMsg(optSettled.reason)}`);
   }
@@ -48,19 +109,36 @@ export async function runGameweekPlan(
   if (capSettled.status === "fulfilled") {
     captaincy = capSettled.value;
   } else if (captainInput) {
-    // Only alert here if the deterministic phase succeeded but synthesis failed;
-    // a deterministic-phase failure was already recorded above.
     alerts.push(`Captain pipeline failed: ${errMsg(capSettled.reason)}`);
   }
 
-  const entry = ctx.managerProfile.entry;
+  return { transfers, captaincy, alerts };
+}
 
+// ── Merged plan (back-compat) ────────────────────────────────────────────────
+// Same full `GameweekPlan` as before — built from the FULL cached context (not
+// the lightweight base), so the squad is full-scored and the armband reflects
+// the (possibly LLM-refined) captaincy.
+export async function runGameweekPlan(
+  teamId: number,
+  options: PlanOptions
+): Promise<GameweekPlan> {
+  const insights = await runGameweekPlanInsights(teamId, options);
+  const ctx = await getCachedAnalysisContext(teamId); // cache hit (insights built it)
+
+  const captainId = insights.captaincy?.captain.player.player.id ?? null;
+  const viceId = insights.captaincy?.viceCaptain?.player.player.id ?? null;
+  const ids = captainId
+    ? { captainId, viceId }
+    : deterministicCaptainIds(ctx, options.captainHorizon);
+
+  const entry = ctx.managerProfile.entry;
   return {
     teamId,
     currentGw: ctx.analysis.currentGw,
-    transfers,
-    captaincy,
-    squad: buildSquadView(ctx, captaincy),
+    transfers: insights.transfers,
+    captaincy: insights.captaincy,
+    squad: buildSquadView(ctx, ids),
     bank: ctx.analysis.bank,
     chipsRemaining: ctx.analysis.chipsRemaining,
     manager: {
@@ -68,9 +146,25 @@ export async function runGameweekPlan(
       overallRank: entry.summaryOverallRank,
       teamName: entry.name,
     },
-    alerts,
+    alerts: insights.alerts,
     generatedAt: new Date().toISOString(),
   };
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function deterministicCaptainIds(
+  ctx: AnalysisContext,
+  horizon: number | undefined
+): { captainId: number | null; viceId: number | null } {
+  try {
+    const input = computeCaptainSynthesisInput(ctx, horizon);
+    return {
+      captainId: input.rankedCandidates[0]?.player.player.id ?? null,
+      viceId: input.viceCaptain?.player.player.id ?? null,
+    };
+  } catch {
+    return { captainId: null, viceId: null };
+  }
 }
 
 // Project the shared analysis into the lean per-player views the pitch needs,
@@ -78,13 +172,12 @@ export async function runGameweekPlan(
 // from the shared context so it is present even when a sub-pipeline failed.
 function buildSquadView(
   ctx: AnalysisContext,
-  captaincy: CaptainResult | null
+  caps: { captainId: number | null; viceId: number | null }
 ): SquadPlayerView[] {
   const scoredById = new Map(
     ctx.analysis.rankedSquad.map((sp) => [sp.player.id, sp])
   );
-  const captainId = captaincy?.captain.player.player.id ?? null;
-  const viceId = captaincy?.viceCaptain?.player.player.id ?? null;
+  const { captainId, viceId } = caps;
   const weakIds = new Set(
     ctx.analysis.weakest3.map((w) => w.player.player.id)
   );
@@ -121,4 +214,9 @@ function buildSquadView(
 
 function errMsg(reason: unknown): string {
   return reason instanceof Error ? reason.message : "Unknown error";
+}
+
+/** Test-only: clear the insights cache. */
+export function _clearInsightsCache(): void {
+  insightsCache.clear();
 }

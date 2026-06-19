@@ -1,11 +1,12 @@
 import type { Player, ElementSummary } from "../types";
 import type { ScoredPlayer, LlmContextSignals, TrendSignals } from "../pipeline/types";
 import type { AnalysisContext } from "../plan/types";
-import { buildAnalysisContext } from "../plan/context";
+import { getCachedAnalysisContext } from "../plan/context";
 import { computeStatisticalSignals } from "../pipeline/statistical-scoring";
 import { computeFixtureSignals } from "../pipeline/fixture-analyzer";
 import { computeMarketSignals } from "../pipeline/market-dynamics";
 import { computeCompositeScore } from "../pipeline/composite-scorer";
+import { scorePlayerLite } from "../pipeline/lite-scoring";
 import { computeTrendSignals } from "../pipeline/trend-analyzer";
 import { batchComputeLlmContext } from "../pipeline/llm-context";
 import { fetchElementSummary } from "../fpl-api";
@@ -77,7 +78,9 @@ export async function getScoutContext(teamId: number): Promise<ScoutContext> {
     return hit.promise;
   }
 
-  const promise = buildAnalysisContext(teamId).then(buildScoutContext);
+  // Builds on the shared context cache so the squad analysis is computed once
+  // and reused across the plan phases and the chat.
+  const promise = getCachedAnalysisContext(teamId).then(buildScoutContext);
   cache.set(teamId, { promise, gw: 0, ts: Date.now() });
 
   try {
@@ -99,30 +102,12 @@ export async function getScoutContext(teamId: number): Promise<ScoutContext> {
 export function scorePlayer(player: Player, sc: ScoutContext): ScoredPlayer {
   const cached = sc.scoredById.get(player.id);
   if (cached) return cached;
-
-  const currentGw = sc.ctx.analysis.currentGw;
-  const stats = computeStatisticalSignals(player, currentGw);
-  const fixtureSignals = computeFixtureSignals(player, sc.ctx.fixtures, sc.ctx.teams, currentGw);
-  const marketSignals = computeMarketSignals(player, sc.maxEpNext);
-  const score = computeCompositeScore(
-    stats,
-    null,
-    fixtureSignals,
-    marketSignals,
-    DEFAULT_LLM_SIGNALS,
-    player.position,
-    player.minutes
-  );
-
-  return {
-    player,
-    score,
-    statisticalSignals: stats,
-    fixtureSignals,
-    trendSignals: null,
-    marketSignals,
-    llmSignals: DEFAULT_LLM_SIGNALS,
-  };
+  return scorePlayerLite(player, {
+    fixtures: sc.ctx.fixtures,
+    teams: sc.ctx.teams,
+    currentGw: sc.ctx.analysis.currentGw,
+    maxEpNext: sc.maxEpNext,
+  });
 }
 
 /**

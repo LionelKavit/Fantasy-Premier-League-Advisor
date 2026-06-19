@@ -14,9 +14,11 @@ vi.mock("../../fpl-api", () => ({
   buildManagerProfile: vi.fn(),
 }));
 
-import { runGameweekPlan } from "../../plan";
+import { runGameweekPlan, runGameweekPlanBase, runGameweekPlanInsights, _clearInsightsCache } from "../../plan";
+import { getCachedAnalysisContext, invalidateAnalysisContext, _clearContextCache } from "../../plan/context";
 import { runOptimizerPipeline } from "../../optimizer";
 import { runCaptainPipeline } from "../../captain";
+import { llm } from "../../llm/client";
 import { fetchBootstrap, fetchFixtures, fetchPicks, fetchElementSummary, fetchSetPieceNotes, buildManagerProfile } from "../../fpl-api";
 
 const CURRENT_GW = 20;
@@ -94,6 +96,8 @@ const combinedReply = {
 };
 
 beforeEach(() => {
+  _clearContextCache(); // module-level caches persist across tests — reset them
+  _clearInsightsCache();
   universe = buildUniverse();
   vi.mocked(fetchBootstrap).mockResolvedValue(universe.bootstrap);
   vi.mocked(fetchFixtures).mockResolvedValue(universe.fixtures);
@@ -201,5 +205,51 @@ describe("standalone entry points (no behavioral drift from the refactor)", () =
   it("runCaptainPipeline returns a captain from the manager's XI", async () => {
     const r = await runCaptainPipeline(1, 5);
     expect(universe.squadA.slice(0, 11)).toContain(r.captain.player.player.id);
+  });
+});
+
+describe("progressive plan: base phase, insights phase, and caching", () => {
+  it("base is lightweight: squad + deterministic captain, no LLM and no element fetches", async () => {
+    const base = await runGameweekPlanBase(1, { freeTransfers: 1 });
+    expect(base.transfers).toBeNull();
+    expect(base.captaincy).toBeNull();
+    expect(base.squad).toHaveLength(15);
+    // A deterministic captain is flagged on the pitch (from the XI).
+    const capFlag = base.squad.find((p) => p.isCaptainRec);
+    expect(capFlag).toBeDefined();
+    expect(universe.squadA.slice(0, 11)).toContain(capFlag!.id);
+    // The lite base makes NO LLM call and NO per-player element-summary fetch.
+    expect(vi.mocked(llm.complete)).not.toHaveBeenCalled();
+    expect(vi.mocked(fetchElementSummary)).not.toHaveBeenCalled();
+  });
+
+  it("caches the analysis context — squad analysis runs once, invalidation refetches", async () => {
+    await getCachedAnalysisContext(1);
+    await getCachedAnalysisContext(1);
+    expect(vi.mocked(fetchPicks)).toHaveBeenCalledTimes(1); // second call hit cache
+
+    invalidateAnalysisContext(1);
+    await getCachedAnalysisContext(1);
+    expect(vi.mocked(fetchPicks)).toHaveBeenCalledTimes(2); // recomputed after invalidate
+  });
+
+  it("caches insights per signature; force bypasses the cache", async () => {
+    await runGameweekPlanInsights(1, { freeTransfers: 1 });
+    const afterFirst = vi.mocked(llm.complete).mock.calls.length;
+    expect(afterFirst).toBeGreaterThan(0);
+
+    await runGameweekPlanInsights(1, { freeTransfers: 1 }); // same key → cache hit
+    expect(vi.mocked(llm.complete).mock.calls.length).toBe(afterFirst);
+
+    await runGameweekPlanInsights(1, { freeTransfers: 1 }, { force: true }); // bypass
+    expect(vi.mocked(llm.complete).mock.calls.length).toBeGreaterThan(afterFirst);
+  });
+
+  it("merged runGameweekPlan still returns a full plan (back-compat)", async () => {
+    const plan = await runGameweekPlan(1, { freeTransfers: 1 });
+    expect(plan.transfers).not.toBeNull();
+    expect(plan.captaincy).not.toBeNull();
+    expect(plan.squad).toHaveLength(15);
+    expect(plan.squad.some((p) => p.isCaptainRec)).toBe(true);
   });
 });

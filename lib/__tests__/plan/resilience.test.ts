@@ -3,13 +3,13 @@ import type { AnalysisContext } from "../../plan/types";
 import type { OptimizerResult } from "../../optimizer/types";
 import type { CaptainResult, CaptainSynthesisInput, TripleCaptainAdvice } from "../../captain/types";
 
-vi.mock("../../plan/context", () => ({ buildAnalysisContext: vi.fn() }));
+vi.mock("../../plan/context", () => ({ getCachedAnalysisContext: vi.fn() }));
 vi.mock("../../optimizer", () => ({ runOptimizerWithContext: vi.fn() }));
 vi.mock("../../captain", () => ({ computeCaptainSynthesisInput: vi.fn() }));
 vi.mock("../../captain/synthesis", () => ({ synthesizeCaptainPick: vi.fn() }));
 
-import { runGameweekPlan } from "../../plan";
-import { buildAnalysisContext } from "../../plan/context";
+import { runGameweekPlan, _clearInsightsCache } from "../../plan";
+import { getCachedAnalysisContext } from "../../plan/context";
 import { runOptimizerWithContext } from "../../optimizer";
 import { computeCaptainSynthesisInput } from "../../captain";
 import { synthesizeCaptainPick } from "../../captain/synthesis";
@@ -33,16 +33,17 @@ const tcAdvice: TripleCaptainAdvice = { recommended: true, targetGw: 22, targetP
 const capInput = { tripleCaptainAdvice: tcAdvice } as unknown as CaptainSynthesisInput;
 
 beforeEach(() => {
-  vi.mocked(buildAnalysisContext).mockReset().mockResolvedValue(ctx);
+  _clearInsightsCache(); // module-level insights cache persists across tests
+  vi.mocked(getCachedAnalysisContext).mockReset().mockResolvedValue(ctx);
   vi.mocked(runOptimizerWithContext).mockReset().mockResolvedValue(fakeOpt);
   vi.mocked(computeCaptainSynthesisInput).mockReset().mockReturnValue(capInput);
   vi.mocked(synthesizeCaptainPick).mockReset().mockResolvedValue(fakeCap);
 });
 
 describe("runGameweekPlan — composition", () => {
-  it("builds analysis once and shares the same context with both pipelines", async () => {
+  it("shares the same context with both pipelines", async () => {
     await runGameweekPlan(1, { freeTransfers: 1 });
-    expect(buildAnalysisContext).toHaveBeenCalledTimes(1);
+    expect(getCachedAnalysisContext).toHaveBeenCalled();
     expect(vi.mocked(runOptimizerWithContext).mock.calls[0][0]).toBe(ctx);
     expect(vi.mocked(computeCaptainSynthesisInput).mock.calls[0][0]).toBe(ctx);
   });
@@ -119,7 +120,7 @@ describe("runGameweekPlan — partial failure isolation", () => {
   });
 
   it("context build failure rejects (surfaces as an error response upstream)", async () => {
-    vi.mocked(buildAnalysisContext).mockRejectedValue(new Error("ctx boom"));
+    vi.mocked(getCachedAnalysisContext).mockRejectedValue(new Error("ctx boom"));
     await expect(runGameweekPlan(1, { freeTransfers: 1 })).rejects.toThrow("ctx boom");
   });
 });

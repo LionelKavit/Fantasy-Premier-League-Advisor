@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import type { GameweekPlan } from "@/lib/plan/types";
-import { fetchPlan } from "@/lib/client/plan";
+import { fetchPlanBase, fetchPlanInsights } from "@/lib/client/plan";
 import { ManagerIdForm } from "@/components/ManagerIdForm";
 import { Header } from "@/components/Header";
 import { Pitch } from "@/components/pitch/Pitch";
@@ -13,6 +13,7 @@ import { ThisWeekDetail } from "@/components/panel/ThisWeekDetail";
 import { LongTermDetail } from "@/components/panel/LongTermDetail";
 import { AskTheScout } from "@/components/panel/AskTheScout";
 import { Skeleton } from "@/components/states/Skeleton";
+import { AnalyzingIndicator } from "@/components/states/AnalyzingIndicator";
 import { ErrorCard } from "@/components/states/ErrorCard";
 import type { AskMessage } from "@/lib/client/ask";
 
@@ -32,17 +33,46 @@ export default function Home() {
   const [error, setError] = useState("");
   const [lens, setLens] = useState<Lens>("this-week");
   const [chat, setChat] = useState<AskMessage[]>([]);
+  const [insightsLoading, setInsightsLoading] = useState(false);
 
-  const load = useCallback(async (id: string, ft: number) => {
+  const load = useCallback(async (id: string, ft: number, opts: { force?: boolean } = {}) => {
     setManagerId(id);
     setFreeTransfers(ft);
     setStatus("loading");
     setError("");
     setChat([]); // new analysis → fresh conversation (grounding context changed)
+    setInsightsLoading(false);
     try {
-      const result = await fetchPlan(id, ft);
-      setPlan(result);
+      // Phase 1 — paint the pitch immediately from the deterministic base.
+      const base = await fetchPlanBase(id, ft);
+      setPlan(base);
       setStatus("loaded");
+      setInsightsLoading(true);
+
+      // Phase 2 — fill in the LLM-derived verdict/detail when it arrives.
+      try {
+        const insights = await fetchPlanInsights(id, ft, { force: opts.force });
+        setPlan((prev) => {
+          if (!prev) return prev;
+          const capId = insights.captaincy?.captain.player.player.id ?? null;
+          const viceId = insights.captaincy?.viceCaptain?.player.player.id ?? null;
+          // Reconcile the armband with the (possibly LLM-refined) captaincy.
+          const squad =
+            capId == null
+              ? prev.squad
+              : prev.squad.map((s) => ({
+                  ...s,
+                  isCaptainRec: s.id === capId,
+                  isViceRec: s.id === viceId,
+                }));
+          return { ...prev, ...insights, squad };
+        });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "Couldn't load the Scout's analysis.";
+        setPlan((prev) => (prev ? { ...prev, alerts: [...prev.alerts, msg] } : prev));
+      } finally {
+        setInsightsLoading(false);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
       setStatus("error");
@@ -113,15 +143,19 @@ export default function Home() {
         plan={plan}
         freeTransfers={freeTransfers}
         onFreeTransfersChange={handleFreeTransfers}
-        onReanalyze={() => load(managerId, freeTransfers)}
+        onReanalyze={() => load(managerId, freeTransfers, { force: true })}
         onChangeManager={changeManager}
-        busy={false}
+        busy={insightsLoading}
       />
       <div className="mx-auto grid w-full max-w-6xl items-start gap-4 px-4 py-6 lg:grid-cols-[1.4fr_1fr]">
         {/* Left: pitch + tab-aware prose + pinned alerts */}
         <div className="flex flex-col gap-4">
           <Pitch squad={plan.squad} transferOutIds={transferOutIds} />
-          <ScoutVerdict plan={plan} tab={lens === "long-term" ? "long-term" : "this-week"} />
+          <ScoutVerdict
+            plan={plan}
+            tab={lens === "long-term" ? "long-term" : "this-week"}
+            loading={insightsLoading}
+          />
           <AlertsCard plan={plan} />
         </div>
 
@@ -144,15 +178,19 @@ export default function Home() {
             </TabsList>
           </Tabs>
 
-          {lens === "this-week" && <ThisWeekDetail plan={plan} />}
-          {lens === "long-term" && <LongTermDetail plan={plan} />}
-          {lens === "ask" && (
+          {lens === "ask" ? (
             <AskTheScout
               teamId={Number(managerId)}
               freeTransfers={freeTransfers}
               messages={chat}
               onMessagesChange={setChat}
             />
+          ) : insightsLoading ? (
+            <AnalyzingIndicator />
+          ) : lens === "this-week" ? (
+            <ThisWeekDetail plan={plan} />
+          ) : (
+            <LongTermDetail plan={plan} />
           )}
         </div>
       </div>

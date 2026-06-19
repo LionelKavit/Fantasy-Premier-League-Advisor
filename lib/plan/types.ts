@@ -47,6 +47,13 @@ export interface SquadPlayerView {
   isWeakSpot: boolean;
 }
 
+// The LLM-derived half of the plan, produced by the slow `insights` phase.
+export interface PlanInsights {
+  transfers: OptimizerResult | null;
+  captaincy: CaptainResult | null;
+  alerts: string[];
+}
+
 export interface GameweekPlan {
   teamId: number;
   currentGw: number;
