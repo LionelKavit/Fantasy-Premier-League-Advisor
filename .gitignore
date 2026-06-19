@@ -39,3 +39,19 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Cloned vaastav FPL dataset (external, large) — not part of the app
+/historical_data
+
+# Generated backtest artifacts (large)
+research/composite-backtest/out/
+
+# Fetched FPL data cache for squad-eval (28M of JSON — regenerate via fetch-cache.ts)
+research/squad-eval/cache/
+
+# Python + OS cruft
+**/__pycache__/
+**/.DS_Store
+
+# Local-only Claude Code launch config
+.claude/launch.json

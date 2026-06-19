@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Offline research tooling (composite-backtest) + cloned dataset — not part of the app.
+    "research/**",
+    "historical_data/**",
   ]),
 ]);
 
