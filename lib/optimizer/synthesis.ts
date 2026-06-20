@@ -8,6 +8,7 @@ import type {
 } from "./types";
 import { llm } from "../llm/client";
 import { loadKnowledge } from "../knowledge";
+import { SCOUT_PERSONA } from "../llm/persona";
 
 // Deterministic, code-authored notice (transfer-ep-notice) — surfaced when the optimizer
 // held transfers because ep_next is unavailable, independent of the LLM narrative.
@@ -33,7 +34,7 @@ export async function synthesizeRecommendation(
 
   try {
     const prompt = buildPrompt(inputs);
-    const text = await llm.complete({ prompt, maxTokens: 4096 });
+    const text = await llm.complete({ prompt, maxTokens: 4096, system: SCOUT_PERSONA });
 
     const parsed = parseOptimizerResult(text, inputs);
     if (parsed) return parsed;
@@ -69,7 +70,7 @@ function buildPrompt(inputs: SynthesisInput): string {
     ? `\n## Expert rank principles (apply these)\n${rankPrinciples}\n`
     : "";
 
-  return `You are an FPL transfer advisor analyzing GW${inputs.analysis.currentGw} options for a manager ranked ${rp.currentRank}.
+  return `Analyze this manager's GW${inputs.analysis.currentGw} transfer options. They are ranked ${rp.currentRank}.
 ${principlesBlock}
 ## Context
 - Rank trend: ${rp.rankTrend} (best: ${rp.bestRank})

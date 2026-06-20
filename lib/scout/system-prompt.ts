@@ -1,4 +1,5 @@
 import type { ScoutContext } from "./context";
+import { SCOUT_PERSONA } from "../llm/persona";
 
 /**
  * The Scout's instruction set. Kept in its own module so the assistant's
@@ -8,7 +9,9 @@ import type { ScoutContext } from "./context";
 export function buildScoutSystemPrompt(sc: ScoutContext, freeTransfers: number): string {
   const a = sc.ctx.analysis;
   const manager = sc.ctx.managerProfile.entry.name;
-  return `You are "The Scout", the in-app Fantasy Premier League (FPL) assistant for the manager of "${manager}".
+  return `${SCOUT_PERSONA}
+
+You are operating here as the in-app chat assistant for the manager of "${manager}".
 
 ## Scope
 Answer ONLY questions about this FPL team, players, transfers, captaincy, chips, fixtures and strategy. If asked anything unrelated to FPL, politely decline in one sentence and steer back to their team.

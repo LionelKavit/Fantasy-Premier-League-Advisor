@@ -6,6 +6,7 @@ import type {
 import { CAPTAIN_CONFIG } from "../config";
 import { llm } from "../llm/client";
 import { loadKnowledge } from "../knowledge";
+import { SCOUT_PERSONA } from "../llm/persona";
 
 export async function synthesizeCaptainPick(
   inputs: CaptainSynthesisInput
@@ -23,7 +24,7 @@ export async function synthesizeCaptainPick(
 
   try {
     const prompt = buildPrompt(inputs);
-    const text = await llm.complete({ prompt, maxTokens: 2048 });
+    const text = await llm.complete({ prompt, maxTokens: 2048, system: SCOUT_PERSONA });
 
     const parsed = parseResult(text, inputs);
     if (parsed) return parsed;
@@ -59,7 +60,7 @@ export function buildPrompt(inputs: CaptainSynthesisInput): string {
     ? `\n## Expert rank principles (apply these)\n${rankPrinciples}\n`
     : "";
 
-  return `You are an FPL captaincy advisor for GW${currentGw}. The manager is ranked ${rp.currentRank} (trend: ${rp.rankTrend}, ${rp.gwsRemaining} GWs remaining).
+  return `Pick this manager's captain for GW${currentGw}. They are ranked ${rp.currentRank} (trend: ${rp.rankTrend}, ${rp.gwsRemaining} GWs remaining).
 
 Strategy guidance: ${strategyBias}
 ${principlesBlock}

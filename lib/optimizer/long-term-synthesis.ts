@@ -2,6 +2,7 @@ import type { HorizonEntry, ChipRecommendation, RestructureOption } from "./type
 import type { ChipsRemaining, ManagerProfile } from "../types";
 import { llm } from "../llm/client";
 import { loadKnowledge } from "../knowledge";
+import { SCOUT_PERSONA } from "../llm/persona";
 
 export interface LongTermInput {
   horizon: HorizonEntry[];
@@ -33,7 +34,7 @@ export async function synthesizeLongTerm(input: LongTermInput): Promise<string |
 
   try {
     const text = (
-      await llm.complete({ prompt: buildLongTermPrompt(input), maxTokens: 600 })
+      await llm.complete({ prompt: buildLongTermPrompt(input), maxTokens: 600, system: SCOUT_PERSONA })
     ).trim();
     return text.length > 0 ? text : null;
   } catch (error) {
@@ -63,7 +64,7 @@ export function buildLongTermPrompt(input: LongTermInput): string {
     ? `\n## Expert chip principles (apply these to the facts below)\n${chipPrinciples}\n`
     : "";
 
-  return `You are an FPL strategist writing a short LONG-TERM outlook for a manager at GW${currentGw}. ${tone}
+  return `Write a short LONG-TERM outlook for this manager at GW${currentGw}. ${tone}
 ${principlesBlock}
 ## Transfer horizon (next 5 GWs)
 ${JSON.stringify(
