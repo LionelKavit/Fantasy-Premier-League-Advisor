@@ -38,3 +38,10 @@ The composite weights and the transfer-hold threshold SHALL be revalidated again
 - **WHEN** a handful of 2026-27 gameweeks have been played
 - **THEN** the composite weight fit and the transfer-threshold curve are recomputed and compared to the shipped weights and `τ=1.5`
 - **AND** a refit/retune is applied only if FPL's 2026-27 scoring rules or the meta shifted them materially; the comparison is documented either way
+
+### Requirement: Chip-count handles the two-halves expiry
+The chips-remaining model SHALL correctly reflect the two-sets-per-season rule, including dropping an unused first-half chip after the GW19 deadline.
+
+#### Scenario: First-half chips expire at the GW19 deadline
+- **WHEN** the GW19 deadline passes and an unused first-half chip exists
+- **THEN** `deriveChipsRemaining` no longer counts it (verify FPL's `bootstrap-static` `chips` stops advertising the expired chip, or otherwise adjust the derivation) so the chip narrative never recommends a chip the manager can no longer play

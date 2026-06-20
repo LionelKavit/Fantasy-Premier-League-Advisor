@@ -19,6 +19,10 @@
 **Capability:** new-season-readiness
 - Recompute the composite weight fit + transfer-threshold curve on 2026-27 data; compare to shipped weights and `τ=1.5`; refit only if rules/meta moved materially. Document the comparison.
 
+### Task 5: Verify chip-count two-halves expiry (around GW19)
+**Capability:** new-season-readiness
+- After the GW19 deadline, confirm `deriveChipsRemaining` drops an unused first-half chip (check FPL `bootstrap-static` `chips` no longer advertises it; adjust the derivation if not). Prevents the chip narrative (`chip-strategist`) from recommending an expired chip.
+
 ### Notes
 - Item 1 is the only pre-GW1, demo-facing piece — prioritize it.
 - Items 2–4 accrue value through the season; partial reports must state `n` and read as provisional.
