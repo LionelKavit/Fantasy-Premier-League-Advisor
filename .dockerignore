@@ -1,0 +1,22 @@
+# Keep the build context small and secrets out of the image.
+node_modules
+.next
+.git
+.gitignore
+
+# Secrets — never send these into the build
+.env
+.env.*
+
+# Dev/editor/OS cruft
+.claude
+.DS_Store
+**/.DS_Store
+
+# Research tooling + cloned datasets (not part of the app)
+research
+historical_data
+
+# Tests aren't needed in the production image
+**/__tests__
+**/*.test.ts

@@ -1,0 +1,32 @@
+# The "run sheet": start two containers (the app + Caddy) and wire them together.
+# Run with:  docker compose up        (foreground, see logs)
+#       or:  docker compose up -d      (background, on a server)
+
+services:
+  # ── The app (your Pocket Scout server, in its box) ─────────────────────────
+  app:
+    build: .                    # build from the Dockerfile in this folder
+    image: pocket-scout:local
+    env_file: .env.docker       # host-only secrets file (gitignored; not the root .env)
+    expose:
+      - "3000"                  # visible to Caddy on the private network, NOT the internet
+    restart: unless-stopped     # auto-restart if it crashes or the machine reboots
+
+  # ── Caddy (the receptionist: HTTPS + password gate + routing) ──────────────
+  caddy:
+    image: caddy:2-alpine       # official Caddy — nothing to build
+    depends_on:
+      - app
+    env_file: .env.docker       # same secrets file
+    ports:
+      - "80:80"                 # the public doors: 80 (http) and 443 (https)
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro   # mount our receptionist instructions
+      - caddy_data:/data                       # persist HTTPS certificates between restarts
+      - caddy_config:/config
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:

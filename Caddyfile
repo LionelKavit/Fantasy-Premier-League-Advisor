@@ -1,0 +1,20 @@
+# Caddy = the receptionist. SITE_ADDRESS decides where it listens:
+#   • local testing  → :80            (plain http on localhost — set in .env)
+#   • production      → your-domain.com (Caddy then fetches an HTTPS cert automatically)
+{$SITE_ADDRESS::80} {
+
+	# Password gate — only known users get in. This matters because every visit
+	# triggers paid AI calls, so the app must never be open to the public.
+	# BASIC_AUTH_HASH is a hashed password (we generate it with `caddy hash-password`).
+	basic_auth {
+		{$BASIC_AUTH_USER} {$BASIC_AUTH_HASH}
+	}
+
+	# Hand the visitor to the app container. read_timeout is generous so the
+	# 30–60s "insights" request (3 LLM calls) has time to finish, not get cut off.
+	reverse_proxy app:3000 {
+		transport http {
+			read_timeout 180s
+		}
+	}
+}
