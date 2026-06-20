@@ -55,3 +55,6 @@ research/squad-eval/cache/
 
 # Local-only Claude Code launch config
 .claude/launch.json
+
+# Demo video — too large to commit; upload via GitHub's web UI for an inline player
+docs/images/*.mov
