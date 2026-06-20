@@ -1,6 +1,7 @@
 import type { HorizonEntry, ChipRecommendation, RestructureOption } from "./types";
 import type { ChipsRemaining, ManagerProfile } from "../types";
 import { llm } from "../llm/client";
+import { loadKnowledge } from "../knowledge";
 
 export interface LongTermInput {
   horizon: HorizonEntry[];
@@ -42,7 +43,7 @@ export async function synthesizeLongTerm(input: LongTermInput): Promise<string |
   }
 }
 
-function buildLongTermPrompt(input: LongTermInput): string {
+export function buildLongTermPrompt(input: LongTermInput): string {
   const { horizon, chipRecommendations, restructureOptions, chipsRemaining, currentGw, riskProfile } = input;
 
   const tone =
@@ -55,8 +56,15 @@ function buildLongTermPrompt(input: LongTermInput): string {
   const held = (["wildcard", "freeHit", "benchBoost", "tripleCaptain"] as const)
     .filter((k) => chipsRemaining[k] > 0);
 
-  return `You are an FPL strategist writing a short LONG-TERM outlook for a manager at GW${currentGw}. ${tone}
+  // Ground chip reasoning in curated expert principles (chip-strategist). Strictly
+  // additive — an empty knowledge file just omits the section.
+  const chipPrinciples = loadKnowledge("chips");
+  const principlesBlock = chipPrinciples
+    ? `\n## Expert chip principles (apply these to the facts below)\n${chipPrinciples}\n`
+    : "";
 
+  return `You are an FPL strategist writing a short LONG-TERM outlook for a manager at GW${currentGw}. ${tone}
+${principlesBlock}
 ## Transfer horizon (next 5 GWs)
 ${JSON.stringify(
     horizon.map((h) => ({

@@ -5,6 +5,7 @@ import type {
 } from "./types";
 import { CAPTAIN_CONFIG } from "../config";
 import { llm } from "../llm/client";
+import { loadKnowledge } from "../knowledge";
 
 export async function synthesizeCaptainPick(
   inputs: CaptainSynthesisInput
@@ -42,7 +43,7 @@ export async function synthesizeCaptainPick(
   }
 }
 
-function buildPrompt(inputs: CaptainSynthesisInput): string {
+export function buildPrompt(inputs: CaptainSynthesisInput): string {
   const { managerProfile, rankedCandidates, viceCaptain, differentialOption, horizon, tripleCaptainAdvice, currentGw } = inputs;
   const rp = managerProfile.riskProfile;
 
@@ -53,10 +54,15 @@ function buildPrompt(inputs: CaptainSynthesisInput): string {
         ? "Chase rank — be willing to endorse a differential captain to gain ground."
         : "Balanced — weigh the safe pick against differential upside.";
 
+  const rankPrinciples = loadKnowledge("rank-strategy");
+  const principlesBlock = rankPrinciples
+    ? `\n## Expert rank principles (apply these)\n${rankPrinciples}\n`
+    : "";
+
   return `You are an FPL captaincy advisor for GW${currentGw}. The manager is ranked ${rp.currentRank} (trend: ${rp.rankTrend}, ${rp.gwsRemaining} GWs remaining).
 
 Strategy guidance: ${strategyBias}
-
+${principlesBlock}
 ## Captain candidates (starting XI, ranked by captain score)
 ${JSON.stringify(rankedCandidates.slice(0, 6).map(fmt), null, 2)}
 

@@ -7,6 +7,7 @@ import type {
   HitTransferResult,
 } from "./types";
 import { llm } from "../llm/client";
+import { loadKnowledge } from "../knowledge";
 
 // Deterministic, code-authored notice (transfer-ep-notice) — surfaced when the optimizer
 // held transfers because ep_next is unavailable, independent of the LLM narrative.
@@ -63,8 +64,13 @@ function buildPrompt(inputs: SynthesisInput): string {
         ? "This manager should be aggressive — consider hits and wildcards more readily."
         : "Balanced approach — weigh immediate vs long-term gains.";
 
-  return `You are an FPL transfer advisor analyzing GW${inputs.analysis.currentGw} options for a manager ranked ${rp.currentRank}.
+  const rankPrinciples = loadKnowledge("rank-strategy");
+  const principlesBlock = rankPrinciples
+    ? `\n## Expert rank principles (apply these)\n${rankPrinciples}\n`
+    : "";
 
+  return `You are an FPL transfer advisor analyzing GW${inputs.analysis.currentGw} options for a manager ranked ${rp.currentRank}.
+${principlesBlock}
 ## Context
 - Rank trend: ${rp.rankTrend} (best: ${rp.bestRank})
 - GWs remaining: ${rp.gwsRemaining}

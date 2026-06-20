@@ -14,6 +14,11 @@ vi.mock("../../fpl-api", () => ({
   buildManagerProfile: vi.fn(),
 }));
 
+// team-news does a live HTTP fetch in the pipeline — stub it so e2e stays offline/fast.
+vi.mock("../../news/team-news", () => ({
+  getCachedTeamNews: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { runGameweekPlan, runGameweekPlanBase, runGameweekPlanInsights, _clearInsightsCache } from "../../plan";
 import { getCachedAnalysisContext, invalidateAnalysisContext, _clearContextCache } from "../../plan/context";
 import { runOptimizerPipeline } from "../../optimizer";
