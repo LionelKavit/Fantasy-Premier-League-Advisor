@@ -44,6 +44,7 @@ export async function buildLiteBaseContext(teamId: number): Promise<AnalysisCont
   const [bootstrap, fixtures] = await Promise.all([fetchBootstrap(), fetchFixtures()]);
   const managerProfile = await buildManagerProfile(teamId, bootstrap);
   const currentGw = bootstrap.currentGameweek?.id ?? 1;
+  const deadline = bootstrap.currentGameweek?.deadline_time ?? null;
   const { players, teams } = bootstrap;
 
   const picksResponse = await fetchPicks(teamId, currentGw);
@@ -67,6 +68,7 @@ export async function buildLiteBaseContext(teamId: number): Promise<AnalysisCont
     chipsRemaining: managerProfile.chipsRemaining,
     bank: picksResponse.entry_history.bank,
     currentGw,
+    deadline,
     generatedAt: new Date().toISOString(),
   };
 

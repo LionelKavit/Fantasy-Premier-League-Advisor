@@ -27,6 +27,7 @@ export async function runGameweekPlanBase(
   return {
     teamId,
     currentGw: ctx.analysis.currentGw,
+    deadline: ctx.analysis.deadline,
     transfers: null,
     captaincy: null,
     squad: buildSquadView(ctx, { captainId, viceId }),
@@ -136,6 +137,7 @@ export async function runGameweekPlan(
   return {
     teamId,
     currentGw: ctx.analysis.currentGw,
+    deadline: ctx.analysis.deadline,
     transfers: insights.transfers,
     captaincy: insights.captaincy,
     squad: buildSquadView(ctx, ids),

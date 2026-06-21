@@ -6,22 +6,16 @@ import { fetchPlanBase, fetchPlanInsights } from "@/lib/client/plan";
 import { ManagerIdForm } from "@/components/ManagerIdForm";
 import { Header } from "@/components/Header";
 import { Pitch } from "@/components/pitch/Pitch";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScoutVerdict } from "@/components/panel/ScoutVerdict";
 import { AlertsCard } from "@/components/panel/AlertsCard";
-import { ThisWeekDetail } from "@/components/panel/ThisWeekDetail";
-import { LongTermDetail } from "@/components/panel/LongTermDetail";
+import { FullBreakdown } from "@/components/panel/FullBreakdown";
 import { AskTheScout } from "@/components/panel/AskTheScout";
 import { Skeleton } from "@/components/states/Skeleton";
-import { AnalyzingIndicator } from "@/components/states/AnalyzingIndicator";
 import { ErrorCard } from "@/components/states/ErrorCard";
 import type { AskMessage } from "@/lib/client/ask";
 
 type Status = "idle" | "loading" | "loaded" | "error";
-type Lens = "this-week" | "long-term" | "ask";
+type Lens = "this-week" | "long-term";
 
-const tabTrigger =
-  "flex-1 whitespace-nowrap rounded-md px-2 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground data-[selected]:bg-fpl-green data-[selected]:text-fpl-purple disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-muted-foreground";
 const LS_ID = "fpl:lastId";
 const LS_FT = "fpl:ft";
 
@@ -32,8 +26,11 @@ export default function Home() {
   const [plan, setPlan] = useState<GameweekPlan | null>(null);
   const [error, setError] = useState("");
   const [lens, setLens] = useState<Lens>("this-week");
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
   const [chat, setChat] = useState<AskMessage[]>([]);
   const [insightsLoading, setInsightsLoading] = useState(false);
+  // Bumped once per completed analysis — signals the chat to fire its opening brief.
+  const [briefNonce, setBriefNonce] = useState(0);
 
   const load = useCallback(async (id: string, ft: number, opts: { force?: boolean } = {}) => {
     setManagerId(id);
@@ -41,6 +38,7 @@ export default function Home() {
     setStatus("loading");
     setError("");
     setChat([]); // new analysis → fresh conversation (grounding context changed)
+    setBreakdownOpen(false); // every load leads with the conversation; breakdown starts collapsed
     setInsightsLoading(false);
     try {
       // Phase 1 — paint the pitch immediately from the deterministic base.
@@ -72,6 +70,7 @@ export default function Home() {
         setPlan((prev) => (prev ? { ...prev, alerts: [...prev.alerts, msg] } : prev));
       } finally {
         setInsightsLoading(false);
+        setBriefNonce((n) => n + 1); // insights ready (or failed) → let the Scout open with its brief
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
@@ -147,52 +146,35 @@ export default function Home() {
         onChangeManager={changeManager}
         busy={insightsLoading}
       />
-      <div className="mx-auto grid w-full max-w-6xl items-start gap-4 px-4 py-6 lg:grid-cols-[1.4fr_1fr]">
-        {/* Left: pitch + tab-aware prose + pinned alerts */}
-        <div className="flex flex-col gap-4">
-          <Pitch squad={plan.squad} transferOutIds={transferOutIds} />
-          <ScoutVerdict
-            plan={plan}
-            tab={lens === "long-term" ? "long-term" : "this-week"}
-            loading={insightsLoading}
-          />
-          <AlertsCard plan={plan} />
-        </div>
+      {/* 2×2 lens — row 1: pitch | conversation (stretched to the pitch's height);
+          row 2: collapsible This Week + Long Term plan | alerts. */}
+      <div className="mx-auto grid w-full max-w-6xl items-start gap-4 px-4 py-6 lg:grid-cols-[1fr_1.1fr]">
+        {/* Row 1 left — the pitch sets the row height */}
+        <Pitch squad={plan.squad} transferOutIds={transferOutIds} />
 
-        {/* Right: tab bar + structured detail (the lens drives both columns) */}
-        <div className="flex flex-col gap-3">
-          <Tabs value={lens} onValueChange={(v) => setLens(v as Lens)}>
-            <TabsList
-              aria-label="Strategy views"
-              className="flex gap-1 rounded-lg border border-border bg-card p-1"
-            >
-              <TabsTrigger value="this-week" className={tabTrigger}>
-                This Week
-              </TabsTrigger>
-              <TabsTrigger value="long-term" className={tabTrigger}>
-                Long Term
-              </TabsTrigger>
-              <TabsTrigger value="ask" className={tabTrigger}>
-                Ask The Scout
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+        {/* Row 1 right — hero conversation, stretched to match the pitch */}
+        <AskTheScout
+          className="lg:self-stretch"
+          teamId={Number(managerId)}
+          freeTransfers={freeTransfers}
+          plan={plan}
+          briefNonce={briefNonce}
+          messages={chat}
+          onMessagesChange={setChat}
+        />
 
-          {lens === "ask" ? (
-            <AskTheScout
-              teamId={Number(managerId)}
-              freeTransfers={freeTransfers}
-              messages={chat}
-              onMessagesChange={setChat}
-            />
-          ) : insightsLoading ? (
-            <AnalyzingIndicator />
-          ) : lens === "this-week" ? (
-            <ThisWeekDetail plan={plan} />
-          ) : (
-            <LongTermDetail plan={plan} />
-          )}
-        </div>
+        {/* Row 2 left — the collapsible This Week + Long Term plan */}
+        <FullBreakdown
+          open={breakdownOpen}
+          onToggle={() => setBreakdownOpen((o) => !o)}
+          lens={lens}
+          onLensChange={setLens}
+          plan={plan}
+          loading={insightsLoading}
+        />
+
+        {/* Row 2 right — alerts, under the conversation */}
+        <AlertsCard plan={plan} />
       </div>
     </main>
   );

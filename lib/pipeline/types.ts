@@ -103,5 +103,6 @@ export interface SquadAnalysisResult {
   chipsRemaining: ChipsRemaining;
   bank: number;
   currentGw: number;
+  deadline: string | null; // ISO deadline of the current gameweek (when picks lock)
   generatedAt: string;
 }

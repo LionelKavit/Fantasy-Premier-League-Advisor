@@ -6,13 +6,13 @@ The loaded screen is a flat dashboard: pitch + verdict + alerts + three equal-we
 
 This change re-architects the shell so the **conversation is the primary, always-visible surface** and the dashboard becomes supporting reference. It is a layout change only: the chat still works exactly as today (manual questions) after this lands — the proactive opening brief is wired in by the separate `proactive-scout-brief-ui` change. Shipping the shell first de-risks the bet by separating "where things live" from "the Scout speaks first."
 
-**Decision (locked):** lowest-risk variant — **keep** the pitch and **keep** the This Week / Long Term structured panels (moved into a collapsible "Full breakdown" drawer). Nothing is removed; the hierarchy is re-weighted.
+**Decision (locked):** lowest-risk variant — **keep** the pitch and **keep** the This Week / Long Term structured panels (moved into a collapsible drawer labelled **"This week & long-term plan"**). Nothing is removed; the hierarchy is re-weighted.
 
 ## What Changes
 
 - **Modified capability `strategy-tabs`** — the screen is no longer "tabs as a lens over two columns". Instead:
   - The **conversation** (the existing `AskTheScout` panel) becomes the prominent, always-visible hero surface — not gated behind a tab.
-  - **This Week** and **Long Term** move into a single collapsible **"Full breakdown"** drawer (a disclosure; the existing tab toggle may live *inside* it), **collapsed by default** so the conversation leads.
+  - **This Week** and **Long Term** move into a single collapsible drawer labelled **"This week & long-term plan"** (a disclosure; the existing tab toggle lives *inside* it), **always collapsed on load** so the conversation leads.
   - The **pitch** and **alerts** remain as the supporting column (pitch still paints instantly from the base phase).
   - The "Ask The Scout" tab is removed (chat is now always present); the long-term narrative remains reachable inside the drawer rather than duplicated in an always-visible prose card.
 - All content still derives from the already-loaded `GameweekPlan` — no new fetch introduced by this change.

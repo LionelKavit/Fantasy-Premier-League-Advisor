@@ -27,6 +27,7 @@ import { llm } from "../../llm/client";
 import { fetchBootstrap, fetchFixtures, fetchPicks, fetchElementSummary, fetchSetPieceNotes, buildManagerProfile } from "../../fpl-api";
 
 const CURRENT_GW = 20;
+const CURRENT_DEADLINE = "2026-02-14T11:30:00Z";
 
 // A 30-player universe = two distinct 15-man squads (A: ids 1–15, B: ids 16–30).
 // For manager A, manager B's players are eligible transfer candidates and vice versa.
@@ -75,7 +76,7 @@ function buildUniverse(): { bootstrap: BootstrapData; fixtures: Fixture[]; squad
     players,
     teams,
     gameweeks: [makeGameweek({ id: CURRENT_GW })],
-    currentGameweek: makeGameweek({ id: CURRENT_GW }),
+    currentGameweek: makeGameweek({ id: CURRENT_GW, deadline_time: CURRENT_DEADLINE }),
     chips: [],
   };
   return {
@@ -256,5 +257,24 @@ describe("progressive plan: base phase, insights phase, and caching", () => {
     expect(plan.captaincy).not.toBeNull();
     expect(plan.squad).toHaveLength(15);
     expect(plan.squad.some((p) => p.isCaptainRec)).toBe(true);
+  });
+});
+
+describe("gameweek deadline threads onto the plan (gameweek-deadline-surface)", () => {
+  it("surfaces the current gameweek's deadline on the base plan (instant phase)", async () => {
+    const base = await runGameweekPlanBase(1, { freeTransfers: 1 });
+    expect(base.deadline).toBe(CURRENT_DEADLINE);
+  });
+
+  it("surfaces the same deadline on the full plan", async () => {
+    const plan = await runGameweekPlan(1, { freeTransfers: 1 });
+    expect(plan.deadline).toBe(CURRENT_DEADLINE);
+  });
+
+  it("is null when the bootstrap has no current gameweek (off-season / cold start)", async () => {
+    _clearContextCache();
+    vi.mocked(fetchBootstrap).mockResolvedValue({ ...universe.bootstrap, currentGameweek: null });
+    const base = await runGameweekPlanBase(1, { freeTransfers: 1 });
+    expect(base.deadline).toBeNull();
   });
 });

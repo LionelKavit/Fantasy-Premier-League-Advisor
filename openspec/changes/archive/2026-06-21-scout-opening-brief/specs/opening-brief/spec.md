@@ -33,6 +33,17 @@ The brief SHALL be produced by a dedicated synthesis (`streamOpeningBrief`) usin
 - **WHEN** the brief streams
 - **THEN** it is ≤4 sentences of plain spoken prose (no markdown headings, tables, or bullet lists) and arrives token-by-token
 
+### Requirement: Brief shape and brevity (both paths)
+Every opening brief — whether the LLM stream or the deterministic fallback — SHALL follow the same brief-specific instruction: **greet, lead with the highest-leverage decision, name the deadline, ≤4 sentences, spoken-aloud, no headings/tables/markdown**. It SHALL be short and punchy, deliberately distinct from the long-form prose of the Scout's verdict or the long-term outlook — it MUST NOT reproduce those multi-paragraph narratives.
+
+#### Scenario: Concise spoken opener, not a verdict
+- **WHEN** any brief is produced (LLM or fallback)
+- **THEN** it is at most four short sentences of spoken prose that greet, lead with the week's biggest call, and name the deadline — not a multi-paragraph write-up
+
+#### Scenario: Same instruction governs the fallback
+- **WHEN** the deterministic fallback composes the brief from the grounding summary
+- **THEN** it obeys the identical greet / lead-with-the-decision / name-the-deadline / ≤4-sentences / no-markdown rules as the LLM path (only the wording is templated, not the shape)
+
 ### Requirement: Grounding reuses cached work
 The endpoint SHALL build its grounding from the cached `runGameweekPlanInsights` (and base meta), not a fresh optimizer/captain run.
 
@@ -45,4 +56,4 @@ When `ANTHROPIC_API_KEY` is not set, the endpoint SHALL stream a deterministic c
 
 #### Scenario: Missing API key
 - **WHEN** no key is configured
-- **THEN** `/api/brief` streams a non-empty plain-English greeting naming the recommended move, captain, and deadline (emitted as a single token), so the Scout still opens the conversation
+- **THEN** `/api/brief` streams a non-empty greeting that obeys the shared brief shape (≤4 spoken sentences, no markdown) and names the recommended move, captain, and deadline (emitted as a single token), so the Scout still opens the conversation — short, not a verdict
