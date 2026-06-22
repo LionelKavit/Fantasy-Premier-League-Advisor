@@ -76,7 +76,7 @@ describe("synthesizeRecommendation — success path (mocked LLM)", () => {
     expect(r.confidence).toBe("medium");
   });
 
-  it("maps HIT_SINGLE, HIT_DOUBLE, WILDCARD and a secondary recommendation", async () => {
+  it("maps HIT_SINGLE/HIT_DOUBLE + a secondary; a chip type no longer elects (falls to ROLL)", async () => {
     stubApiKey();
     const input = makeInput();
     const a = rising;
@@ -99,10 +99,12 @@ describe("synthesizeRecommendation — success path (mocked LLM)", () => {
     expect(single.primaryRecommendation.type).toBe("HIT_SINGLE");
     expect(single.primaryRecommendation.netPointsCost).toBe(-4);
 
+    // The transfer synthesis no longer elects chips — a chip type falls back to ROLL
+    // (chip timing is decided in the single chipPlan, not here).
     mockClaudeJson({ ...validReply, primaryRecommendation: { type: "WILDCARD" } });
     const wc = await synthesizeRecommendation(input);
-    expect(wc.primaryRecommendation.type).toBe("WILDCARD");
-    expect(wc.primaryRecommendation.transfers.length).toBeGreaterThan(0);
+    expect(wc.primaryRecommendation.type).toBe("ROLL");
+    expect(wc.primaryRecommendation.transfers).toHaveLength(0);
   });
 
   it("maps an unknown/ROLL action type to a ROLL with no transfers", async () => {

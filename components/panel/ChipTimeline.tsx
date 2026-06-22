@@ -8,21 +8,13 @@ const CHIP_KEYS: (keyof ChipsRemaining)[] = ["wildcard", "freeHit", "benchBoost"
 export function ChipTimeline({
   chipPlan,
   chipsRemaining,
-  currentGw,
 }: {
   chipPlan: ChipRecommendation[];
   chipsRemaining: ChipsRemaining;
-  currentGw: number;
 }) {
   const heldKeys = CHIP_KEYS.filter((k) => chipsRemaining[k] > 0);
   const allUsed = heldKeys.length === 0;
   const windows = [...chipPlan].sort((a, b) => a.triggerGw - b.triggerGw);
-
-  // GW ticks from now to the furthest recommended window (min 5 ahead, capped).
-  const maxGw = Math.min(38, Math.max(currentGw + 5, ...windows.map((w) => w.triggerGw)));
-  const ticks: number[] = [];
-  for (let gw = currentGw; gw <= maxGw; gw++) ticks.push(gw);
-  const byGw = new Map(windows.map((w) => [w.triggerGw, w]));
 
   return (
     <div className="flex flex-col gap-3">
@@ -47,33 +39,21 @@ export function ChipTimeline({
 
       {windows.length > 0 ? (
         <>
-          {/* GW axis with chip markers */}
-          <div className="relative">
-            <div className="flex items-end justify-between">
-              {ticks.map((gw) => {
-                const rec = byGw.get(gw);
-                return (
-                  <div key={gw} className="flex flex-1 flex-col items-center gap-1">
-                    {rec && (
-                      <span className="rounded bg-fpl-cyan px-1 text-[8px] font-bold uppercase leading-3 text-fpl-purple">
-                        {chipName(rec.chip)}
-                      </span>
-                    )}
-                    <span className={cn("h-2 w-0.5", rec ? "bg-fpl-cyan" : "bg-border")} />
-                    <span className="text-[9px] tabular-nums text-muted-foreground">{gw}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          {/* Reasons */}
+          {/* Recommended chip windows, with the play-now distinguished. */}
           <ul className="flex flex-col gap-1.5">
-            {windows.map((w, i) => (
-              <li key={i} className="text-sm">
-                <span className="font-semibold text-fpl-cyan">{chipName(w.chip)}</span>
-                <span className="text-muted-foreground"> · GW{w.triggerGw} — {w.reason}</span>
-              </li>
-            ))}
+            {windows.map((w, i) => {
+              const playNow = w.status === "play-now";
+              return (
+                <li key={i} className="text-sm">
+                  <span className={cn("font-semibold", playNow ? "text-fpl-green" : "text-fpl-cyan")}>
+                    {chipName(w.chip)}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {" "}· {playNow ? "Play now" : `GW${w.triggerGw}`} — {w.reason}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         </>
       ) : (

@@ -3,6 +3,7 @@
 // buffering) lives in `postNdjsonStream`; this file owns the ask event shape.
 
 import { postNdjsonStream } from "./ndjson";
+import type { ChipPlanLine } from "@/lib/scout/system-prompt";
 
 export interface AskMessage {
   role: "user" | "assistant";
@@ -19,6 +20,8 @@ export interface AskParams {
   teamId: number;
   freeTransfers?: number;
   messages: AskMessage[];
+  /** The committed chip plan from the displayed plan — grounds chip answers. */
+  chipPlan?: ChipPlanLine[];
 }
 
 interface AskEvent {
@@ -41,6 +44,7 @@ export async function streamAsk(params: AskParams, handlers: AskHandlers = {}): 
       team_id: params.teamId,
       freeTransfers: params.freeTransfers,
       messages: params.messages,
+      chipPlan: params.chipPlan,
     },
     (raw) => {
       const event = raw as unknown as AskEvent;

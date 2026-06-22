@@ -96,9 +96,17 @@ export function AskTheScout({
     setStreamingText("");
     setActiveTool(null);
 
+    // Ground chip answers in the committed plan the panels show (drop the draft).
+    const chipPlan = plan.transfers?.chipPlan?.map(({ chip, status, triggerGw, reason }) => ({
+      chip,
+      status,
+      triggerGw,
+      reason,
+    }));
+
     let errorMsg: string | null = null;
     const answer = await streamAsk(
-      { teamId, freeTransfers, messages: next },
+      { teamId, freeTransfers, messages: next, chipPlan },
       {
         onToken: (t) => setStreamingText((prev) => prev + t),
         // A tool call means the prior text was just preamble — clear it so the
@@ -126,7 +134,7 @@ export function AskTheScout({
   const showStarters = !streaming && !messages.some((m) => m.role === "user");
 
   return (
-    <div className={cn("flex min-h-[34rem] flex-col rounded-lg border border-border bg-card", className)}>
+    <div className={cn("flex h-[32rem] flex-col overflow-hidden rounded-lg border border-border bg-card lg:h-auto", className)}>
 
       <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         <Sparkles className="size-3.5 text-fpl-green" />
@@ -139,7 +147,7 @@ export function AskTheScout({
         aria-live="polite"
         aria-atomic="false"
         aria-label="Conversation with the Scout"
-        className="flex-1 space-y-3 overflow-y-auto p-4"
+        className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4"
       >
         {messages.length === 0 && !streaming && (
           <p className="text-sm text-muted-foreground">

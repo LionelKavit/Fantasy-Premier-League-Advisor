@@ -13,9 +13,7 @@ export type TransferType =
   | "FREE"
   | "HIT_SINGLE"
   | "HIT_DOUBLE"
-  | "ROLL"
-  | "WILDCARD"
-  | "FREE_HIT";
+  | "ROLL";
 
 export interface TransferAction {
   type: TransferType;
@@ -76,11 +74,18 @@ export interface HorizonEntry {
 
 export type ChipName = "wildcard" | "freeHit" | "benchBoost" | "tripleCaptain";
 
+// status drives the single-source-of-truth rendering: `window` = a candidate
+// future slot (Chips tab); `play-now` = activate at the current gameweek (only the
+// orchestrator may set this); `hold`. `draft` is the chip's transfer set (wildcard/
+// free-hit), computed once and reused wherever the chip is shown.
+export type ChipStatus = "window" | "play-now" | "hold";
+
 export interface ChipRecommendation {
   chip: ChipName;
   triggerGw: number;
+  status: ChipStatus;
   reason: string;
-  alteredTransfers: TransferAction | null;
+  draft: ValidTransfer[] | null;
 }
 
 export interface OptimizerResult {

@@ -1,7 +1,7 @@
 import type { GameweekPlan } from "@/lib/plan/types";
 import type { TransferAction, RestructureOption } from "@/lib/optimizer/types";
 import { ArrowRight, Crown, Repeat, Coins, Info } from "lucide-react";
-import { Section, ConfidenceBadge } from "./parts";
+import { Section, ConfidenceBadge, chipName } from "./parts";
 import { CaptainRanking } from "./CaptainRanking";
 import { groupTransferMoves } from "@/lib/client/transferMoves";
 
@@ -15,10 +15,6 @@ function primaryHeadline(action: TransferAction): string {
       return "Take a −4 hit";
     case "HIT_DOUBLE":
       return "Take a −8 hit";
-    case "WILDCARD":
-      return "Play your Wildcard";
-    case "FREE_HIT":
-      return "Play your Free Hit";
     default:
       return "Recommendation";
   }
@@ -43,6 +39,11 @@ export function ThisWeekDetail({ plan }: { plan: GameweekPlan }) {
   const { transfers, captaincy } = plan;
   const restructure = transfers?.restructureOptions ?? [];
 
+  // Single source of truth: This Week activates a chip ONLY when the plan plays one
+  // this gameweek (orchestrator-set play-now). The deterministic layer never does.
+  const activeChip =
+    transfers?.chipPlan?.find((c) => c.status === "play-now" && c.triggerGw === plan.currentGw) ?? null;
+
   // Group funding options under each dream target (avoids repeating "To afford X").
   const restructureGroups = restructure.reduce<Record<string, RestructureOption[]>>((acc, o) => {
     const k = o.dreamTarget.candidate.player.webName;
@@ -56,6 +57,15 @@ export function ThisWeekDetail({ plan }: { plan: GameweekPlan }) {
       <Section title="Transfer" icon={<Repeat className="size-3.5" />}>
         {!transfers ? (
           <p className="text-sm text-muted-foreground">Transfer analysis unavailable.</p>
+        ) : activeChip ? (
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-semibold text-foreground">
+              Play your {chipName(activeChip.chip)}
+            </span>
+            {groupTransferMoves(activeChip.draft ?? []).map((g, i) => (
+              <TransferLine key={i} out={g.out} candidates={g.candidates} />
+            ))}
+          </div>
         ) : (
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between gap-2">

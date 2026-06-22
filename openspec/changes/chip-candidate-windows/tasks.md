@@ -1,8 +1,10 @@
 ## Tasks
 
 > Deterministic. Improves the candidate windows; still emits `window`/`hold` only.
+>
+> Status: implemented on branch `claude/musing-hoover-ef5e36`. `tsc` clean, `eslint` 0 errors, `vitest` 240 passed. New `CHIP_CALENDAR` + `WILDCARD_TRIGGER` config; Wildcard now triggers on a fixture swing (`computeFdrRun`) or near DGW setup (not upgrade count); expiry/"don't-hoard" pressure annotates windows as a half-deadline nears; FH/BB/TC look-ahead widened to the half's end (season-wide); FH also opens on a Double. (TC single-great-fixture left as a minor follow-up — not a spec scenario.) In-app pass pending.
 
-### Task 1: Real Wildcard trigger
+### Task 1 — ✅ Done: Real Wildcard trigger
 **Capability:** chip-windows
 **File:** `lib/optimizer/chip-interaction.ts`
 

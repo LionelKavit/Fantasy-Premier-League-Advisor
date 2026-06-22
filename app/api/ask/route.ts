@@ -3,11 +3,13 @@ import type { ApiErrorResponse } from "@/lib/types";
 import { llm } from "@/lib/llm/client";
 import { getScoutContext } from "@/lib/scout/context";
 import { runScoutConversation, type ScoutTurn } from "@/lib/scout/chat";
+import type { ChipPlanLine } from "@/lib/scout/system-prompt";
 
 interface AskBody {
   team_id?: number | string;
   freeTransfers?: number;
   messages?: ScoutTurn[];
+  chipPlan?: ChipPlanLine[];
 }
 
 type AskEvent =
@@ -107,12 +109,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const chipPlan = Array.isArray(body.chipPlan) ? body.chipPlan : undefined;
+
   // Stream the reply token-by-token, with a `tool` event before each tool runs.
   return ndjsonResponse(async (emit) => {
     await runScoutConversation({
       sc,
       freeTransfers,
       messages,
+      chipPlan,
       onToken: (text) => emit({ type: "token", text }),
       onTool: (name) => emit({ type: "tool", name }),
     });

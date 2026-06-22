@@ -1,8 +1,10 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { runScoutConversation } from "../../scout/chat";
+import { buildScoutSystemPrompt } from "../../scout/system-prompt";
 import { llm } from "../../llm/client";
 import { makeScoutContext, mockScoutStream } from "./helpers";
+import { makeChips } from "../factories";
 import { stubApiKey, clearApiKey, restoreClaude } from "../mock-claude";
 
 // Stub the cached context builder (which would otherwise hit the FPL API);
@@ -100,16 +102,47 @@ describe("runScoutConversation (streaming agentic loop)", () => {
         { role: "user", content: "follow up" },
       ],
     });
-    const call = spy.mock.calls[0][0] as { system: string; messages: { role: string; content: unknown }[]; tools: unknown[] };
+    const call = spy.mock.calls[0][0] as {
+      system: Array<{ type: string; text: string; cache_control?: { type: string } }>;
+      messages: { role: string; content: unknown }[];
+      tools: unknown[];
+    };
     expect(call.messages[0]).toMatchObject({ role: "user", content: "first" });
     expect(call.messages[1]).toMatchObject({ role: "assistant", content: "earlier reply" });
-    expect(call.messages[2]).toMatchObject({ role: "user", content: "follow up" });
-    expect(call.system).toMatch(/only/i);
-    expect(call.system).toMatch(/fantasy premier league/i);
+    // Prompt caching: the system block and the message tail carry breakpoints.
+    expect(call.messages[2]).toMatchObject({
+      role: "user",
+      content: [{ type: "text", text: "follow up", cache_control: { type: "ephemeral" } }],
+    });
+    const sysText = call.system[0].text;
+    expect(call.system[0].cache_control).toEqual({ type: "ephemeral" });
+    expect(sysText).toMatch(/only/i);
+    expect(sysText).toMatch(/fantasy premier league/i);
     // Formatting rules: no tables, and complement (don't restate) the panels.
-    expect(call.system).toMatch(/markdown tables/i);
-    expect(call.system).toMatch(/restate/i);
+    expect(sysText).toMatch(/markdown tables/i);
+    expect(sysText).toMatch(/restate/i);
     expect(Array.isArray(call.tools)).toBe(true);
+    // No chip plan supplied → no chip-plan grounding section.
+    expect(sysText).not.toMatch(/committed recommendation/i);
+  });
+
+  it("grounds chip answers in the supplied chip plan (single source)", async () => {
+    stubApiKey();
+    const spy = mockScoutStream([{ text: "Play your Bench Boost." }]);
+    await runScoutConversation({
+      sc: makeScoutContext(),
+      freeTransfers: 1,
+      messages: [{ role: "user", content: "TC or Bench Boost?" }],
+      chipPlan: [
+        { chip: "benchBoost", status: "play-now", triggerGw: 38, reason: "Expires GW38; bench will score." },
+        { chip: "tripleCaptain", status: "hold", triggerGw: 38, reason: "Better saved for a Double." },
+      ],
+    });
+    const sysText = (spy.mock.calls[0][0] as { system: { text: string }[] }).system[0].text;
+    expect(sysText).toMatch(/committed recommendation.*authoritative/i);
+    expect(sysText).toMatch(/Bench Boost: PLAY NOW/);
+    expect(sysText).toMatch(/Triple Captain: HOLD/);
+    expect(sysText).toMatch(/explain and defend THIS plan/i);
   });
 });
 
@@ -172,5 +205,23 @@ describe("POST /api/ask", () => {
     expect(String(err?.message)).toMatch(/authorized|api key/i);
     expect(String(err?.message)).not.toMatch(/401|x-api-key/i); // raw detail not leaked
     expect(events.at(-1)).toEqual({ type: "done" });
+  });
+});
+
+describe("buildScoutSystemPrompt — held-chip grounding", () => {
+  it("lists held chips + expiry and the Wildcard-as-hit-alternative principle", () => {
+    const sc = makeScoutContext();
+    sc.ctx.analysis.chipsRemaining = makeChips({ wildcard: 1, benchBoost: 1 });
+    const sys = buildScoutSystemPrompt(sc, 2);
+    expect(sys).toMatch(/Chips in hand/i);
+    expect(sys).toMatch(/Wildcard/);
+    expect(sys).toMatch(/Bench Boost/);
+    expect(sys).toMatch(/expire GW38/i); // GW20 → second-half deadline
+    expect(sys).toMatch(/free/i); // the Wildcard-as-hit-alternative principle
+  });
+
+  it("omits held-chip grounding when no chips remain", () => {
+    const sc = makeScoutContext(); // default: no chips
+    expect(buildScoutSystemPrompt(sc, 1)).not.toMatch(/Chips in hand/i);
   });
 });

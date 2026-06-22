@@ -11,6 +11,17 @@ The system SHALL produce the chip plan via a single LLM synthesis grounded in `c
 - **WHEN** the orchestrator returns a gameweek not present in the provided windows
 - **THEN** that entry is dropped (it may only act on provided, confirmed windows)
 
+### Requirement: Orchestrator-judged single-fixture Triple Captain
+The grounding SHALL include the current gameweek's top captain-candidate signals (form, fixture multiplier, ceiling, minutes certainty). A single-fixture Triple Captain (no Double) SHALL be an orchestrator judgment, not a deterministic rule.
+
+#### Scenario: Justified single-fixture TC
+- **WHEN** there is no premium Double before the chip expires, but the top captain candidate has a fixture-driven exceptional ceiling (very weak opponent), is in form, and is nailed on minutes
+- **THEN** the orchestrator MAY propose a single-fixture Triple Captain, grounded in those signals and `chips.md` (a Double is the textbook spot; a single great fixture can justify it)
+
+#### Scenario: Held when risky or a Double is available
+- **WHEN** the captain's minutes are uncertain, or a premium Double exists before the chip expires
+- **THEN** the orchestrator does NOT propose a single-fixture Triple Captain (it holds for the Double or a safer week)
+
 ### Requirement: LLM-gated This Week activation (N2)
 A chip SHALL be activated in This Week only when the orchestrator sets a `play-now` entry at the current gameweek; the deterministic layer never activates.
 

@@ -15,7 +15,7 @@ These are **deterministic** improvements (calendar + fixture arithmetic the app 
 - **Real Wildcard trigger** (`chip-windows`): key off a **fixture swing** (a team's FDR run improving materially, via `computeFdrRun`) and/or a **Double-Gameweek setup**, not "≥3 upgrades." Emits a `window` at the relevant gameweek.
 - **Expiry / half-awareness:** encode the season calendar (GW19 first-set expiry, GW20 unlock, GW38; one-per-gameweek) and surface **deadline pressure** as a window nears its expiry ("use-it-or-lose-it").
 - **Wider look-ahead:** detect Double/Blank windows across the remaining half, not just the next ~3 gameweeks.
-- **Minor:** Free Hit also on a big Double (one-week ceiling); Triple Captain on a single great fixture, not only a Double.
+- **Minor:** Free Hit also on a big Double (one-week ceiling). Triple Captain look-ahead is widened across the half, but **single-fixture** Triple Captain (the highest-risk call) is deliberately **deferred to `chip-orchestrator`** — it's a judgment over the captain signals, not a deterministic threshold.
 
 ## Scope & decisions
 

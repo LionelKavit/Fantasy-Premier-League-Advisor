@@ -2,6 +2,7 @@ import type { GameweekPlan, SquadPlayerView, AnalysisContext, PlanInsights } fro
 import type { CaptainSynthesisInput, CaptainResult } from "../captain/types";
 import { getCachedAnalysisContext, buildLiteBaseContext } from "./context";
 import { runOptimizerWithContext } from "../optimizer";
+import { orchestrateChips } from "../optimizer/chip-orchestrator";
 import { computeCaptainSynthesisInput } from "../captain";
 import { synthesizeCaptainPick } from "../captain/synthesis";
 import { computeRiskAlerts } from "../alerts";
@@ -112,6 +113,19 @@ async function computeInsights(
     captaincy = capSettled.value;
   } else if (captainInput) {
     alerts.push(`Captain pipeline failed: ${errMsg(capSettled.reason)}`);
+  }
+
+  // The chips.md-grounded orchestrator decides the chip plan over the deterministic
+  // candidate windows (needs both the optimizer's windows and the captain signals).
+  // Its result is the single `chipPlan`; keyless/failure → windows unchanged (N2).
+  if (transfers) {
+    transfers.chipPlan = await orchestrateChips({
+      windows: transfers.chipPlan ?? [],
+      chipsRemaining: ctx.analysis.chipsRemaining,
+      currentGw: ctx.analysis.currentGw,
+      gwFlags: ctx.gwFlags ?? [],
+      captainTop: captaincy?.captain ?? null,
+    });
   }
 
   // Curated, deterministic risk alerts lead; pipeline-failure notices follow.

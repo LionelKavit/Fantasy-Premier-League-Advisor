@@ -22,6 +22,9 @@ const LS_FT = "fpl:ft";
 export default function Home() {
   const [managerId, setManagerId] = useState("");
   const [freeTransfers, setFreeTransfers] = useState(1);
+  // The FT value the displayed plan was actually computed with. The toggle moves
+  // `freeTransfers` (the selection); `appliedFt` only changes when an analysis runs.
+  const [appliedFt, setAppliedFt] = useState(1);
   const [status, setStatus] = useState<Status>("idle");
   const [plan, setPlan] = useState<GameweekPlan | null>(null);
   const [error, setError] = useState("");
@@ -35,6 +38,7 @@ export default function Home() {
   const load = useCallback(async (id: string, ft: number, opts: { force?: boolean } = {}) => {
     setManagerId(id);
     setFreeTransfers(ft);
+    setAppliedFt(ft); // this analysis is the new applied baseline → clears any pending state
     setStatus("loading");
     setError("");
     setChat([]); // new analysis → fresh conversation (grounding context changed)
@@ -94,9 +98,11 @@ export default function Home() {
     load(id, ft);
   };
 
+  // The toggle only updates the selection (persisted). Analysis re-runs on
+  // Re-analyze, which reads this value — never automatically here.
   const handleFreeTransfers = (n: number) => {
     localStorage.setItem(LS_FT, String(n));
-    if (managerId) load(managerId, n);
+    setFreeTransfers(n);
   };
 
   const changeManager = () => {
@@ -136,6 +142,9 @@ export default function Home() {
     plan.transfers?.primaryRecommendation.transfers.map((t) => t.weakPlayer.player.id) ?? []
   );
 
+  // Selection changed but not yet analyzed → Re-analyze is pending.
+  const ftPending = freeTransfers !== appliedFt;
+
   return (
     <main className="flex flex-1 flex-col">
       <Header
@@ -145,6 +154,7 @@ export default function Home() {
         onReanalyze={() => load(managerId, freeTransfers, { force: true })}
         onChangeManager={changeManager}
         busy={insightsLoading}
+        dirty={ftPending}
       />
       {/* 2×2 lens — row 1: pitch | conversation (stretched to the pitch's height);
           row 2: collapsible This Week + Long Term plan | alerts. */}
@@ -152,16 +162,21 @@ export default function Home() {
         {/* Row 1 left — the pitch sets the row height */}
         <Pitch squad={plan.squad} transferOutIds={transferOutIds} />
 
-        {/* Row 1 right — hero conversation, stretched to match the pitch */}
-        <AskTheScout
-          className="lg:self-stretch"
-          teamId={Number(managerId)}
-          freeTransfers={freeTransfers}
-          plan={plan}
-          briefNonce={briefNonce}
-          messages={chat}
-          onMessagesChange={setChat}
-        />
+        {/* Row 1 right — hero conversation. The wrapper stretches to the pitch's
+            height; the panel fills it via absolute inset-0 so its own message list
+            can't grow the grid row (the chat scrolls inside instead). On mobile the
+            wrapper is a normal block and the panel takes its own fixed height. */}
+        <div className="lg:relative lg:self-stretch">
+          <AskTheScout
+            className="lg:absolute lg:inset-0"
+            teamId={Number(managerId)}
+            freeTransfers={appliedFt}
+            plan={plan}
+            briefNonce={briefNonce}
+            messages={chat}
+            onMessagesChange={setChat}
+          />
+        </div>
 
         {/* Row 2 left — the collapsible This Week + Long Term plan */}
         <FullBreakdown

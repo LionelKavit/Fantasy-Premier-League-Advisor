@@ -141,7 +141,7 @@ ${JSON.stringify(chipRecommendations.map(c => ({
 })), null, 2)}
 
 ## Instructions
-Evaluate conflicts between recommendations. Consider the manager's risk tolerance. Sequence chip usage optimally. Output JSON matching the OptimizerResult schema exactly.
+Evaluate conflicts between recommendations. Consider the manager's risk tolerance. Output JSON matching the OptimizerResult schema exactly. (Chip timing is decided separately — do not recommend playing a chip here.)
 
 The narrativeSummary is shown ALONGSIDE the structured recommendation — the chosen transfer, restructure chain, hit verdict and captain are already displayed as chips and rows on screen. So do NOT restate which move to make. Instead, in 2-4 sentences, give the INSIGHT the numbers don't show: why this option beats the alternatives, the key trade-off or risk being accepted, and context such as recent form vs underlying stats, fixture swing, ownership/template, or timing. Add reasoning, not a summary.
 
@@ -151,10 +151,9 @@ For secondaryRecommendation: suggest a plan for next week if applicable (e.g. a 
 
 ## Output Schema
 {
-  "primaryRecommendation": { "type": "FREE|HIT_SINGLE|HIT_DOUBLE|ROLL|WILDCARD|FREE_HIT", "transfers": [{"outPlayer": "name", "inPlayer": "name"}], "netPointsCost": number, "netGain": number, "breakEvenGw": number|null },
+  "primaryRecommendation": { "type": "FREE|HIT_SINGLE|HIT_DOUBLE|ROLL", "transfers": [{"outPlayer": "name", "inPlayer": "name"}], "netPointsCost": number, "netGain": number, "breakEvenGw": number|null },
   "secondaryRecommendation": same shape or null,
   "hitVerdict": { "recommended": boolean, "reasoning": "string", "breakEvenGw": number|null },
-  "chipPlan": [{ "chip": "wildcard|freeHit|benchBoost|tripleCaptain", "triggerGw": number, "reason": "string" }],
   "confidence": "high|medium|low",
   "narrativeSummary": "2-4 sentences of plain English",
   "alerts": ["string"]
@@ -261,16 +260,6 @@ function mapTransferAction(
         netGain: hitResult.doubleHit?.netGain ?? 0,
         breakEvenGw: hitResult.doubleHit?.breakEvenGw ?? null,
       };
-    case "WILDCARD": {
-      const wcTransfers = validTransfers.filter((vt) => vt.gw1Gain > 0);
-      return {
-        type: "WILDCARD",
-        transfers: wcTransfers,
-        netPointsCost: 0,
-        netGain: wcTransfers.reduce((sum, vt) => sum + vt.gw1Gain, 0),
-        breakEvenGw: null,
-      };
-    }
     default:
       return {
         type: "ROLL",

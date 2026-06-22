@@ -1,8 +1,10 @@
 ## Tasks
 
 > Deterministic only. Establishes the single source + invariant; the orchestrator and better triggers are later changes.
+>
+> Status: implemented on branch `claude/musing-hoover-ef5e36`. `tsc` clean, `eslint` 0 errors, `vitest` 237 passed. `ChipRecommendation` gained `status` + `draft` (kept `triggerGw`); `TransferType` dropped `WILDCARD`/`FREE_HIT`; the transfer synthesis no longer elects chips; This Week renders a chip only from `chipPlan` `play-now`@currentGw (none yet — deterministic emits `window` only). FREE_HIT's broken ROLL-coercion is gone with the type. In-app pass pending.
 
-### Task 1: Unified chip-plan model
+### Task 1 — ✅ Done: Unified chip-plan model
 **Capability:** chip-strategy
 **File:** `lib/optimizer/types.ts`
 

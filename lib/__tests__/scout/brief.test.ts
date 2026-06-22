@@ -165,12 +165,15 @@ describe("streamOpeningBrief (LLM path)", () => {
 
     expect(tokens.join("")).toBe("Right Kavit — deadline's Saturday. Saka in for Mbeumo.");
     const params = spy.mock.calls[0][0] as {
-      system?: string;
+      system?: Array<{ type: string; text: string; cache_control?: { type: string } }>;
       max_tokens?: number;
       messages: { content: string }[];
       tools?: unknown;
     };
-    expect(params.system).toBe(SCOUT_PERSONA);
+    // The persona is sent as a cache-marked system block (prompt caching).
+    expect(params.system).toEqual([
+      { type: "text", text: SCOUT_PERSONA, cache_control: { type: "ephemeral" } },
+    ]);
     expect(params.tools).toBeUndefined();
     // A runaway guard well above the ≤4-sentence budget (~110-150 tokens), so the
     // brief is never truncated mid-sentence, but still bounded.

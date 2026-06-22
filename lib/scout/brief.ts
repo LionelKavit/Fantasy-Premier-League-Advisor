@@ -13,7 +13,7 @@
 import type { GameweekPlan } from "../plan/types";
 import type { TransferType } from "../optimizer/types";
 import type { ChipsRemaining } from "../types";
-import { llm } from "../llm/client";
+import { llm, withCachedSystem } from "../llm/client";
 import { SCOUT_PERSONA } from "../llm/persona";
 
 export interface BriefTransfer {
@@ -62,10 +62,6 @@ function transferHeadline(type: TransferType): string {
       return "Take a −4 hit";
     case "HIT_DOUBLE":
       return "Take a −8 hit";
-    case "WILDCARD":
-      return "Play your Wildcard";
-    case "FREE_HIT":
-      return "Play your Free Hit";
     default:
       return "Recommendation";
   }
@@ -180,7 +176,7 @@ export async function streamOpeningBrief(
   const s = llm.stream({
     model: llm.DEFAULT_MODEL,
     max_tokens: BRIEF_MAX_TOKENS,
-    system: SCOUT_PERSONA,
+    system: withCachedSystem(SCOUT_PERSONA),
     messages: [{ role: "user", content: buildBriefPrompt(grounding) }],
   });
   for await (const delta of s.textStream) onToken(delta);
