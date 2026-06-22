@@ -97,7 +97,6 @@ export interface OptimizerResult {
   alerts: string[];
   confidence: "high" | "medium" | "low";
   narrativeSummary: string;
-  longTermNarrative: string | null;
   generatedAt: string;
   // Deterministic, code-authored notice (not LLM) — set when transfers are held
   // because ep_next is unavailable (transfer-ep-notice). Null in normal operation.

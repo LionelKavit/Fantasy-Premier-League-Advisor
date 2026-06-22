@@ -14,7 +14,7 @@ import { ErrorCard } from "@/components/states/ErrorCard";
 import type { AskMessage } from "@/lib/client/ask";
 
 type Status = "idle" | "loading" | "loaded" | "error";
-type Lens = "this-week" | "long-term";
+type Lens = "this-week" | "long-term" | "chips";
 
 const LS_ID = "fpl:lastId";
 const LS_FT = "fpl:ft";

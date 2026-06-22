@@ -53,7 +53,7 @@ const validReply = {
 };
 
 describe("synthesizeRecommendation — success path (mocked LLM)", () => {
-  it("parses a valid reply, maps the action, and merges computed alerts", async () => {
+  it("parses a valid reply and maps the action; emits no synthesis alerts", async () => {
     stubApiKey();
     mockClaudeJson(validReply);
     const r = await synthesizeRecommendation(makeInput());
@@ -63,10 +63,10 @@ describe("synthesizeRecommendation — success path (mocked LLM)", () => {
     expect(r.primaryRecommendation.transfers).toHaveLength(1); // mapped from bestSingle
     expect(r.narrativeSummary).toBe("Transfer X for Y.");
 
-    expect(r.alerts).toContain("LLM note");
-    expect(r.alerts.some((a) => a.includes("Rising"))).toBe(true); // transferMomentum > 0.7
-    expect(r.alerts.some((a) => a.includes("Doubt"))).toBe(true); // doubtful squad player
-    expect(r.alerts.some((a) => /multiple weak spots at MID/i.test(a))).toBe(true);
+    // Risk/LLM alerts are no longer surfaced from the synthesis — they're computed
+    // centrally (lib/alerts) and live on plan.alerts. The model's free-form alerts
+    // ("LLM note"), price-rise, doubtful, and "multiple weak spots" do not appear here.
+    expect(r.alerts).toEqual([]);
   });
 
   it("clamps an out-of-range confidence to medium", async () => {

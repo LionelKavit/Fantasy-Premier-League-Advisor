@@ -35,7 +35,6 @@ function makeTransfer(type: TransferType, moves: { out: string; in: string }[]):
     alerts: [],
     confidence: "high",
     narrativeSummary: "Saka's underlying numbers dwarf Mbeumo's over the next month.",
-    longTermNarrative: "A long, multi-paragraph outlook that must NEVER leak into the brief.",
     generatedAt: "2026-02-10T00:00:00Z",
     dataNotice: null,
   };

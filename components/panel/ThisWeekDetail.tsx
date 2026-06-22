@@ -3,6 +3,7 @@ import type { TransferAction, RestructureOption } from "@/lib/optimizer/types";
 import { ArrowRight, Crown, Repeat, Coins, Info } from "lucide-react";
 import { Section, ConfidenceBadge } from "./parts";
 import { CaptainRanking } from "./CaptainRanking";
+import { groupTransferMoves } from "@/lib/client/transferMoves";
 
 function primaryHeadline(action: TransferAction): string {
   switch (action.type) {
@@ -23,12 +24,17 @@ function primaryHeadline(action: TransferAction): string {
   }
 }
 
-function TransferLine({ out, inn }: { out: string; inn: string }) {
+function TransferLine({ out, candidates }: { out: string; candidates: string[] }) {
   return (
-    <div className="flex items-center gap-2 text-sm">
+    <div className="flex flex-wrap items-center gap-1.5 text-sm">
       <span className="rounded bg-fpl-pink/15 px-1.5 py-0.5 font-medium text-fpl-pink">{out}</span>
       <ArrowRight className="size-3.5 text-muted-foreground" aria-label="to" />
-      <span className="rounded bg-fpl-green/15 px-1.5 py-0.5 font-medium text-fpl-green">{inn}</span>
+      {candidates.map((c, i) => (
+        <span key={c} className="flex items-center gap-1.5">
+          {i > 0 && <span className="text-muted-foreground">/</span>}
+          <span className="rounded bg-fpl-green/15 px-1.5 py-0.5 font-medium text-fpl-green">{c}</span>
+        </span>
+      ))}
     </div>
   );
 }
@@ -65,8 +71,8 @@ export function ThisWeekDetail({ plan }: { plan: GameweekPlan }) {
                 <span>{transfers.dataNotice}</span>
               </p>
             )}
-            {transfers.primaryRecommendation.transfers.map((t, i) => (
-              <TransferLine key={i} out={t.weakPlayer.player.webName} inn={t.candidate.player.webName} />
+            {groupTransferMoves(transfers.primaryRecommendation.transfers).map((g, i) => (
+              <TransferLine key={i} out={g.out} candidates={g.candidates} />
             ))}
             {transfers.hitVerdict && (
               <p className="text-xs text-muted-foreground">

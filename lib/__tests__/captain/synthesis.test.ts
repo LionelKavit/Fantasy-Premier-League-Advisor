@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { synthesizeCaptainPick } from "../../captain/synthesis";
-import type { CaptainSynthesisInput, TripleCaptainAdvice } from "../../captain/types";
-import { makeCaptainCandidate, makeManagerProfile, makeAvailability } from "../factories";
+import type { CaptainSynthesisInput } from "../../captain/types";
+import { makeCaptainCandidate, makeManagerProfile } from "../factories";
 import { mockClaudeJson, mockClaudeError, stubApiKey, clearApiKey, restoreClaude } from "../mock-claude";
 
 afterEach(restoreClaude);
@@ -55,22 +55,12 @@ describe("synthesizeCaptainPick — fail-safe and alerts", () => {
     expect(r.alerts.some((a) => a.includes("500"))).toBe(true);
   });
 
-  it("alerts when the chosen captain is doubtful", async () => {
-    clearApiKey();
-    const doubtfulCap = makeCaptainCandidate({
-      total: 8,
-      player: { player: { webName: "Doubt", availability: makeAvailability({ status: "doubtful", chanceOfPlayingNext: 50 }) } },
-    });
-    const r = await synthesizeCaptainPick(makeInput({ rankedCandidates: [doubtfulCap] }));
-    expect(r.alerts.some((a) => /doubtful/i.test(a))).toBe(true);
-  });
-
-  it("alerts when a triple-captain window is within two gameweeks", async () => {
-    clearApiKey();
-    const tc: TripleCaptainAdvice = {
-      recommended: true, targetGw: 21, targetPlayer: "Cap", peakScore: 12, baselineScore: 5, reasoning: "DGW",
-    };
-    const r = await synthesizeCaptainPick(makeInput({ tripleCaptainAdvice: tc }));
-    expect(r.alerts.some((a) => /triple captain window/i.test(a))).toBe(true);
+  it("emits no synthesis alerts on the success path", async () => {
+    stubApiKey();
+    mockClaudeJson({ captainName: "Cap", confidence: "high", narrativeSummary: "Captain Cap.", alerts: ["LLM note"] });
+    const r = await synthesizeCaptainPick(makeInput());
+    // Captain availability risk now lives in lib/alerts (plan.alerts); the model's
+    // free-form alerts and the TC-window reminder are no longer surfaced here.
+    expect(r.alerts).toEqual([]);
   });
 });

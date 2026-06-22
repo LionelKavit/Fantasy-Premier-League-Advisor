@@ -202,7 +202,9 @@ function parseOptimizerResult(
       );
     }
 
-    const alerts = buildAlerts(inputs, raw.alerts ?? []);
+    // Risk alerts are computed centrally (lib/alerts) and surfaced on plan.alerts;
+    // the success path no longer emits the model's free-form alerts.
+    const alerts: string[] = [];
 
     return {
       primaryRecommendation: primaryAction,
@@ -218,7 +220,6 @@ function parseOptimizerResult(
       alerts,
       confidence: validateConfidence(raw.confidence),
       narrativeSummary: raw.narrativeSummary,
-      longTermNarrative: null, // set by runOptimizerWithContext (parallel call)
       generatedAt: new Date().toISOString(),
       dataNotice: epDataNotice(inputs.singleResult),
     };
@@ -288,51 +289,8 @@ function validateConfidence(
   return "medium";
 }
 
-function buildAlerts(
-  inputs: SynthesisInput,
-  llmAlerts: string[]
-): string[] {
-  const alerts: string[] = [...llmAlerts];
-
-  for (const vt of inputs.validTransfers) {
-    if (vt.candidate.marketSignals.transferMomentum > 0.7) {
-      alerts.push(
-        `Price rise likely for ${vt.candidate.player.webName} — act before deadline`
-      );
-    }
-  }
-
-  for (const sp of inputs.analysis.rankedSquad) {
-    if (
-      sp.player.availability.status === "doubtful" &&
-      (sp.player.availability.chanceOfPlayingNext ?? 100) <= 50
-    ) {
-      alerts.push(
-        `${sp.player.webName} flagged doubtful (${sp.player.availability.chanceOfPlayingNext}% chance of playing)`
-      );
-    }
-  }
-
-  const weakPositions = inputs.analysis.weakest3.map(
-    (ws) => ws.player.player.position
-  );
-  const posCounts = new Map<string, number>();
-  for (const pos of weakPositions) {
-    posCounts.set(pos, (posCounts.get(pos) ?? 0) + 1);
-  }
-  for (const [pos, count] of posCounts) {
-    if (count >= 2) {
-      alerts.push(
-        `Multiple weak spots at ${pos} — consider prioritizing this area`
-      );
-    }
-  }
-
-  return alerts;
-}
-
 function buildFailSafe(inputs: SynthesisInput): OptimizerResult {
-  const { singleResult, hitResult, chipRecommendations, restructureOptions, horizon } = inputs;
+  const { singleResult, chipRecommendations, restructureOptions, horizon } = inputs;
 
   let primaryRecommendation: TransferAction;
   if (singleResult.bestSingle) {
@@ -368,7 +326,6 @@ function buildFailSafe(inputs: SynthesisInput): OptimizerResult {
     confidence: "low",
     narrativeSummary:
       "Automated recommendation without AI synthesis. Review manually.",
-    longTermNarrative: null, // set by runOptimizerWithContext (parallel call)
     generatedAt: new Date().toISOString(),
     dataNotice: epDataNotice(singleResult),
   };

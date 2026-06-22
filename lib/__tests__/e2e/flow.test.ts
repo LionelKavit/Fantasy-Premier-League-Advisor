@@ -129,10 +129,6 @@ describe("end-to-end: request → pipelines → personalized GameweekPlan", () =
     expect(plan.transfers).not.toBeNull();
     expect(plan.captaincy).not.toBeNull();
     expect(plan.transfers!.primaryRecommendation).toBeDefined();
-    expect(
-      plan.transfers!.longTermNarrative === null ||
-        typeof plan.transfers!.longTermNarrative === "string"
-    ).toBe(true);
     expect(plan.captaincy!.captain).toBeDefined();
     expect(plan.captaincy!.rankedCandidates).toHaveLength(11); // starting XI
     expect(plan.alerts).toHaveLength(0);

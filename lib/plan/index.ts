@@ -4,6 +4,7 @@ import { getCachedAnalysisContext, buildLiteBaseContext } from "./context";
 import { runOptimizerWithContext } from "../optimizer";
 import { computeCaptainSynthesisInput } from "../captain";
 import { synthesizeCaptainPick } from "../captain/synthesis";
+import { computeRiskAlerts } from "../alerts";
 import { CAPTAIN_CONFIG } from "../config";
 
 export interface PlanOptions {
@@ -113,7 +114,9 @@ async function computeInsights(
     alerts.push(`Captain pipeline failed: ${errMsg(capSettled.reason)}`);
   }
 
-  return { transfers, captaincy, alerts };
+  // Curated, deterministic risk alerts lead; pipeline-failure notices follow.
+  const riskAlerts = computeRiskAlerts({ analysis: ctx.analysis, transfers, captaincy });
+  return { transfers, captaincy, alerts: [...riskAlerts, ...alerts] };
 }
 
 // ── Merged plan (back-compat) ────────────────────────────────────────────────
