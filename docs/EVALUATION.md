@@ -63,7 +63,7 @@ The strength signal was **worse in every position** — decisively so for defend
 ## How it's done
 
 - **Calibrate-first.** Every model change is gated by a report-only calibration on the backtest before it touches runtime — which is exactly how the fixture idea was caught.
-- **Spec-first.** Built with [OpenSpec](https://github.com/Fission-AI/OpenSpec): ~28 change proposals under `openspec/changes/archive/`, each with the rationale, design, and as-built outcome — *including the no-ships and report-only results*.
+- **Spec-first.** Built with [OpenSpec](https://github.com/Fission-AI/OpenSpec): ~45 change proposals under `openspec/changes/archive/`, each with the rationale, design, and as-built outcome — *including the no-ships and report-only results*.
 - **Honest about limits.** The numbers above are within-position rank correlation on a point-in-time backtest, and deterministic-floor for the squad replays — not a live A/B. They're presented with those caveats rather than as marketing.
 
 ## Reproduce

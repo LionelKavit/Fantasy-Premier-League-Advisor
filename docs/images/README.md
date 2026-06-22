@@ -2,16 +2,19 @@
 
 Screenshots and the demo video referenced from the root `README.md`.
 
-| File | Used as |
-|---|---|
-| `fpl-advisor-this-week-dashboard.png` | README hero (pitch + ratings + verdict) |
-| `fpl-advisor-this-week-scout-verdict.png` | Screenshots — This Week verdict |
-| `fpl-advisor-long-term-dashboard.png` | Screenshots — Long Term chip timeline |
-| `fpl-advisor-long-term-scout-verdict.png` | Screenshots — Long Term outlook |
-| `fpl-advisor-ask-the-scout-chat-panel-1.png` | Screenshots — agentic chat |
-| `fpl-advisor-ask-the-scout-chat-panel-2.png` | spare |
-| `fpl-advisor-manager-id-login.png` | spare (entry screen) |
-| `fpl-advisor-demo.mov` | demo video — see note below |
+**Current set** (conversation-first UI) — all captured on the same manager (GW38) so the set reads
+as one coherent story.
+
+| File | Used as | Shows |
+|---|---|---|
+| `fpl-advisor-hero.png` | README hero | The landing: pitch (left) + Ask The Scout hero with the proactive brief and starter chips (right). |
+| `fpl-advisor-chat.png` | Screenshots — opening brief | The chat panel with the Scout's proactive, deadline-aware opening brief + the contextual starter chips. |
+| `fpl-advisor-chat-continued.png` | Screenshots — tool-grounded answer | The chat after a follow-up ("Why Haaland over Anderson?") — a crisp, answer-first reply citing real numbers. |
+| `fpl-advisor-this-week.png` | Screenshots — This Week | Breakdown on **This Week**: the recommended move, restructure chains, and EO-aware captaincy. |
+| `fpl-advisor-chips.png` | Screenshots — Chips | Breakdown on **Chips**: chips-left row + reasons list, play-now highlighted (no gameweek axis). |
+| `fpl-advisor-long-term.png` | spare | Breakdown on **Long Term** (final-GW empty state here — swap in a mid-season shot for a populated horizon). |
+| `fpl-advisor-login.png` | spare | The entry screen (manager-ID form). |
+| `fpl-advisor-demo.mov` | demo video — see note below | Flow: squad load → pitch → proactive brief → breakdown tabs → Ask The Scout. |
 
 ## Demo video — inline player on GitHub
 

@@ -1,6 +1,6 @@
 # Architecture
 
-Pocket Scout is a single **long-running Next.js server**: a deterministic FPL scoring engine, an LLM reasoning layer on top, and an agentic chat alongside. No database — all state is per-request or in short-lived in-memory caches.
+Pocket Scout is a single **long-running Next.js server**: a deterministic FPL scoring engine, an LLM reasoning layer on top, and an agentic chat as the primary, **conversation-first** surface. No database — all state is per-request or in short-lived in-memory caches.
 
 ## Request flow (two phases)
 
@@ -18,10 +18,10 @@ flowchart TB
   OPT --> TR[Transfer: hold-gate on Δep]
   OPT --> RES[Restructure chains]
   OPT --> HZ[5-GW horizon]
-  OPT --> CHIP[Chip windows]
+  OPT --> CHIP[Chip candidate windows]
   RANK --> CAP[Captain pipeline<br/>ceiling-weighted, EO-aware]
-  TR & CAP & HZ & CHIP --> SYN[LLM syntheses<br/>persona + knowledge grounding]
-  SYN --> INSOUT[[Verdict · This Week · Long Term]]
+  TR & CAP & HZ & CHIP --> SYN[LLM syntheses + chip orchestrator<br/>persona + knowledge grounding]
+  SYN --> INSOUT[[This Week · Long Term · Chips]]
 ```
 
 - **Base phase** (`/api/plan/base`) — deterministic only. Builds the squad analysis and composite scores; returns the pitch. Fast, no LLM.
@@ -43,27 +43,28 @@ total = squash( Σ wᵢ · signalᵢ  +  trendAdj + llmAdj − suspensionPenalty
 - A strictly-monotonic **logistic squash** maps the raw score into (0,1) for the "/10" display without tie-collapsing at the bounds.
 - Details + how the weights were derived: **[EVALUATION.md](EVALUATION.md)**.
 
-**Optimizer** (`lib/optimizer/`) — ranks candidate transfers, but the *go/hold* decision is gated on **projected points**: recommend a transfer only if `Δep = in.epNext − out.epNext` clears a bar (≈1.5 free, >4 for a hit); otherwise hold. Also computes restructure chains, a 5-GW horizon, and chip windows (DGW/BGW-aware).
+**Optimizer** (`lib/optimizer/`) — ranks candidate transfers, but the *go/hold* decision is gated on **projected points**: recommend a transfer only if `Δep = in.epNext − out.epNext` clears a bar (≈1.5 free, >4 for a hit); otherwise hold. Also computes restructure chains, a 5-GW horizon, and chip **candidate windows** (DGW/BGW-aware, plus a use-it-or-lose-it last-call on the half deadline). Those windows are deterministic candidates; an LLM **chip orchestrator** (`chip-orchestrator.ts`), grounded in `chips.md`, turns them into the committed chip plan — play-now / hold / sequenced — that both This Week and the Chips tab read (a single source of truth).
 
 **Captain** (`lib/captain/`) — a separate ceiling-weighted model (explosiveness, set-pieces, fixture, minutes certainty), with template-vs-differential awareness driven by the manager's rank.
 
 ## The LLM layer
 
-**Syntheses** (`lib/optimizer/synthesis.ts`, `long-term-synthesis.ts`, `lib/captain/synthesis.ts`) turn the deterministic results into prose — the verdict, the transfer rationale, the long-term outlook. They are:
+**Syntheses** (`lib/optimizer/synthesis.ts`, `lib/captain/synthesis.ts`, the chip orchestrator `lib/optimizer/chip-orchestrator.ts`, and the opening brief `lib/scout/brief.ts`) turn the deterministic results into prose — the transfer verdict, the captaincy call, the chip plan, and the proactive opening brief. They are:
 - **Persona-unified** — all share `lib/llm/persona.ts` (the *Pocket Scout* identity) as their system instruction.
 - **Knowledge-grounded** — curated markdown (`lib/knowledge/chips.md`, `rank-strategy.md`) is injected so chip timing and effective-ownership reasoning reflect expert principles, not generic model priors.
 - **Format-safe** — several return structured JSON that the UI renders; the persona explicitly defers to each task's output format.
+- **Prompt-cached** — `cache_control` marks the stable system / agent prefixes so repeated prefixes (notably the agentic chat's multi-round loop) bill at the cache-read rate.
 
-**Agentic Scout chat** (`lib/scout/`) — the "Ask The Scout" tab is a real tool-use agent: a stateless loop where the model calls tools (`get_plan`, `score_player`, `simulate_transfer`, `simulate_captain`) to fetch *real* numbers rather than hallucinate them, streaming the reply token-by-token.
+**Agentic Scout chat** (`lib/scout/`) — Ask The Scout is the **hero conversation**: it opens proactively with a deadline-aware brief, then runs a stateless tool-use loop where the model calls tools (`get_plan`, `score_player`, `simulate_transfer`, `simulate_captain`) to fetch *real* numbers rather than hallucinate them, streaming the reply token-by-token. It's grounded in the committed chip plan and your held chips, so its chip advice never contradicts the panels.
 
 ### Knowledge & grounding
 
 | Layer | Source | Type | Feeds |
 |---|---|---|---|
 | Rotation / injury | predicted-lineup news (fetched, LLM-extracted → structured) | dynamic data | `LlmContextSignals` → composite + captain |
-| Chip timing | `lib/knowledge/chips.md` | static principles | long-term narrative |
+| Chip timing | `lib/knowledge/chips.md` | static principles | the **chip orchestrator** → chip plan |
 | Rank / EO | `lib/knowledge/rank-strategy.md` | static principles | captain + transfer narratives |
-| Persona | `lib/llm/persona.ts` | identity | all four reasoning calls |
+| Persona | `lib/llm/persona.ts` | identity | every reasoning call + the chat |
 
 Static knowledge files are read at runtime, so they're explicitly copied into the Docker image (see [Deployment](#deployment)).
 
