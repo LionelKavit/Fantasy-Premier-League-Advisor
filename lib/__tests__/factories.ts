@@ -410,6 +410,7 @@ export function makeSquadAnalysisResult(
     chipsRemaining: o.chipsRemaining ?? makeChips(),
     bank: o.bank ?? 2.0,
     currentGw: o.currentGw ?? 20,
+    deadline: o.deadline ?? "2026-01-01T00:00:00Z",
     generatedAt: o.generatedAt ?? "2026-01-01T00:00:00.000Z",
   };
 }

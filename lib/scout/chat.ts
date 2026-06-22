@@ -1,8 +1,8 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { llm, DEFAULT_MODEL } from "../llm/client";
+import { llm, DEFAULT_MODEL, withCachedSystem, withCachedTail } from "../llm/client";
 import type { ScoutContext } from "./context";
 import { SCOUT_TOOLS, runScoutTool } from "./tools";
-import { buildScoutSystemPrompt } from "./system-prompt";
+import { buildScoutSystemPrompt, type ChipPlanLine } from "./system-prompt";
 
 export interface ScoutTurn {
   role: "user" | "assistant";
@@ -49,13 +49,19 @@ export async function runScoutConversation(params: {
   sc: ScoutContext;
   freeTransfers: number;
   messages: ScoutTurn[];
+  /** The committed chip plan the panels show — grounds chip answers (single source). */
+  chipPlan?: ChipPlanLine[];
   onToken?: (text: string) => void;
   onTool?: (name: string) => void;
   maxToolRounds?: number;
 }): Promise<ScoutConversationResult> {
-  const { sc, freeTransfers, onToken, onTool } = params;
+  const { sc, freeTransfers, chipPlan, onToken, onTool } = params;
   const maxRounds = params.maxToolRounds ?? MAX_TOOL_ROUNDS;
-  const system = buildScoutSystemPrompt(sc, freeTransfers);
+  // Cache the stable prefix reused across this question's model calls: one
+  // breakpoint on the system block (covers tools + system), one on the message
+  // tail (covers history). `messages` stays clean; `withCachedTail` marks a copy
+  // per call so breakpoints never accumulate past the 4-per-request cap.
+  const system = withCachedSystem(buildScoutSystemPrompt(sc, freeTransfers, chipPlan));
 
   const messages: Anthropic.MessageParam[] = params.messages.map((m) => ({
     role: m.role,
@@ -66,7 +72,7 @@ export async function runScoutConversation(params: {
 
   for (let round = 0; round < maxRounds; round++) {
     const { text, message } = await streamRound(
-      { model: DEFAULT_MODEL, max_tokens: MAX_TOKENS, system, tools: SCOUT_TOOLS, messages },
+      { model: DEFAULT_MODEL, max_tokens: MAX_TOKENS, system, tools: SCOUT_TOOLS, messages: withCachedTail(messages) },
       onToken
     );
 
@@ -96,7 +102,7 @@ export async function runScoutConversation(params: {
 
   // Round cap hit while still calling tools — force a final answer without tools.
   const { text } = await streamRound(
-    { model: DEFAULT_MODEL, max_tokens: MAX_TOKENS, system, messages },
+    { model: DEFAULT_MODEL, max_tokens: MAX_TOKENS, system, messages: withCachedTail(messages) },
     onToken
   );
   let finalText = text.trim();

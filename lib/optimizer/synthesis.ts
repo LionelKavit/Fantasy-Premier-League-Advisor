@@ -141,7 +141,7 @@ ${JSON.stringify(chipRecommendations.map(c => ({
 })), null, 2)}
 
 ## Instructions
-Evaluate conflicts between recommendations. Consider the manager's risk tolerance. Sequence chip usage optimally. Output JSON matching the OptimizerResult schema exactly.
+Evaluate conflicts between recommendations. Consider the manager's risk tolerance. Output JSON matching the OptimizerResult schema exactly. (Chip timing is decided separately — do not recommend playing a chip here.)
 
 The narrativeSummary is shown ALONGSIDE the structured recommendation — the chosen transfer, restructure chain, hit verdict and captain are already displayed as chips and rows on screen. So do NOT restate which move to make. Instead, in 2-4 sentences, give the INSIGHT the numbers don't show: why this option beats the alternatives, the key trade-off or risk being accepted, and context such as recent form vs underlying stats, fixture swing, ownership/template, or timing. Add reasoning, not a summary.
 
@@ -151,10 +151,9 @@ For secondaryRecommendation: suggest a plan for next week if applicable (e.g. a 
 
 ## Output Schema
 {
-  "primaryRecommendation": { "type": "FREE|HIT_SINGLE|HIT_DOUBLE|ROLL|WILDCARD|FREE_HIT", "transfers": [{"outPlayer": "name", "inPlayer": "name"}], "netPointsCost": number, "netGain": number, "breakEvenGw": number|null },
+  "primaryRecommendation": { "type": "FREE|HIT_SINGLE|HIT_DOUBLE|ROLL", "transfers": [{"outPlayer": "name", "inPlayer": "name"}], "netPointsCost": number, "netGain": number, "breakEvenGw": number|null },
   "secondaryRecommendation": same shape or null,
   "hitVerdict": { "recommended": boolean, "reasoning": "string", "breakEvenGw": number|null },
-  "chipPlan": [{ "chip": "wildcard|freeHit|benchBoost|tripleCaptain", "triggerGw": number, "reason": "string" }],
   "confidence": "high|medium|low",
   "narrativeSummary": "2-4 sentences of plain English",
   "alerts": ["string"]
@@ -202,7 +201,9 @@ function parseOptimizerResult(
       );
     }
 
-    const alerts = buildAlerts(inputs, raw.alerts ?? []);
+    // Risk alerts are computed centrally (lib/alerts) and surfaced on plan.alerts;
+    // the success path no longer emits the model's free-form alerts.
+    const alerts: string[] = [];
 
     return {
       primaryRecommendation: primaryAction,
@@ -218,7 +219,6 @@ function parseOptimizerResult(
       alerts,
       confidence: validateConfidence(raw.confidence),
       narrativeSummary: raw.narrativeSummary,
-      longTermNarrative: null, // set by runOptimizerWithContext (parallel call)
       generatedAt: new Date().toISOString(),
       dataNotice: epDataNotice(inputs.singleResult),
     };
@@ -260,16 +260,6 @@ function mapTransferAction(
         netGain: hitResult.doubleHit?.netGain ?? 0,
         breakEvenGw: hitResult.doubleHit?.breakEvenGw ?? null,
       };
-    case "WILDCARD": {
-      const wcTransfers = validTransfers.filter((vt) => vt.gw1Gain > 0);
-      return {
-        type: "WILDCARD",
-        transfers: wcTransfers,
-        netPointsCost: 0,
-        netGain: wcTransfers.reduce((sum, vt) => sum + vt.gw1Gain, 0),
-        breakEvenGw: null,
-      };
-    }
     default:
       return {
         type: "ROLL",
@@ -288,51 +278,8 @@ function validateConfidence(
   return "medium";
 }
 
-function buildAlerts(
-  inputs: SynthesisInput,
-  llmAlerts: string[]
-): string[] {
-  const alerts: string[] = [...llmAlerts];
-
-  for (const vt of inputs.validTransfers) {
-    if (vt.candidate.marketSignals.transferMomentum > 0.7) {
-      alerts.push(
-        `Price rise likely for ${vt.candidate.player.webName} — act before deadline`
-      );
-    }
-  }
-
-  for (const sp of inputs.analysis.rankedSquad) {
-    if (
-      sp.player.availability.status === "doubtful" &&
-      (sp.player.availability.chanceOfPlayingNext ?? 100) <= 50
-    ) {
-      alerts.push(
-        `${sp.player.webName} flagged doubtful (${sp.player.availability.chanceOfPlayingNext}% chance of playing)`
-      );
-    }
-  }
-
-  const weakPositions = inputs.analysis.weakest3.map(
-    (ws) => ws.player.player.position
-  );
-  const posCounts = new Map<string, number>();
-  for (const pos of weakPositions) {
-    posCounts.set(pos, (posCounts.get(pos) ?? 0) + 1);
-  }
-  for (const [pos, count] of posCounts) {
-    if (count >= 2) {
-      alerts.push(
-        `Multiple weak spots at ${pos} — consider prioritizing this area`
-      );
-    }
-  }
-
-  return alerts;
-}
-
 function buildFailSafe(inputs: SynthesisInput): OptimizerResult {
-  const { singleResult, hitResult, chipRecommendations, restructureOptions, horizon } = inputs;
+  const { singleResult, chipRecommendations, restructureOptions, horizon } = inputs;
 
   let primaryRecommendation: TransferAction;
   if (singleResult.bestSingle) {
@@ -368,7 +315,6 @@ function buildFailSafe(inputs: SynthesisInput): OptimizerResult {
     confidence: "low",
     narrativeSummary:
       "Automated recommendation without AI synthesis. Review manually.",
-    longTermNarrative: null, // set by runOptimizerWithContext (parallel call)
     generatedAt: new Date().toISOString(),
     dataNotice: epDataNotice(singleResult),
   };

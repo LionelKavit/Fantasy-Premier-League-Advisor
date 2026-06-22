@@ -2,9 +2,9 @@
 
 **An agentic Fantasy Premier League advisor with a Premier League pundit's eye — grounded in real data, not vibes.**
 
-Enter your FPL manager ID and Pocket Scout scouts your squad: transfer recommendations, captaincy, and chip strategy, each explained the way a post-match analyst breaks down a game. A deterministic scoring engine does the maths; a knowledge-grounded LLM layer does the reasoning; an agentic in-app chat answers "what if?".
+Enter your FPL manager ID and Pocket Scout scouts your squad: transfer recommendations, captaincy, and chip strategy, each explained the way a post-match analyst breaks down a game. A deterministic scoring engine does the maths; a knowledge-grounded LLM layer does the reasoning; and a **conversation-first** agentic chat — which opens with a proactive, deadline-aware brief — answers "what if?".
 
-![Pocket Scout — the pitch, 0–10 player ratings, and the transfer verdict](docs/images/fpl-advisor-this-week-dashboard.png)
+![Pocket Scout — the pitch, the Scout's proactive brief, and the breakdown](docs/images/fpl-advisor-hero.png)
 
 ## Demo
 
@@ -12,16 +12,18 @@ Enter your FPL manager ID and Pocket Scout scouts your squad: transfer recommend
      docs/images/fpl-advisor-demo.mov into the text area — GitHub uploads it to its CDN and
      inserts a player URL — then replace the link below with that URL. (A repo-relative .mov
      renders as a download link, not a player.) -->
-▶️ **[Watch the 90-second demo](docs/images/fpl-advisor-demo.mov)** — squad load → pitch paints → verdict streams in → Long Term → Ask The Scout.
+▶️ **[Watch the 90-second demo](docs/images/fpl-advisor-demo.mov)** — squad load → pitch paints → the Scout opens with a proactive brief → breakdown (This Week · Long Term · Chips) → Ask The Scout.
 
 ---
 
 ## What it does
 
 - **Pitch & ratings** — every squad player scored 0–10 by a position-aware composite model (anchored on FPL's expected points, corrected by form, fixtures, value, and underlying stats).
-- **This Week** — a transfer recommendation gated on *projected points* (it holds rather than churning), plus EO-aware captaincy.
-- **Long Term** — a multi-gameweek horizon and a chip-strategy timeline.
-- **Ask The Scout** — an agentic chat that calls real tools (`simulate_transfer`, `score_player`, …) so it never invents numbers.
+- **Ask The Scout (the hero)** — the conversation is the primary surface: the Scout opens with a proactive, deadline-aware brief, then answers "what if?" via real tool calls (`simulate_transfer`, `score_player`, …), grounded in your committed plan so it never invents numbers or contradicts the panels.
+- **Breakdown** — a collapsible drawer with three tabs:
+  - *This Week* — a transfer recommendation gated on *projected points* (it holds rather than churning), plus EO-aware captaincy.
+  - *Long Term* — a multi-gameweek horizon.
+  - *Chips* — an LLM-orchestrated chip plan (play now / hold / sequenced windows), grounded in chip principles and the deterministic candidate windows.
 
 Everything is delivered in one consistent voice — **Pocket Scout** — and grounded in curated expert knowledge (chip timing, effective-ownership strategy).
 
@@ -34,18 +36,18 @@ flowchart LR
     BASE[Squad analysis<br/>+ composite scoring] --> PITCH[Pitch + ratings]
   end
   subgraph Slow["Insights phase — LLM, cached"]
-    OPT[Optimizer<br/>transfers / captain / horizon] --> SYN[Grounded syntheses<br/>+ Pocket Scout persona]
+    OPT[Optimizer<br/>transfers / captain / horizon / chip windows] --> SYN[Grounded syntheses<br/>+ chip orchestrator + Pocket Scout persona]
   end
   BASE --> OPT
   FPL[(FPL API)] --> BASE
   NEWS[(Team news)] -.-> OPT
   KB[(Knowledge:<br/>chips · rank)] -.-> SYN
-  PITCH --> UI[Dashboard]
+  PITCH --> UI[Conversation-first UI<br/>pitch · chat · breakdown]
   SYN --> UI
-  CHAT[Agentic Scout chat<br/>tool-use loop] --> UI
+  CHAT[Ask The Scout<br/>proactive brief + tool-use loop] --> UI
 ```
 
-The pitch paints **immediately** from a fast deterministic phase; the LLM insights stream in after. → **Full breakdown: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**
+The pitch paints **immediately** from a fast deterministic phase; the Scout then opens with a proactive brief and the LLM insights stream in. → **Full breakdown: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**
 
 ## What makes it interesting (engineering)
 
@@ -59,13 +61,13 @@ It's built **eval-first**: a point-in-time backtest harness over 10 seasons of F
 
 ## Screenshots
 
-| This Week — verdict + transfer | Long Term — chip timeline & horizon |
+| Ask The Scout — the proactive opening brief | Ask The Scout — a tool-grounded follow-up |
 |---|---|
-| ![This Week verdict](docs/images/fpl-advisor-this-week-scout-verdict.png) | ![Long Term dashboard](docs/images/fpl-advisor-long-term-dashboard.png) |
+| ![Opening brief](docs/images/fpl-advisor-chat.png) | ![Follow-up answer](docs/images/fpl-advisor-chat-continued.png) |
 
-| Ask The Scout — agentic chat | Long Term — Scout's outlook |
+| This Week — the move, restructure & captaincy | Chips — the orchestrated chip plan |
 |---|---|
-| ![Ask The Scout](docs/images/fpl-advisor-ask-the-scout-chat-panel-1.png) | ![Long Term verdict](docs/images/fpl-advisor-long-term-scout-verdict.png) |
+| ![This Week breakdown](docs/images/fpl-advisor-this-week.png) | ![Chips plan](docs/images/fpl-advisor-chips.png) |
 
 ## Quickstart
 
@@ -95,11 +97,11 @@ docker compose up --build
 
 ## Tech stack
 
-Next.js 16 (App Router) · React 19 · TypeScript · Tailwind + shadcn · Anthropic Claude (Sonnet) · Vitest (204 tests) · Docker + Caddy · the public FPL API.
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind + shadcn · Anthropic Claude (Sonnet, with prompt caching) · Vitest (263 tests) · Docker + Caddy · the public FPL API.
 
 ## Project notes
 
-- **Spec-driven:** built with [OpenSpec](https://github.com/Fission-AI/OpenSpec) — ~28 documented change proposals live under `openspec/changes/archive/` (the paper trail behind every feature and eval decision).
+- **Spec-driven:** built with [OpenSpec](https://github.com/Fission-AI/OpenSpec) — ~45 documented change proposals live under `openspec/changes/archive/` (the paper trail behind every feature and eval decision).
 - **Status:** feature-complete demo; a couple of changes are intentionally parked for the 2026-27 season (forward evaluation + cold-start hardening).
 
 ## Documentation

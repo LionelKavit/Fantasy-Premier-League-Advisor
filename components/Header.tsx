@@ -12,6 +12,7 @@ export function Header({
   onReanalyze,
   onChangeManager,
   busy,
+  dirty = false,
 }: {
   plan: GameweekPlan;
   freeTransfers: number;
@@ -19,6 +20,8 @@ export function Header({
   onReanalyze: () => void;
   onChangeManager: () => void;
   busy: boolean;
+  /** Selection changed but not yet analyzed — highlight Re-analyze as pending. */
+  dirty?: boolean;
 }) {
   return (
     <header className="bg-[#37003c] text-white">
@@ -70,11 +73,19 @@ export function Header({
           <Button
             variant="ghost"
             size="sm"
-            className="rounded-full border border-white/30 text-white hover:bg-white/10"
+            title={dirty ? "Apply the new free-transfer count" : undefined}
+            className={cn(
+              "rounded-full border",
+              dirty
+                ? "border-[#00ff87] bg-[#00ff87] font-semibold text-[#37003c] hover:bg-[#00ff87]/90"
+                : "border-white/30 text-white hover:bg-white/10"
+            )}
             onClick={onReanalyze}
             disabled={busy}
           >
-            <RefreshCw className={cn("size-3.5 text-fpl-green", busy && "animate-spin")} />
+            <RefreshCw
+              className={cn("size-3.5", dirty ? "text-[#37003c]" : "text-fpl-green", busy && "animate-spin")}
+            />
             Re-analyze
           </Button>
           <Button

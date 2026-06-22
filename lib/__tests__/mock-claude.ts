@@ -47,6 +47,29 @@ export function mockClaudeMessages(
   });
 }
 
+/**
+ * `llm.stream` yields the supplied chunks as text deltas, then resolves
+ * `finalMessage()` to the concatenated text. For the streamed brief / chat.
+ */
+export function mockClaudeStream(chunks: string[]): ReturnType<typeof vi.spyOn> {
+  return vi.spyOn(llm, "stream").mockImplementation(() => ({
+    textStream: (async function* () {
+      for (const c of chunks) yield c;
+    })(),
+    finalMessage: async () =>
+      ({
+        id: "msg_test",
+        type: "message",
+        role: "assistant",
+        model: "test",
+        content: [{ type: "text", text: chunks.join("") }],
+        stop_reason: "end_turn",
+        stop_sequence: null,
+        usage: { input_tokens: 0, output_tokens: 0 },
+      }) as unknown as Anthropic.Messages.Message,
+  }));
+}
+
 /** Set a dummy API key for success-path tests. */
 export function stubApiKey(key = "test-key"): void {
   vi.stubEnv("ANTHROPIC_API_KEY", key);

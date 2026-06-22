@@ -167,3 +167,24 @@ export const CAPTAIN_CONFIG = {
   captainDoubtfulChanceAlert: 75, // alert if recommended captain chance <= this
   horizonLengthDefault: 5,
 };
+
+// Season chip calendar (2025/26 — update each season; mirrors lib/knowledge/chips.md).
+// Two sets of chips: the first expires at the GW19 deadline, the second unlocks at
+// GW20 and expires at GW38. A held chip can only be played within its half.
+export const CHIP_CALENDAR = {
+  firstHalfExpiryGw: 19,
+  secondHalfStartGw: 20,
+  seasonEndGw: 38,
+  expiryPressureGws: 4, // raise urgency when the current half's deadline is within this many GWs
+};
+
+// Deterministic Wildcard trigger: a Wildcard window opens on a fixture swing (a chunk
+// of the XI facing a hard upcoming run) or to set up a near-term Double Gameweek —
+// NOT merely because upgrades are available.
+export const WILDCARD_TRIGGER = {
+  lookahead: 4, // gameweeks of fixtures to assess for the swing
+  hardFdr: 3.5, // average FDR at/above which a run counts as "hard"
+  hardStartersMin: 6, // # of starting XI in a hard run to call it a swing
+  dgwSetupLookahead: 4, // a DGW within this many GWs opens a "set up for the double" window
+  minDraft: 3, // need at least this many beneficial targets to rebuild into
+};

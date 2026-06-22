@@ -3,7 +3,6 @@ import type {
   CaptainResult,
   CaptainCandidate,
 } from "./types";
-import { CAPTAIN_CONFIG } from "../config";
 import { llm } from "../llm/client";
 import { loadKnowledge } from "../knowledge";
 import { SCOUT_PERSONA } from "../llm/persona";
@@ -126,7 +125,9 @@ function parseResult(
       tripleCaptainAdvice: inputs.tripleCaptainAdvice,
       confidence: validateConfidence(raw.confidence),
       narrativeSummary: raw.narrativeSummary,
-      alerts: buildAlerts(inputs, chosen, raw.alerts ?? []),
+      // Risk alerts (incl. captain availability) are computed centrally in lib/alerts
+      // and surfaced on plan.alerts; the success path emits no alerts.
+      alerts: [],
       currentGw: inputs.currentGw,
       generatedAt: new Date().toISOString(),
     };
@@ -138,31 +139,6 @@ function parseResult(
 function validateConfidence(raw: unknown): "high" | "medium" | "low" {
   if (raw === "high" || raw === "medium" || raw === "low") return raw;
   return "medium";
-}
-
-function buildAlerts(
-  inputs: CaptainSynthesisInput,
-  captain: CaptainCandidate | undefined,
-  llmAlerts: string[]
-): string[] {
-  const alerts: string[] = [...llmAlerts];
-
-  if (!captain) return alerts;
-  const chance = captain.player.player.availability.chanceOfPlayingNext;
-  if (chance !== null && chance <= CAPTAIN_CONFIG.captainDoubtfulChanceAlert) {
-    alerts.push(
-      `Captain ${captain.player.player.webName} is doubtful (${chance}% chance) — confirm the vice-captain before the deadline`
-    );
-  }
-
-  const tc = inputs.tripleCaptainAdvice;
-  if (tc?.recommended && tc.targetGw !== null && tc.targetGw - inputs.currentGw <= 2) {
-    alerts.push(
-      `Triple Captain window approaching: consider GW${tc.targetGw} for ${tc.targetPlayer}`
-    );
-  }
-
-  return alerts;
 }
 
 function buildFailSafe(inputs: CaptainSynthesisInput): CaptainResult {
@@ -177,7 +153,7 @@ function buildFailSafe(inputs: CaptainSynthesisInput): CaptainResult {
     narrativeSummary: captain
       ? `Automated pick: captain ${captain.player.player.webName} (highest projected return this gameweek). Review manually.`
       : "No viable captain candidate found.",
-    alerts: buildAlerts(inputs, captain, []),
+    alerts: [], // risk alerts computed centrally (lib/alerts); system notices appended by callers
     currentGw: inputs.currentGw,
     generatedAt: new Date().toISOString(),
   };

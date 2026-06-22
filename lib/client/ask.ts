@@ -1,6 +1,9 @@
 // Browser-side helper: POST a chat turn to /api/ask and dispatch the NDJSON
-// event stream to callbacks. Isolates the transport (fetch + stream reader +
-// partial-line buffering) from the React chat panel.
+// event stream to callbacks. Transport (fetch + stream reader + partial-line
+// buffering) lives in `postNdjsonStream`; this file owns the ask event shape.
+
+import { postNdjsonStream } from "./ndjson";
+import type { ChipPlanLine } from "@/lib/scout/system-prompt";
 
 export interface AskMessage {
   role: "user" | "assistant";
@@ -17,6 +20,8 @@ export interface AskParams {
   teamId: number;
   freeTransfers?: number;
   messages: AskMessage[];
+  /** The committed chip plan from the displayed plan — grounds chip answers. */
+  chipPlan?: ChipPlanLine[];
 }
 
 interface AskEvent {
@@ -26,79 +31,44 @@ interface AskEvent {
   message?: string;
 }
 
-function dispatch(line: string, handlers: AskHandlers, acc: { text: string }): void {
-  const trimmed = line.trim();
-  if (!trimmed) return;
-  let event: AskEvent;
-  try {
-    event = JSON.parse(trimmed) as AskEvent;
-  } catch {
-    return; // ignore malformed lines
-  }
-  switch (event.type) {
-    case "token":
-      if (event.text) {
-        acc.text += event.text;
-        handlers.onToken?.(event.text);
-      }
-      break;
-    case "tool":
-      // Text streamed before a tool call is preamble ("Let me check…"); drop it
-      // so the resolved answer holds only the final post-tool response.
-      acc.text = "";
-      if (event.name) handlers.onTool?.(event.name);
-      break;
-    case "error":
-      handlers.onError?.(event.message ?? "Unknown error");
-      break;
-    // "done" needs no handler — the stream ends.
-  }
-}
-
 /**
  * Streams one assistant turn. Resolves with the full accumulated answer text
  * once the stream completes. Network/HTTP failures are surfaced via `onError`.
  */
 export async function streamAsk(params: AskParams, handlers: AskHandlers = {}): Promise<string> {
-  let res: Response;
-  try {
-    res = await fetch("/api/ask", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        team_id: params.teamId,
-        freeTransfers: params.freeTransfers,
-        messages: params.messages,
-      }),
-    });
-  } catch {
-    handlers.onError?.("Couldn't reach the Scout. Check your connection and try again.");
-    return "";
-  }
-
-  if (!res.ok || !res.body) {
-    handlers.onError?.(`The Scout is unavailable (status ${res.status}).`);
-    return "";
-  }
-
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
   const acc = { text: "" };
-  let buffer = "";
 
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    let nl: number;
-    while ((nl = buffer.indexOf("\n")) >= 0) {
-      const line = buffer.slice(0, nl);
-      buffer = buffer.slice(nl + 1);
-      dispatch(line, handlers, acc);
-    }
-  }
-  // Flush any trailing line that wasn't newline-terminated.
-  if (buffer) dispatch(buffer, handlers, acc);
+  await postNdjsonStream(
+    "/api/ask",
+    {
+      team_id: params.teamId,
+      freeTransfers: params.freeTransfers,
+      messages: params.messages,
+      chipPlan: params.chipPlan,
+    },
+    (raw) => {
+      const event = raw as unknown as AskEvent;
+      switch (event.type) {
+        case "token":
+          if (event.text) {
+            acc.text += event.text;
+            handlers.onToken?.(event.text);
+          }
+          break;
+        case "tool":
+          // Text streamed before a tool call is preamble ("Let me check…"); drop
+          // it so the resolved answer holds only the final post-tool response.
+          acc.text = "";
+          if (event.name) handlers.onTool?.(event.name);
+          break;
+        case "error":
+          handlers.onError?.(event.message ?? "Unknown error");
+          break;
+        // "done" needs no handler — the stream ends.
+      }
+    },
+    handlers.onError
+  );
 
   return acc.text;
 }

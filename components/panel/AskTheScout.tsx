@@ -1,17 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Send, Sparkles, Loader2 } from "lucide-react";
 import { streamAsk, type AskMessage } from "@/lib/client/ask";
+import { streamBrief } from "@/lib/client/brief";
+import { buildScoutStarters } from "@/lib/client/scoutStarters";
+import type { GameweekPlan } from "@/lib/plan/types";
 import { Markdown } from "@/components/ui/Markdown";
 import { cn } from "@/lib/utils";
-
-const SUGGESTIONS = [
-  "Who should I captain this week?",
-  "What's my best transfer right now?",
-  "Should I take a -4 hit?",
-  "Which of my players are at risk?",
-];
 
 const TOOL_LABELS: Record<string, string> = {
   get_plan: "Reviewing your gameweek plan…",
@@ -26,24 +22,68 @@ const TOOL_LABELS: Record<string, string> = {
 export function AskTheScout({
   teamId,
   freeTransfers,
+  plan,
+  briefNonce,
   messages,
   onMessagesChange,
+  className,
 }: {
   teamId: number;
   freeTransfers: number;
+  plan: GameweekPlan;
+  /** Bumped by the page once per fresh analysis — triggers the proactive brief. */
+  briefNonce: number;
   messages: AskMessage[];
   onMessagesChange: (messages: AskMessage[]) => void;
+  className?: string;
 }) {
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState("");
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const firedNonceRef = useRef(0);
 
   // Keep the latest message / streamed token in view.
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, streamingText, activeTool]);
+
+  // The Scout opens the conversation: when a fresh analysis is ready (briefNonce
+  // bumps), stream the opening brief into the first assistant bubble — exactly
+  // once per analysis, and never on top of an existing conversation.
+  const fireBrief = useCallback(async () => {
+    setStreaming(true);
+    setStreamingText("");
+    setActiveTool(null);
+
+    let errorMsg: string | null = null;
+    const text = await streamBrief(
+      { teamId, freeTransfers },
+      {
+        onToken: (t) => setStreamingText((prev) => prev + t),
+        onError: (m) => {
+          errorMsg = m;
+        },
+      }
+    );
+
+    const finalText = text || errorMsg || "I'm ready when you are — ask me anything about your squad.";
+    onMessagesChange([{ role: "assistant", content: finalText }]);
+    setStreaming(false);
+    setStreamingText("");
+  }, [teamId, freeTransfers, onMessagesChange]);
+
+  useEffect(() => {
+    if (briefNonce === 0 || firedNonceRef.current === briefNonce) return;
+    firedNonceRef.current = briefNonce; // claim this analysis so it fires only once
+    if (messages.length > 0) return; // user already started chatting — don't inject the brief
+    // Kick off the proactive brief. This is a legitimate effect→external-system
+    // sync (start streaming from /api/brief); the setState begins the stream UI,
+    // not a cascading render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fireBrief();
+  }, [briefNonce, messages.length, fireBrief]);
 
   async function send(text: string) {
     const question = text.trim();
@@ -56,9 +96,17 @@ export function AskTheScout({
     setStreamingText("");
     setActiveTool(null);
 
+    // Ground chip answers in the committed plan the panels show (drop the draft).
+    const chipPlan = plan.transfers?.chipPlan?.map(({ chip, status, triggerGw, reason }) => ({
+      chip,
+      status,
+      triggerGw,
+      reason,
+    }));
+
     let errorMsg: string | null = null;
     const answer = await streamAsk(
-      { teamId, freeTransfers, messages: next },
+      { teamId, freeTransfers, messages: next, chipPlan },
       {
         onToken: (t) => setStreamingText((prev) => prev + t),
         // A tool call means the prior text was just preamble — clear it so the
@@ -80,10 +128,14 @@ export function AskTheScout({
     setActiveTool(null);
   }
 
-  const isEmpty = messages.length === 0;
+  const starters = buildScoutStarters(plan);
+  // Show starter chips until the manager asks their first question — both before
+  // the brief (empty) and as follow-ups beneath it.
+  const showStarters = !streaming && !messages.some((m) => m.role === "user");
 
   return (
-    <div className="flex h-[34rem] flex-col rounded-lg border border-border bg-card">
+    <div className={cn("flex h-[32rem] flex-col overflow-hidden rounded-lg border border-border bg-card lg:h-auto", className)}>
+
       <div className="flex items-center gap-1.5 border-b border-border px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         <Sparkles className="size-3.5 text-fpl-green" />
         Ask The Scout
@@ -95,31 +147,34 @@ export function AskTheScout({
         aria-live="polite"
         aria-atomic="false"
         aria-label="Conversation with the Scout"
-        className="flex-1 space-y-3 overflow-y-auto p-4"
+        className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4"
       >
-        {isEmpty && (
-          <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-            <p className="max-w-xs text-sm text-muted-foreground">
-              Ask about transfers, captaincy, chips or any player — grounded in your squad and the
-              live data.
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {SUGGESTIONS.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => send(s)}
-                  className="rounded-full border border-border px-3 py-1.5 text-xs text-foreground/80 transition-colors hover:border-fpl-green hover:text-foreground"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
+        {messages.length === 0 && !streaming && (
+          <p className="text-sm text-muted-foreground">
+            Ask about transfers, captaincy, chips or any player — grounded in your squad and the live
+            data.
+          </p>
         )}
 
         {messages.map((m, i) => (
           <Bubble key={i} role={m.role} text={m.content} />
         ))}
+
+        {/* Contextual starters — the Scout's invitation to dig in (hidden once the
+            manager asks something or while a reply streams). */}
+        {showStarters && (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {starters.map((s) => (
+              <button
+                key={s}
+                onClick={() => send(s)}
+                className="rounded-full border border-border px-3 py-1.5 text-xs text-foreground/80 transition-colors hover:border-fpl-green hover:text-foreground"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* In-flight assistant reply */}
         {streaming && (

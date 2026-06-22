@@ -30,6 +30,7 @@ export async function runSquadAnalysisPipeline(
   const managerProfile = await buildManagerProfile(teamId, bootstrap);
 
   const currentGw = bootstrap.currentGameweek?.id ?? 1;
+  const deadline = bootstrap.currentGameweek?.deadline_time ?? null;
   const { players, teams } = bootstrap;
 
   // Step 2: Get current squad picks
@@ -161,6 +162,7 @@ export async function runSquadAnalysisPipeline(
     chipsRemaining: managerProfile.chipsRemaining,
     bank,
     currentGw,
+    deadline,
     generatedAt: new Date().toISOString(),
   };
 }

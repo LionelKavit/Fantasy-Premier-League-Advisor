@@ -2,8 +2,10 @@ import type { GameweekPlan, SquadPlayerView, AnalysisContext, PlanInsights } fro
 import type { CaptainSynthesisInput, CaptainResult } from "../captain/types";
 import { getCachedAnalysisContext, buildLiteBaseContext } from "./context";
 import { runOptimizerWithContext } from "../optimizer";
+import { orchestrateChips } from "../optimizer/chip-orchestrator";
 import { computeCaptainSynthesisInput } from "../captain";
 import { synthesizeCaptainPick } from "../captain/synthesis";
+import { computeRiskAlerts } from "../alerts";
 import { CAPTAIN_CONFIG } from "../config";
 
 export interface PlanOptions {
@@ -27,6 +29,7 @@ export async function runGameweekPlanBase(
   return {
     teamId,
     currentGw: ctx.analysis.currentGw,
+    deadline: ctx.analysis.deadline,
     transfers: null,
     captaincy: null,
     squad: buildSquadView(ctx, { captainId, viceId }),
@@ -112,7 +115,22 @@ async function computeInsights(
     alerts.push(`Captain pipeline failed: ${errMsg(capSettled.reason)}`);
   }
 
-  return { transfers, captaincy, alerts };
+  // The chips.md-grounded orchestrator decides the chip plan over the deterministic
+  // candidate windows (needs both the optimizer's windows and the captain signals).
+  // Its result is the single `chipPlan`; keyless/failure → windows unchanged (N2).
+  if (transfers) {
+    transfers.chipPlan = await orchestrateChips({
+      windows: transfers.chipPlan ?? [],
+      chipsRemaining: ctx.analysis.chipsRemaining,
+      currentGw: ctx.analysis.currentGw,
+      gwFlags: ctx.gwFlags ?? [],
+      captainTop: captaincy?.captain ?? null,
+    });
+  }
+
+  // Curated, deterministic risk alerts lead; pipeline-failure notices follow.
+  const riskAlerts = computeRiskAlerts({ analysis: ctx.analysis, transfers, captaincy });
+  return { transfers, captaincy, alerts: [...riskAlerts, ...alerts] };
 }
 
 // ── Merged plan (back-compat) ────────────────────────────────────────────────
@@ -136,6 +154,7 @@ export async function runGameweekPlan(
   return {
     teamId,
     currentGw: ctx.analysis.currentGw,
+    deadline: ctx.analysis.deadline,
     transfers: insights.transfers,
     captaincy: insights.captaincy,
     squad: buildSquadView(ctx, ids),
