@@ -1,3 +1,11 @@
+> **SUPERSEDED (2026-06-22, not implemented).** Split into two focused changes —
+> `glanceable-verdict` (verdict bar + FPL transfers handoff) and
+> `player-detail-dialog` (player dialog + premierleague.com link + cache-warm
+> endpoint) — because the two surfaces share only the `FPL_TRANSFERS_URL`
+> constant and are cleaner to build and review apart. Archived as the paper trail;
+> no code shipped under this change. The nationality map it referenced shipped
+> separately as `player-nationality-map`.
+
 ## Why
 
 Pocket Scout is strong at *telling* a manager what to do, but advice → execution is fully manual: you read "João Pedro → X, captain Haaland," then open fantasy.premierleague.com and re-find every player yourself. There is also no one-second, always-visible verdict for the manager who doesn't want to read the brief or expand a drawer. Closing this last mile is the single biggest driver of whether someone returns every gameweek — it turns a dashboard you *read* into a tool you *act* with.

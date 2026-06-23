@@ -62,6 +62,10 @@ function normalizePlayer(raw: FplPlayerRaw, teams: Team[]): Player {
   return {
     id: raw.id,
     webName: raw.web_name,
+    fullName: `${raw.first_name} ${raw.second_name}`.trim() || raw.web_name,
+    optaCode: raw.opta_code,
+    birthDate: raw.birth_date,
+    region: raw.region,
     teamId: raw.team,
     teamCode: raw.team_code,
     teamName: team?.name ?? "Unknown",

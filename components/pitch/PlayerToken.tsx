@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { SquadPlayerView } from "@/lib/plan/types";
 import { shirtUrl, scoreToRating, ratingTier } from "@/lib/client/formation";
+import { useOpenPlayerDialog } from "@/components/panel/PlayerDialog";
 import { cn } from "@/lib/utils";
 
 const TINTS = ["#e90052", "#00d4e6", "#963cff", "#00ff87", "#f5a623", "#ff6b35"];
@@ -56,6 +57,7 @@ export function PlayerToken({
   isTransferOut?: boolean;
 }) {
   const [imgError, setImgError] = useState(false);
+  const openDialog = useOpenPlayerDialog();
   const isGk = player.position === "GK";
   const alt = `${player.webName}, ${player.teamShortName}`;
   const rating = scoreToRating(player.score);
@@ -63,18 +65,20 @@ export function PlayerToken({
   const avail = availabilityInfo(player.availability);
 
   return (
-    <div
+    <button
+      type="button"
+      onClick={() => openDialog({ id: player.id, name: player.webName })}
       className={cn(
         // Frosted translucent card so the pitch shows through; /15 gives the shirt
         // a touch more backing so kits pop without losing the frosted look.
-        "relative w-[64px] overflow-hidden rounded-md border bg-white/15 shadow-sm backdrop-blur-sm sm:w-[84px]",
+        "relative w-[64px] cursor-pointer overflow-hidden rounded-md border bg-white/15 text-left shadow-sm backdrop-blur-sm transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fpl-green sm:w-[84px]",
         isTransferOut
           ? "border-[#e90052] ring-2 ring-[#e90052]/70"
           : player.isWeakSpot
             ? "border-[#f5a623] ring-2 ring-[#f5a623]/70"
             : "border-white/15"
       )}
-      title={alt}
+      title={`${alt} — view details`}
     >
       {/* Top-left: weak / transfer-out marker — small so it stays a tidy corner chip */}
       {(isTransferOut || player.isWeakSpot) && (
@@ -146,6 +150,6 @@ export function PlayerToken({
           </span>
         </p>
       </div>
-    </div>
+    </button>
   );
 }

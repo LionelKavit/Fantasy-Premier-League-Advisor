@@ -38,7 +38,10 @@ export interface BriefGrounding {
   transfer: BriefTransfer | null;
   captain: BriefCaptain | null;
   topAlert: string | null;
-  chips: string[]; // remaining chips, human-readable
+  // The chip the committed plan plays THIS gameweek (play-now), if any — so the
+  // brief can lead with it and stay consistent with the verdict bar / This Week.
+  chip: { label: string; reason: string } | null;
+  chips: string[]; // remaining (held) chips, human-readable
 }
 
 const CHIP_LABELS: Record<keyof ChipsRemaining, string> = {
@@ -114,6 +117,12 @@ export function buildBriefGrounding(plan: GameweekPlan): BriefGrounding {
   // Merge plan-level + sub-result alerts; the brief mentions at most the first.
   const alerts = [...plan.alerts, ...(t?.alerts ?? []), ...(c?.alerts ?? [])];
 
+  // The chip the plan plays THIS gameweek — same predicate the panels use, so the
+  // brief can't disagree with the verdict bar / This Week.
+  const playNow =
+    t?.chipPlan?.find((p) => p.status === "play-now" && p.triggerGw === plan.currentGw) ?? null;
+  const chip = playNow ? { label: CHIP_LABELS[playNow.chip], reason: playNow.reason } : null;
+
   return {
     managerName: plan.manager.name,
     currentGw: plan.currentGw,
@@ -121,6 +130,7 @@ export function buildBriefGrounding(plan: GameweekPlan): BriefGrounding {
     transfer,
     captain,
     topAlert: alerts[0] ?? null,
+    chip,
     chips: remainingChips(plan.chipsRemaining),
   };
 }
@@ -144,12 +154,14 @@ function buildBriefPrompt(g: BriefGrounding): string {
 - Transfer call: ${transferLine}
 - Transfer reasoning (context only — do not quote verbatim): ${g.transfer?.reasoning ?? "n/a"}
 - Captain: ${captainLine}
+- Chip call: ${g.chip ? `Play your ${g.chip.label} this gameweek — ${g.chip.reason}` : "no chip recommended this gameweek"}
 - Top alert: ${g.topAlert ?? "none"}
-- Chips left: ${g.chips.length ? g.chips.join(", ") : "none"}
+- Chips held: ${g.chips.length ? g.chips.join(", ") : "none"}
 
 ## How to write it
 This is a spoken opening line — a pundit greeting the manager before kickoff — NOT the written verdict.
 - Greet them, then lead with the single highest-leverage decision this week.
+- If a chip is recommended this gameweek (the Chip call above), treat it as a top-tier lever — lead with it (you can still name the transfer); do NOT imply the chips are merely being held.
 - Name the deadline.
 - At most 4 short sentences. Plain spoken prose. No markdown, no headings, no bullet lists, no tables.
 - Be specific and confident; mention the alert only if it genuinely matters. Don't restate every number — set up the week and invite them in.
@@ -209,6 +221,12 @@ export function composeDeterministicBrief(g: BriefGrounding): string {
       const moves = g.transfer.moves.map((m) => `${m.out} → ${m.in}`).join(", ");
       sentences.push(`${g.transfer.headline}: ${moves}.`);
     }
+  }
+
+  // 2b — a chip the plan plays this gameweek is a top lever; name it next so it
+  // survives the 4-sentence cap (ahead of captain/alert).
+  if (g.chip) {
+    sentences.push(`Play your ${g.chip.label} this week — it's the big lever.`);
   }
 
   // 3 — captain.

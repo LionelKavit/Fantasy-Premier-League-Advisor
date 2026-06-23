@@ -7,6 +7,8 @@ import { ManagerIdForm } from "@/components/ManagerIdForm";
 import { Header } from "@/components/Header";
 import { Pitch } from "@/components/pitch/Pitch";
 import { AlertsCard } from "@/components/panel/AlertsCard";
+import { VerdictBar } from "@/components/panel/VerdictBar";
+import { PlayerDialogProvider } from "@/components/panel/PlayerDialog";
 import { FullBreakdown } from "@/components/panel/FullBreakdown";
 import { AskTheScout } from "@/components/panel/AskTheScout";
 import { Skeleton } from "@/components/states/Skeleton";
@@ -146,6 +148,7 @@ export default function Home() {
   const ftPending = freeTransfers !== appliedFt;
 
   return (
+    <PlayerDialogProvider>
     <main className="flex flex-1 flex-col">
       <Header
         plan={plan}
@@ -156,6 +159,11 @@ export default function Home() {
         busy={insightsLoading}
         dirty={ftPending}
       />
+      {/* Glanceable verdict — full-width, above the fold, spanning both columns */}
+      <div className="mx-auto w-full max-w-6xl px-4 pt-6">
+        <VerdictBar plan={plan} loading={insightsLoading} />
+      </div>
+
       {/* 2×2 lens — row 1: pitch | conversation (stretched to the pitch's height);
           row 2: collapsible This Week + Long Term plan | alerts. */}
       <div className="mx-auto grid w-full max-w-6xl items-start gap-4 px-4 py-6 lg:grid-cols-[1fr_1.1fr]">
@@ -192,5 +200,6 @@ export default function Home() {
         <AlertsCard plan={plan} />
       </div>
     </main>
+    </PlayerDialogProvider>
   );
 }

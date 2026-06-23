@@ -3,6 +3,7 @@ import type { ChipRecommendation } from "../optimizer/types";
 import type { ChipsRemaining } from "../types";
 import { CHIP_CALENDAR } from "../config";
 import { SCOUT_PERSONA } from "../llm/persona";
+import { loadKnowledge } from "../knowledge";
 
 /** Slim chip plan the chat is grounded in (no transfer draft). */
 export type ChipPlanLine = Pick<ChipRecommendation, "chip" | "status" | "triggerGw" | "reason">;
@@ -66,6 +67,36 @@ When the manager asks which chip to play or about chip timing, explain and defen
 }
 
 /**
+ * Ground the agentic loop in the repo's curated expert knowledge (the same
+ * content that grounds the optimizer/captain syntheses), so the chat reasons
+ * with the same principles the panels are built on — including chip rules like
+ * "one chip per gameweek". Additive: a missing file degrades to "" (no section).
+ * Framed as GENERAL guidance — the committed Chip plan (above) and the closing
+ * authority clause (below) keep the chip *decision* with the plan, not these.
+ */
+function expertKnowledgeBlock(): string {
+  const parts = [loadKnowledge("chips"), loadKnowledge("rank-strategy")].filter(Boolean);
+  if (parts.length === 0) return "";
+  return `
+
+## Expert principles (curated knowledge — GENERAL guidance for your reasoning; the committed Chip plan above has already applied these to this squad and remains the authority on the chip decision)
+${parts.join("\n\n")}`;
+}
+
+/**
+ * Closing authority clause — rendered last (after the knowledge) so it governs
+ * it by recency. Only present when a committed chip plan exists. Keeps the chip
+ * *verdict* with the plan while leaving explanation/comparison free.
+ */
+function chipVerdictAuthorityClause(chipPlan: ChipPlanLine[] | undefined): string {
+  if (!chipPlan || chipPlan.length === 0) return "";
+  return `
+
+## Chip decision authority (read this last)
+The Expert principles above are general guidance; the committed Chip plan has already applied them to THIS squad and gameweek. For the actual chip decision, defer to the committed Chip plan: do NOT recommend playing a different chip this gameweek than its play-now call, and do NOT recommend playing a chip when the plan holds — even if a principle might seem to suggest otherwise. Use the principles only to explain and justify the committed call. You may still compare chips and lay out trade-offs; you simply never issue a competing chip recommendation.`;
+}
+
+/**
  * The Scout's instruction set. Kept in its own module so the assistant's
  * behaviour and output formatting live in one legible place. Built per request
  * so it can name the manager and inject the current situation.
@@ -99,5 +130,5 @@ This renders in a narrow chat column. Be crisp:
 - No headings. Use **bold** sparingly — only the headline pick or a key figure, never whole sentences or scattered asterisks.
 
 ## What to say
-The manager can already see their squad, the recommended transfer, restructure options and captaincy on screen. Don't just restate those — answer the actual question and add the reasoning: why this option over the alternatives, the key trade-off or risk, and context the raw numbers don't show (recent form vs underlying, fixtures, ownership/template, timing). Reference specific players, gameweeks and numbers.${heldChipsBlock(a.chipsRemaining, a.currentGw)}${chipPlanBlock(chipPlan, a.currentGw)}`;
+The manager can already see their squad, the recommended transfer, restructure options and captaincy on screen. Don't just restate those — answer the actual question and add the reasoning: why this option over the alternatives, the key trade-off or risk, and context the raw numbers don't show (recent form vs underlying, fixtures, ownership/template, timing). Reference specific players, gameweeks and numbers.${heldChipsBlock(a.chipsRemaining, a.currentGw)}${chipPlanBlock(chipPlan, a.currentGw)}${expertKnowledgeBlock()}${chipVerdictAuthorityClause(chipPlan)}`;
 }
