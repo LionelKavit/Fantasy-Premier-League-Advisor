@@ -17,6 +17,9 @@ export interface ScoutConversationResult {
 
 const MAX_TOOL_ROUNDS = 5;
 const MAX_TOKENS = 1024;
+// Tighter output ceiling for the public demo chat (conservative token usage); the
+// demo system prompt also asks for ~2-sentence answers. Tools still run normally.
+const DEMO_MAX_TOKENS = 384;
 
 /**
  * Stream one round and forward token deltas to `onToken`. Returns the round's
@@ -64,6 +67,7 @@ export async function runScoutConversation(params: {
   // tail (covers history). `messages` stays clean; `withCachedTail` marks a copy
   // per call so breakpoints never accumulate past the 4-per-request cap.
   const system = withCachedSystem(buildScoutSystemPrompt(sc, freeTransfers, chipPlan, demo));
+  const maxTokens = demo ? DEMO_MAX_TOKENS : MAX_TOKENS;
 
   const messages: Anthropic.MessageParam[] = params.messages.map((m) => ({
     role: m.role,
@@ -74,7 +78,7 @@ export async function runScoutConversation(params: {
 
   for (let round = 0; round < maxRounds; round++) {
     const { text, message } = await streamRound(
-      { model: DEFAULT_MODEL, max_tokens: MAX_TOKENS, system, tools: SCOUT_TOOLS, messages: withCachedTail(messages) },
+      { model: DEFAULT_MODEL, max_tokens: maxTokens, system, tools: SCOUT_TOOLS, messages: withCachedTail(messages) },
       onToken
     );
 
@@ -104,7 +108,7 @@ export async function runScoutConversation(params: {
 
   // Round cap hit while still calling tools — force a final answer without tools.
   const { text } = await streamRound(
-    { model: DEFAULT_MODEL, max_tokens: MAX_TOKENS, system, messages: withCachedTail(messages) },
+    { model: DEFAULT_MODEL, max_tokens: maxTokens, system, messages: withCachedTail(messages) },
     onToken
   );
   let finalText = text.trim();
