@@ -225,3 +225,37 @@ describe("buildScoutSystemPrompt — held-chip grounding", () => {
     expect(buildScoutSystemPrompt(sc, 1)).not.toMatch(/Chips in hand/i);
   });
 });
+
+describe("buildScoutSystemPrompt — curated knowledge grounding", () => {
+  it("injects the chip + rank expert knowledge so the agentic loop reasons with it", () => {
+    const sys = buildScoutSystemPrompt(makeScoutContext(), 1);
+    expect(sys).toMatch(/Expert principles/i);
+    // the one-chip-per-gameweek rule reaches the chat from chips.md itself
+    expect(sys).toMatch(/One chip per gameweek/i);
+    // rank-strategy.md is grounded too (EO / chase-vs-protect)
+    expect(sys).toMatch(/effective ownership/i);
+  });
+});
+
+describe("buildScoutSystemPrompt — chip verdict authority over knowledge", () => {
+  const chipPlan = [
+    { chip: "benchBoost", status: "play-now", triggerGw: 20, reason: "Final-day bench boost." },
+    { chip: "tripleCaptain", status: "hold", triggerGw: 20, reason: "Hold — no premium Double." },
+  ] as const;
+
+  it("renders the closing authority clause after the knowledge when a chip plan is present", () => {
+    const sys = buildScoutSystemPrompt(makeScoutContext(), 1, [...chipPlan]);
+    expect(sys).toMatch(/Chip decision authority/i);
+    expect(sys).toMatch(/do NOT recommend playing a different chip/i);
+    // it must come AFTER the expert principles so it governs them by recency
+    expect(sys.indexOf("Chip decision authority")).toBeGreaterThan(sys.indexOf("Expert principles"));
+    // knowledge is still present (explanation), not removed
+    expect(sys).toMatch(/Expert principles/i);
+  });
+
+  it("omits the authority clause when no chip plan is supplied (knowledge still present)", () => {
+    const sys = buildScoutSystemPrompt(makeScoutContext(), 1);
+    expect(sys).not.toMatch(/Chip decision authority/i);
+    expect(sys).toMatch(/Expert principles/i);
+  });
+});

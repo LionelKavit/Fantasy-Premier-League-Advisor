@@ -15,9 +15,12 @@ function vt(outId: number, outName: string, inName: string, gain: number): Valid
 }
 
 describe("groupTransferMoves", () => {
-  it("keeps a single move as one out → one candidate", () => {
+  it("keeps a single move as one out → one candidate (with element ids)", () => {
     const groups = groupTransferMoves([vt(1, "Solanke", "Watkins", 1.2)]);
-    expect(groups).toEqual([{ out: "Solanke", candidates: ["Watkins"] }]);
+    expect(groups).toHaveLength(1);
+    expect(groups[0]).toMatchObject({ out: "Solanke", outId: 1, candidates: ["Watkins"] });
+    expect(groups[0].candidateIds).toHaveLength(1);
+    expect(typeof groups[0].candidateIds[0]).toBe("number");
   });
 
   it("groups multiple candidates for one out-player, best-first, capped to 3", () => {

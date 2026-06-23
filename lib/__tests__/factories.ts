@@ -52,6 +52,10 @@ export function makePlayer(o: Partial<Player> = {}): Player {
   return {
     id,
     webName: `Player${id}`,
+    fullName: `Player ${id}`,
+    optaCode: `p${100000 + id}`,
+    birthDate: "1998-01-01",
+    region: null,
     teamId: 1,
     teamCode: 3,
     teamName: "Team 1",

@@ -14,6 +14,8 @@ export interface FplPlayerRaw {
   team_code: number;
   element_type: number; // 1=GK, 2=DEF, 3=MID, 4=FWD
   squad_number: number | null;
+  birth_date: string | null; // ISO "YYYY-MM-DD" (player age, when published)
+  region: number | null; // FPL's own nationality/region id (see lib/fpl-regions.ts)
 
   // Status
   status: string; // a/d/i/s/u
@@ -166,6 +168,10 @@ export interface PlayerSetPieceDuties {
 export interface Player {
   id: number;
   webName: string;
+  fullName: string; // "first second" — for the premierleague.com slug
+  optaCode: string | null; // "p223094" → premierleague.com player id
+  birthDate: string | null; // ISO "YYYY-MM-DD" → age (when published)
+  region: number | null; // FPL region id → nationality (lib/fpl-regions.ts)
   teamId: number;
   teamCode: number;
   teamName: string;

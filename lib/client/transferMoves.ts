@@ -8,28 +8,35 @@ const MAX_CANDIDATES = 3;
 
 export interface GroupedMove {
   out: string;
+  outId: number; // FPL element id of the out-player (opens the detail dialog)
   candidates: string[]; // web names, best-first, capped
+  candidateIds: number[]; // element ids aligned with `candidates`
 }
 
 export function groupTransferMoves(transfers: ValidTransfer[]): GroupedMove[] {
-  const byOut = new Map<number, { out: string; cands: { name: string; gain: number }[] }>();
+  const byOut = new Map<
+    number,
+    { out: string; outId: number; cands: { name: string; id: number; gain: number }[] }
+  >();
 
   for (const t of transfers) {
     const id = t.weakPlayer.player.id;
-    const group = byOut.get(id) ?? { out: t.weakPlayer.player.webName, cands: [] };
-    group.cands.push({ name: t.candidate.player.webName, gain: t.gw1Gain });
+    const group = byOut.get(id) ?? { out: t.weakPlayer.player.webName, outId: id, cands: [] };
+    group.cands.push({ name: t.candidate.player.webName, id: t.candidate.player.id, gain: t.gw1Gain });
     byOut.set(id, group);
   }
 
   return Array.from(byOut.values())
     .map((g) => {
-      const sorted = [...g.cands].sort((a, b) => b.gain - a.gain);
+      const sorted = [...g.cands].sort((a, b) => b.gain - a.gain).slice(0, MAX_CANDIDATES);
       return {
         out: g.out,
-        candidates: sorted.slice(0, MAX_CANDIDATES).map((c) => c.name),
+        outId: g.outId,
+        candidates: sorted.map((c) => c.name),
+        candidateIds: sorted.map((c) => c.id),
         bestGain: sorted[0]?.gain ?? 0,
       };
     })
     .sort((a, b) => b.bestGain - a.bestGain)
-    .map(({ out, candidates }) => ({ out, candidates }));
+    .map(({ out, outId, candidates, candidateIds }) => ({ out, outId, candidates, candidateIds }));
 }

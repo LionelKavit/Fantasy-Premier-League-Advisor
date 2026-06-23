@@ -105,6 +105,27 @@ describe("buildBriefGrounding", () => {
     const g = buildBriefGrounding(makePlan({ alerts: [], transfers }));
     expect(g.topAlert).toMatch(/Price rise likely for Saka/);
   });
+
+  it("captures a play-now chip from the committed plan", () => {
+    const transfers = makeTransfer("FREE", [{ out: "Mbeumo", in: "Saka" }]);
+    transfers.chipPlan = [
+      { chip: "benchBoost", triggerGw: 20, status: "play-now", reason: "Final-day bench boost.", draft: null },
+    ];
+    const g = buildBriefGrounding(makePlan({ transfers }));
+    expect(g.chip).toEqual({ label: "Bench Boost", reason: "Final-day bench boost." });
+  });
+
+  it("has no chip call when nothing is play-now this gameweek", () => {
+    expect(buildBriefGrounding(makePlan()).chip).toBeNull(); // default chipPlan: []
+  });
+
+  it("ignores a chip scheduled for a future gameweek (not play-now)", () => {
+    const transfers = makeTransfer("FREE", [{ out: "Mbeumo", in: "Saka" }]);
+    transfers.chipPlan = [
+      { chip: "wildcard", triggerGw: 25, status: "window", reason: "Hold for the GW25 swing.", draft: null },
+    ];
+    expect(buildBriefGrounding(makePlan({ transfers })).chip).toBeNull();
+  });
 });
 
 describe("composeDeterministicBrief — same shape, short, no markdown", () => {
@@ -128,6 +149,22 @@ describe("composeDeterministicBrief — same shape, short, no markdown", () => {
     const plan = makePlan({ transfers: makeTransfer("ROLL", []) });
     const text = composeDeterministicBrief(buildBriefGrounding(plan));
     expect(text).toMatch(/Hold your transfer this week/);
+  });
+
+  it("names a play-now chip as the big lever (within the 4-sentence cap)", () => {
+    const transfers = makeTransfer("FREE", [{ out: "Mbeumo", in: "Saka" }]);
+    transfers.chipPlan = [
+      { chip: "benchBoost", triggerGw: 20, status: "play-now", reason: "Final-day bench boost.", draft: null },
+    ];
+    const text = composeDeterministicBrief(buildBriefGrounding(makePlan({ transfers })));
+    expect(text).toContain("Play your Bench Boost this week");
+    expect(SENTENCE_COUNT(text)).toBeLessThanOrEqual(4);
+    expect(HAS_MARKDOWN(text)).toBe(false);
+  });
+
+  it("omits the chip sentence when nothing is play-now", () => {
+    const text = composeDeterministicBrief(buildBriefGrounding(makePlan()));
+    expect(text).not.toMatch(/Play your .* this week/);
   });
 
   it("falls back gracefully when the deadline is missing", () => {

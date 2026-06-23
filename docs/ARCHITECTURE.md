@@ -24,8 +24,9 @@ flowchart TB
   SYN --> INSOUT[[This Week · Long Term · Chips]]
 ```
 
-- **Base phase** (`/api/plan/base`) — deterministic only. Builds the squad analysis and composite scores; returns the pitch. Fast, no LLM.
+- **Base phase** (`/api/plan/base`) — deterministic only. Builds the squad analysis and composite scores; returns the pitch. Fast, no LLM. The client renders the **glanceable verdict bar** above the fold from the merged plan once insights land (so the captain/transfer are final, never swapped mid-flight), with an **Open FPL Transfers** deep link that hands off to the FPL transfers screen.
 - **Insights phase** (`/api/plan/insights`) — runs the optimizer + captain logic, then the LLM syntheses. Cached per `manager:gw:freeTransfers:horizon`.
+- **Player detail** (`/api/player/[id]`) — a lightweight, on-demand route behind the **player dialog** (opened from a pitch token or a This-Week transfer name). It reuses the warm bootstrap + element-summary caches the insights phase already populated, so for an analyzed player it issues **no new FPL request**; returns name, age, nationality, form, last-week minutes/points, and expected next points, plus the `opta_code` that builds the **View on Premier League** link.
 
 ## The deterministic engine
 
@@ -55,15 +56,15 @@ total = squash( Σ wᵢ · signalᵢ  +  trendAdj + llmAdj − suspensionPenalty
 - **Format-safe** — several return structured JSON that the UI renders; the persona explicitly defers to each task's output format.
 - **Prompt-cached** — `cache_control` marks the stable system / agent prefixes so repeated prefixes (notably the agentic chat's multi-round loop) bill at the cache-read rate.
 
-**Agentic Scout chat** (`lib/scout/`) — Ask The Scout is the **hero conversation**: it opens proactively with a deadline-aware brief, then runs a stateless tool-use loop where the model calls tools (`get_plan`, `score_player`, `simulate_transfer`, `simulate_captain`) to fetch *real* numbers rather than hallucinate them, streaming the reply token-by-token. It's grounded in the committed chip plan and your held chips, so its chip advice never contradicts the panels.
+**Agentic Scout chat** (`lib/scout/`) — Ask The Scout is the **hero conversation**: it opens proactively with a deadline-aware brief, then runs a stateless tool-use loop where the model calls tools (`get_plan`, `score_player`, `simulate_transfer`, `simulate_captain`) to fetch *real* numbers rather than hallucinate them, streaming the reply token-by-token. It's grounded in the committed chip plan, your held chips, **and the curated knowledge base** (`chips.md` + `rank-strategy.md`, injected via `loadKnowledge`) — with the committed chip plan held **authoritative over** those principles for the chip decision, so the chat reasons with expert principles but never issues a competing chip verdict to the panels.
 
 ### Knowledge & grounding
 
 | Layer | Source | Type | Feeds |
 |---|---|---|---|
 | Rotation / injury | predicted-lineup news (fetched, LLM-extracted → structured) | dynamic data | `LlmContextSignals` → composite + captain |
-| Chip timing | `lib/knowledge/chips.md` | static principles | the **chip orchestrator** → chip plan |
-| Rank / EO | `lib/knowledge/rank-strategy.md` | static principles | captain + transfer narratives |
+| Chip timing | `lib/knowledge/chips.md` | static principles | the **chip orchestrator** → chip plan · the **Scout chat** |
+| Rank / EO | `lib/knowledge/rank-strategy.md` | static principles | captain + transfer narratives · the **Scout chat** |
 | Persona | `lib/llm/persona.ts` | identity | every reasoning call + the chat |
 
 Static knowledge files are read at runtime, so they're explicitly copied into the Docker image (see [Deployment](#deployment)).
