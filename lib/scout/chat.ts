@@ -51,17 +51,19 @@ export async function runScoutConversation(params: {
   messages: ScoutTurn[];
   /** The committed chip plan the panels show — grounds chip answers (single source). */
   chipPlan?: ChipPlanLine[];
+  /** Demo mode — general advice about a sample squad (no "your squad"/chips). */
+  demo?: boolean;
   onToken?: (text: string) => void;
   onTool?: (name: string) => void;
   maxToolRounds?: number;
 }): Promise<ScoutConversationResult> {
-  const { sc, freeTransfers, chipPlan, onToken, onTool } = params;
+  const { sc, freeTransfers, chipPlan, demo, onToken, onTool } = params;
   const maxRounds = params.maxToolRounds ?? MAX_TOOL_ROUNDS;
   // Cache the stable prefix reused across this question's model calls: one
   // breakpoint on the system block (covers tools + system), one on the message
   // tail (covers history). `messages` stays clean; `withCachedTail` marks a copy
   // per call so breakpoints never accumulate past the 4-per-request cap.
-  const system = withCachedSystem(buildScoutSystemPrompt(sc, freeTransfers, chipPlan));
+  const system = withCachedSystem(buildScoutSystemPrompt(sc, freeTransfers, chipPlan, demo));
 
   const messages: Anthropic.MessageParam[] = params.messages.map((m) => ({
     role: m.role,

@@ -15,6 +15,7 @@ import type { TransferType } from "../optimizer/types";
 import type { ChipsRemaining } from "../types";
 import { llm, withCachedSystem } from "../llm/client";
 import { SCOUT_PERSONA } from "../llm/persona";
+import type { DemoSeason } from "../demo/squad";
 
 export interface BriefTransfer {
   type: TransferType;
@@ -240,4 +241,79 @@ export function composeDeterministicBrief(g: BriefGrounding): string {
   if (g.topAlert) sentences.push(`Heads up: ${lowerFirst(g.topAlert)}`);
 
   return sentences.slice(0, 4).join(" ");
+}
+
+// ── Demo welcome brief ───────────────────────────────────────────────────────
+// A different brief for ID-less visitors: greet, explain the sample squad and
+// what it was built from (season-aware), name the captain, and invite a question.
+// No deadline / transfer / chip / "your squad" references — there's no manager.
+
+export interface DemoBriefGrounding {
+  season: DemoSeason;
+  captain: string | null;
+  vice: string | null;
+}
+
+const seasonBasis = (s: DemoSeason): string =>
+  s === "offseason" ? "last season's points returns" : "this week's projected points";
+
+export function buildDemoBriefGrounding(plan: GameweekPlan): DemoBriefGrounding {
+  const c = plan.captaincy;
+  return {
+    season: plan.demoSeason ?? "live",
+    captain: c?.captain.player.player.webName ?? null,
+    vice: c?.viceCaptain?.player.player.webName ?? null,
+  };
+}
+
+function buildDemoBriefPrompt(g: DemoBriefGrounding): string {
+  const captainLine = g.captain
+    ? `${g.captain}${g.vice ? `, with ${g.vice} as vice` : ""}`
+    : "the standout pick";
+  return `Greet a new visitor who is exploring Pocket Scout with a SAMPLE squad (they have not entered a manager ID).
+
+## Facts (use ONLY these — never invent names or numbers)
+- The sample squad was built from ${seasonBasis(g.season)}.
+- Suggested captain: ${captainLine}.
+
+## How to write it
+This is a spoken welcome — a pundit showing a newcomer around, NOT a written verdict.
+- Greet them, say you've put together a sample "dream team" from ${seasonBasis(g.season)}, and name the captain.
+- Invite them to ask anything — compare two players, why someone made the team, or who to draft next season.
+- Do NOT mention a deadline, transfers, chips, a manager's rank, or "your team" — there is no manager here.
+- At most 3 short sentences. Plain spoken prose. No markdown, headings, bullets or tables.
+
+Return only the brief text.`;
+}
+
+/** Stream the LLM demo welcome brief token-by-token (Scout persona, no tools). */
+export async function streamDemoBrief(
+  grounding: DemoBriefGrounding,
+  onToken: (text: string) => void
+): Promise<void> {
+  const s = llm.stream({
+    model: llm.DEFAULT_MODEL,
+    max_tokens: BRIEF_MAX_TOKENS,
+    system: withCachedSystem(SCOUT_PERSONA),
+    messages: [{ role: "user", content: buildDemoBriefPrompt(grounding) }],
+  });
+  for await (const delta of s.textStream) onToken(delta);
+  await s.finalMessage();
+}
+
+/**
+ * Deterministic demo welcome brief — the fallback for BOTH no-key and any runtime
+ * LLM failure, so a demo visitor never sees an error string in the brief bubble.
+ */
+export function composeDeterministicDemoBrief(g: DemoBriefGrounding): string {
+  const sentences: string[] = [
+    `Welcome to Pocket Scout — I've built a sample squad from ${seasonBasis(g.season)} to show you around.`,
+  ];
+  if (g.captain) {
+    sentences.push(g.vice ? `I'd captain ${g.captain}, with ${g.vice} as vice.` : `I'd captain ${g.captain}.`);
+  }
+  sentences.push(
+    "Ask me anything — compare two players, why someone's in the team, or who to draft for next season."
+  );
+  return sentences.slice(0, 3).join(" ");
 }

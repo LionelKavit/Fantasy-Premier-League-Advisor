@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ApiErrorResponse } from "@/lib/types";
 import { llm } from "@/lib/llm/client";
-import { runGameweekPlan } from "@/lib/plan";
-import { buildBriefGrounding, streamOpeningBrief, composeDeterministicBrief } from "@/lib/scout/brief";
+import { runGameweekPlan, runDemoPlan } from "@/lib/plan";
+import {
+  buildBriefGrounding,
+  streamOpeningBrief,
+  composeDeterministicBrief,
+  buildDemoBriefGrounding,
+  streamDemoBrief,
+  composeDeterministicDemoBrief,
+  type DemoBriefGrounding,
+} from "@/lib/scout/brief";
 
 interface BriefBody {
   team_id?: number | string;
   freeTransfers?: number;
+  demo?: boolean;
 }
 
 type BriefEvent =
@@ -63,8 +72,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const demo = body.demo === true;
   const teamId = body.team_id != null ? parseInt(String(body.team_id), 10) : NaN;
-  if (!Number.isInteger(teamId)) {
+  if (!demo && !Number.isInteger(teamId)) {
     return NextResponse.json(
       { error: "team_id is required", status: 400 } satisfies ApiErrorResponse,
       { status: 400 }
@@ -72,6 +82,36 @@ export async function POST(request: NextRequest) {
   }
 
   const freeTransfers = Math.min(2, Math.max(1, body.freeTransfers ?? 1));
+
+  // Demo: a welcome brief that NEVER shows an error in the bubble — falls back to
+  // the deterministic demo brief on no-key or any pre-token failure.
+  if (demo) {
+    return ndjsonResponse(async (emit) => {
+      let grounding: DemoBriefGrounding = { season: "live", captain: null, vice: null };
+      try {
+        const plan = await runDemoPlan({ freeTransfers });
+        grounding = buildDemoBriefGrounding(plan);
+      } catch (e) {
+        console.error("[brief] demo plan failed:", e);
+        emit({ type: "token", text: composeDeterministicDemoBrief(grounding) });
+        return;
+      }
+      if (!llm.hasApiKey()) {
+        emit({ type: "token", text: composeDeterministicDemoBrief(grounding) });
+        return;
+      }
+      let emitted = false;
+      try {
+        await streamDemoBrief(grounding, (text) => {
+          emitted = true;
+          emit({ type: "token", text });
+        });
+      } catch (e) {
+        console.error("[brief] demo stream failed:", e);
+        if (!emitted) emit({ type: "token", text: composeDeterministicDemoBrief(grounding) });
+      }
+    });
+  }
 
   // Grounding is built inside the stream so any failure (e.g. unknown manager)
   // surfaces as an `error` event then `done`, rather than crashing the stream.

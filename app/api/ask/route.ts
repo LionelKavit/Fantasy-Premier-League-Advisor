@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ApiErrorResponse } from "@/lib/types";
 import { llm } from "@/lib/llm/client";
-import { getScoutContext } from "@/lib/scout/context";
+import { getScoutContext, getDemoScoutContext } from "@/lib/scout/context";
 import { runScoutConversation, type ScoutTurn } from "@/lib/scout/chat";
 import type { ChipPlanLine } from "@/lib/scout/system-prompt";
 
@@ -10,6 +10,7 @@ interface AskBody {
   freeTransfers?: number;
   messages?: ScoutTurn[];
   chipPlan?: ChipPlanLine[];
+  demo?: boolean;
 }
 
 type AskEvent =
@@ -69,8 +70,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const demo = body.demo === true;
   const teamId = body.team_id != null ? parseInt(String(body.team_id), 10) : NaN;
-  if (!Number.isInteger(teamId)) {
+  if (!demo && !Number.isInteger(teamId)) {
     return NextResponse.json(
       { error: "team_id is required", status: 400 } satisfies ApiErrorResponse,
       { status: 400 }
@@ -99,7 +101,7 @@ export async function POST(request: NextRequest) {
 
   let sc;
   try {
-    sc = await getScoutContext(teamId);
+    sc = demo ? await getDemoScoutContext() : await getScoutContext(teamId);
   } catch (e) {
     const message = e instanceof Error ? e.message : "Unknown error";
     const status = message.includes("404") ? 404 : 500;
@@ -118,6 +120,7 @@ export async function POST(request: NextRequest) {
       freeTransfers,
       messages,
       chipPlan,
+      demo,
       onToken: (text) => emit({ type: "token", text }),
       onTool: (name) => emit({ type: "tool", name }),
     });

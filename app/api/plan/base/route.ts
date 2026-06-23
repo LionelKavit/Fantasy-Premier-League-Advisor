@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { runGameweekPlanBase } from "@/lib/plan";
+import { runGameweekPlanBase, runDemoPlanBase } from "@/lib/plan";
 import { CAPTAIN_CONFIG } from "@/lib/config";
 import type { ApiErrorResponse } from "@/lib/types";
 
@@ -8,8 +8,9 @@ export async function GET(request: NextRequest) {
   const teamId = request.nextUrl.searchParams.get("team_id");
   const freeTransfersParam = request.nextUrl.searchParams.get("free_transfers");
   const horizonParam = request.nextUrl.searchParams.get("horizon");
+  const demo = request.nextUrl.searchParams.get("demo") === "1";
 
-  if (!teamId) {
+  if (!demo && !teamId) {
     return NextResponse.json(
       { error: "team_id is required", status: 400 } satisfies ApiErrorResponse,
       { status: 400 }
@@ -24,10 +25,9 @@ export async function GET(request: NextRequest) {
     : CAPTAIN_CONFIG.horizonLengthDefault;
 
   try {
-    const result = await runGameweekPlanBase(parseInt(teamId), {
-      freeTransfers,
-      captainHorizon,
-    });
+    const result = demo
+      ? await runDemoPlanBase({ freeTransfers, captainHorizon })
+      : await runGameweekPlanBase(parseInt(teamId!), { freeTransfers, captainHorizon });
     return NextResponse.json(result);
   } catch (e) {
     const message = e instanceof Error ? e.message : "Unknown error";
