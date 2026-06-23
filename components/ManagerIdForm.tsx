@@ -8,10 +8,13 @@ export function ManagerIdForm({
   initialId = "",
   initialFreeTransfers = 1,
   onSubmit,
+  onExplore,
 }: {
   initialId?: string;
   initialFreeTransfers?: number;
   onSubmit: (managerId: string, freeTransfers: number) => void;
+  /** Start demo mode — explore a sample squad without a manager ID. */
+  onExplore?: () => void;
 }) {
   const [id, setId] = useState(initialId);
   const [ft, setFt] = useState(initialFreeTransfers);
@@ -87,6 +90,22 @@ export function ManagerIdForm({
           Analyze my team
         </Button>
       </form>
+
+      {onExplore && (
+        <div className="flex w-full flex-col items-center gap-3">
+          <div className="flex w-full items-center gap-3 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <span className="h-px flex-1 bg-border" />
+            or
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <Button type="button" variant="outline" size="lg" className="w-full" onClick={onExplore}>
+            Explore without a team
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            No ID? See a sample squad and ask the Scout anything — chat only, no personalized plan.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

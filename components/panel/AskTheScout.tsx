@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Send, Sparkles, Loader2 } from "lucide-react";
 import { streamAsk, type AskMessage } from "@/lib/client/ask";
 import { streamBrief } from "@/lib/client/brief";
-import { buildScoutStarters } from "@/lib/client/scoutStarters";
+import { buildScoutStarters, buildDemoStarters } from "@/lib/client/scoutStarters";
 import type { GameweekPlan } from "@/lib/plan/types";
 import { Markdown } from "@/components/ui/Markdown";
 import { cn } from "@/lib/utils";
@@ -55,6 +55,7 @@ export function AskTheScout({
   messages,
   onMessagesChange,
   className,
+  demo = false,
 }: {
   teamId: number;
   freeTransfers: number;
@@ -64,6 +65,8 @@ export function AskTheScout({
   messages: AskMessage[];
   onMessagesChange: (messages: AskMessage[]) => void;
   className?: string;
+  /** Demo mode — general advice about a sample squad (no manager). */
+  demo?: boolean;
 }) {
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -87,7 +90,7 @@ export function AskTheScout({
 
     let errorMsg: string | null = null;
     const text = await streamBrief(
-      { teamId, freeTransfers },
+      { teamId, freeTransfers, demo },
       {
         onToken: (t) => setStreamingText((prev) => prev + t),
         onError: (m) => {
@@ -96,11 +99,14 @@ export function AskTheScout({
       }
     );
 
-    const finalText = text || errorMsg || "I'm ready when you are — ask me anything about your squad.";
+    const fallback = demo
+      ? "Welcome — explore the sample squad, or ask me anything about FPL."
+      : "I'm ready when you are — ask me anything about your squad.";
+    const finalText = text || errorMsg || fallback;
     onMessagesChange([{ role: "assistant", content: finalText }]);
     setStreaming(false);
     setStreamingText("");
-  }, [teamId, freeTransfers, onMessagesChange]);
+  }, [teamId, freeTransfers, demo, onMessagesChange]);
 
   useEffect(() => {
     if (briefNonce === 0 || firedNonceRef.current === briefNonce) return;
@@ -134,7 +140,7 @@ export function AskTheScout({
 
     let errorMsg: string | null = null;
     const answer = await streamAsk(
-      { teamId, freeTransfers, messages: next, chipPlan },
+      { teamId, freeTransfers, messages: next, chipPlan, demo },
       {
         onToken: (t) => setStreamingText((prev) => prev + t),
         // A tool call means the prior text was just preamble — clear it so the
@@ -156,7 +162,7 @@ export function AskTheScout({
     setActiveTool(null);
   }
 
-  const starters = buildScoutStarters(plan);
+  const starters = demo ? buildDemoStarters(plan) : buildScoutStarters(plan);
   // Show starter chips until the manager asks their first question — both before
   // the brief (empty) and as follow-ups beneath it.
   const showStarters = !streaming && !messages.some((m) => m.role === "user");
@@ -179,8 +185,9 @@ export function AskTheScout({
       >
         {messages.length === 0 && !streaming && (
           <p className="text-sm text-muted-foreground">
-            Ask about transfers, captaincy, chips or any player — grounded in your squad and the live
-            data.
+            {demo
+              ? "Ask about captaincy, value, or any player — grounded in real data, not vibes."
+              : "Ask about transfers, captaincy, chips or any player — grounded in your squad and the live data."}
           </p>
         )}
 

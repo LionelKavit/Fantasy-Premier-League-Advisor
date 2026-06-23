@@ -21,16 +21,21 @@ async function getJson<T>(path: string): Promise<T> {
   return (await res.json()) as T;
 }
 
+interface PlanParamOpts {
+  horizon?: number;
+  /** Demo mode — sends `demo=1` and omits `team_id` (no manager ID needed). */
+  demo?: boolean;
+}
+
 function planParams(
   managerId: number | string,
   freeTransfers: number,
-  horizon?: number
+  opts: PlanParamOpts = {}
 ): URLSearchParams {
-  const params = new URLSearchParams({
-    team_id: String(managerId),
-    free_transfers: String(freeTransfers),
-  });
-  if (horizon) params.set("horizon", String(horizon));
+  const params = new URLSearchParams({ free_transfers: String(freeTransfers) });
+  if (opts.demo) params.set("demo", "1");
+  else params.set("team_id", String(managerId));
+  if (opts.horizon) params.set("horizon", String(opts.horizon));
   return params;
 }
 
@@ -40,25 +45,25 @@ export function fetchPlan(
   freeTransfers: number,
   horizon?: number
 ): Promise<GameweekPlan> {
-  return getJson<GameweekPlan>(`/api/plan?${planParams(managerId, freeTransfers, horizon)}`);
+  return getJson<GameweekPlan>(`/api/plan?${planParams(managerId, freeTransfers, { horizon })}`);
 }
 
 /** Fast base phase — squad/pitch/meta + deterministic captain (no LLM wait). */
 export function fetchPlanBase(
   managerId: number | string,
   freeTransfers: number,
-  horizon?: number
+  opts: PlanParamOpts = {}
 ): Promise<GameweekPlan> {
-  return getJson<GameweekPlan>(`/api/plan/base?${planParams(managerId, freeTransfers, horizon)}`);
+  return getJson<GameweekPlan>(`/api/plan/base?${planParams(managerId, freeTransfers, opts)}`);
 }
 
 /** Slow insights phase — the LLM syntheses. `force` bypasses the server cache. */
 export function fetchPlanInsights(
   managerId: number | string,
   freeTransfers: number,
-  opts: { horizon?: number; force?: boolean } = {}
+  opts: { horizon?: number; force?: boolean; demo?: boolean } = {}
 ): Promise<PlanInsights> {
-  const params = planParams(managerId, freeTransfers, opts.horizon);
+  const params = planParams(managerId, freeTransfers, { horizon: opts.horizon, demo: opts.demo });
   if (opts.force) params.set("force", "1");
   return getJson<PlanInsights>(`/api/plan/insights?${params}`);
 }

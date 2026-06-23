@@ -12,6 +12,8 @@ export interface BriefHandlers {
 export interface BriefParams {
   teamId: number;
   freeTransfers?: number;
+  /** Demo mode — the welcome brief for a sample squad (no team_id sent). */
+  demo?: boolean;
 }
 
 interface BriefEvent {
@@ -29,7 +31,7 @@ export async function streamBrief(params: BriefParams, handlers: BriefHandlers =
 
   await postNdjsonStream(
     "/api/brief",
-    { team_id: params.teamId, freeTransfers: params.freeTransfers },
+    { team_id: params.demo ? undefined : params.teamId, freeTransfers: params.freeTransfers, demo: params.demo },
     (raw) => {
       const event = raw as unknown as BriefEvent;
       switch (event.type) {

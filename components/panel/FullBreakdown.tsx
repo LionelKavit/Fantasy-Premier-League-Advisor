@@ -28,6 +28,7 @@ export function FullBreakdown({
   onLensChange,
   plan,
   loading,
+  demo = false,
 }: {
   open: boolean;
   onToggle: () => void;
@@ -35,6 +36,8 @@ export function FullBreakdown({
   onLensChange: (lens: Lens) => void;
   plan: GameweekPlan;
   loading: boolean;
+  /** Demo mode — captaincy only (no transfer / long-term / chips). */
+  demo?: boolean;
 }) {
   return (
     <div className="rounded-lg border border-border bg-card">
@@ -46,38 +49,45 @@ export function FullBreakdown({
       >
         <span className="flex items-center gap-1.5">
           <ListTree className="size-3.5" />
-          This week &amp; long-term plan
+          {demo ? "Captaincy & ratings" : "This week & long-term plan"}
         </span>
         <ChevronDown className={cn("size-4 transition-transform", open && "rotate-180")} />
       </button>
 
       {open && (
         <div className="border-t border-border p-4">
-          <Tabs value={lens} onValueChange={(v) => onLensChange(v as Lens)}>
-            <TabsList
-              aria-label="Breakdown views"
-              className="mb-3 flex gap-1 rounded-lg border border-border bg-background p-1"
-            >
-              <TabsTrigger value="this-week" className={tabTrigger}>
-                This Week
-              </TabsTrigger>
-              <TabsTrigger value="long-term" className={tabTrigger}>
-                Long Term
-              </TabsTrigger>
-              <TabsTrigger value="chips" className={tabTrigger}>
-                Chips
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          {loading ? (
-            <AnalyzingIndicator />
-          ) : lens === "this-week" ? (
-            <ThisWeekDetail plan={plan} />
-          ) : lens === "long-term" ? (
-            <LongTermDetail plan={plan} />
+          {demo ? (
+            // Demo: only captaincy is meaningful (no optimizer) — no tabs, no transfer.
+            loading ? <AnalyzingIndicator /> : <ThisWeekDetail plan={plan} demo />
           ) : (
-            <ChipsDetail plan={plan} />
+            <>
+              <Tabs value={lens} onValueChange={(v) => onLensChange(v as Lens)}>
+                <TabsList
+                  aria-label="Breakdown views"
+                  className="mb-3 flex gap-1 rounded-lg border border-border bg-background p-1"
+                >
+                  <TabsTrigger value="this-week" className={tabTrigger}>
+                    This Week
+                  </TabsTrigger>
+                  <TabsTrigger value="long-term" className={tabTrigger}>
+                    Long Term
+                  </TabsTrigger>
+                  <TabsTrigger value="chips" className={tabTrigger}>
+                    Chips
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+
+              {loading ? (
+                <AnalyzingIndicator />
+              ) : lens === "this-week" ? (
+                <ThisWeekDetail plan={plan} />
+              ) : lens === "long-term" ? (
+                <LongTermDetail plan={plan} />
+              ) : (
+                <ChipsDetail plan={plan} />
+              )}
+            </>
           )}
         </div>
       )}

@@ -56,7 +56,7 @@ function TransferLine({ move }: { move: GroupedMove }) {
   );
 }
 
-export function ThisWeekDetail({ plan }: { plan: GameweekPlan }) {
+export function ThisWeekDetail({ plan, demo = false }: { plan: GameweekPlan; demo?: boolean }) {
   const openDialog = useOpenPlayerDialog();
   const { transfers, captaincy } = plan;
   const restructure = transfers?.restructureOptions ?? [];
@@ -77,7 +77,9 @@ export function ThisWeekDetail({ plan }: { plan: GameweekPlan }) {
     <div className="flex flex-col gap-3">
       {/* Transfer — the week's actual transfers: the chip draft for a transfer chip
           (Wildcard / Free Hit), otherwise the normal primaryRecommendation. The chip
-          announcement lives in its own Chip section below, never here. */}
+          announcement lives in its own Chip section below, never here. Hidden in demo
+          (no personalized transfer strategy — captaincy only). */}
+      {!demo && (
       <Section title="Transfer" icon={<Repeat className="size-3.5" />}>
         {!transfers ? (
           <p className="text-sm text-muted-foreground">Transfer analysis unavailable.</p>
@@ -118,6 +120,7 @@ export function ThisWeekDetail({ plan }: { plan: GameweekPlan }) {
           </div>
         )}
       </Section>
+      )}
 
       {/* Captaincy */}
       <Section title="Captaincy" icon={<Crown className="size-3.5" />}>
