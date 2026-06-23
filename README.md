@@ -26,14 +26,16 @@ Enter your FPL manager ID and Pocket Scout scouts your squad: transfer recommend
   - *This Week* — clear sections in order: **Transfer · Captaincy · Chip · Restructure** — a transfer recommendation gated on *projected points* (it holds rather than churning), EO-aware captaincy, and the chip call in its own section (so a Bench Boost never hides your free transfer).
   - *Long Term* — a multi-gameweek horizon.
   - *Chips* — an LLM-orchestrated chip plan (play now / hold / sequenced windows), grounded in chip principles and the deterministic candidate windows.
+- **Explore without a team** — no FPL ID required: Pocket Scout builds a **season-aware sample "dream team"** (best XV by FPL's projected points in-season, last-season returns off-season) and you can **Ask The Scout** anything. The chat is the whole point in this mode — there's no personalized transfer plan, and the chat is grounded in the current FPL rules so it never answers from stale knowledge.
 
-Everything is delivered in one consistent voice — **Pocket Scout** — and grounded in curated expert knowledge (chip timing, effective-ownership strategy).
+Everything is delivered in one consistent voice — **Pocket Scout** — and grounded in curated expert knowledge (chip timing, effective-ownership strategy, and the FPL rules).
 
 ## Architecture at a glance
 
 ```mermaid
 flowchart LR
   U([Manager ID]) --> BASE
+  D([No ID · Explore<br/>sample dream team]) --> BASE
   subgraph Fast["Base phase — deterministic, instant"]
     BASE[Squad analysis<br/>+ composite scoring] --> PITCH[Pitch + ratings]
   end
@@ -43,12 +45,14 @@ flowchart LR
   BASE --> OPT
   FPL[(FPL API)] --> BASE
   NEWS[(Team news)] -.-> OPT
-  KB[(Knowledge:<br/>chips · rank)] -.-> SYN
+  KB[(Knowledge:<br/>chips · rank · rules)] -.-> SYN
   KB -.-> CHAT
   PITCH --> UI[Conversation-first UI<br/>verdict bar · pitch · chat · breakdown · player dialog]
   SYN --> UI
   CHAT[Ask The Scout<br/>proactive brief + tool-use loop] --> UI
 ```
+
+> In **demo mode** (no ID) the base phase paints a synthesized sample squad, the insights phase runs **captaincy only** (the optimizer is skipped — no transfers/horizon/chips), and the chat answers general FPL questions grounded in the rules.
 
 The pitch paints **immediately** from a fast deterministic phase; the Scout then opens with a proactive brief and the LLM insights stream in. → **Full breakdown: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**
 
@@ -72,6 +76,13 @@ It's built **eval-first**: a point-in-time backtest harness over 10 seasons of F
 |---|---|
 | ![This Week breakdown](docs/images/fpl-advisor-this-week.png) | ![Chips plan](docs/images/fpl-advisor-chips.png) |
 
+| Explore without a team — the demo dream team + Scout chat |
+|---|
+| ![Demo mode — Explore without a team](docs/images/fpl-advisor-demo-mode.png) |
+<!-- PLACEHOLDER: add docs/images/fpl-advisor-demo-mode.png — the Explore view
+     (DEMO header, season banner, the sample XI with armbands/ratings, demo starter
+     chips). Captured on the same viewport as the rest of the set. -->
+
 ## Quickstart
 
 You need an [Anthropic API key](https://console.anthropic.com/) for the AI features. **It also runs without one** — the pitch, ratings, and deterministic recommendations work; only the LLM prose falls back.
@@ -83,7 +94,7 @@ cd Fantasy-Premier-League-Advisor
 npm install
 echo "ANTHROPIC_API_KEY=sk-ant-..." > .env.local   # optional
 npm run dev
-# open http://localhost:3000  (enter any public FPL manager ID)
+# open http://localhost:3000  (enter any public FPL manager ID — or click "Explore without a team")
 ```
 
 **Option B — production build (Docker + Caddy):**
@@ -100,7 +111,7 @@ docker compose up --build
 
 ## Tech stack
 
-Next.js 16 (App Router) · React 19 · TypeScript · Tailwind + shadcn · Anthropic Claude (Sonnet, with prompt caching) · Vitest (263 tests) · Docker + Caddy · the public FPL API.
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind + shadcn · Anthropic Claude (Sonnet, with prompt caching) · Vitest (317 tests) · Docker + Caddy · the public FPL API.
 
 ## Project notes
 

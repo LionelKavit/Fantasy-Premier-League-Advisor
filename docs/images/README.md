@@ -13,7 +13,8 @@ as one coherent story.
 | `fpl-advisor-player-dialog.png` | Screenshots — player dialog | The player detail dialog (opened from a pitch token / This-Week name): age, nationality + flag, form, last-week mins/pts, exp. next pts, and the **View on Premier League** button. |
 | `fpl-advisor-chips.png` | Screenshots — Chips | Breakdown on **Chips**: chips-left row + reasons list, play-now highlighted (no gameweek axis). |
 | `fpl-advisor-long-term.png` | spare | Breakdown on **Long Term** (final-GW empty state here — swap in a mid-season shot for a populated horizon). |
-| `fpl-advisor-login.png` | spare | The entry screen (manager-ID form). |
+| `fpl-advisor-login.png` | spare | The entry screen (manager-ID form, now with the "Explore without a team" CTA). |
+| `fpl-advisor-demo-mode.png` | Screenshots — demo mode | **⏳ PLACEHOLDER — to be supplied.** The Explore-without-a-team view: the **DEMO** header badge, the season-aware banner ("dream XV — built from last season's returns"), the sample XI with armbands + 0–10 ratings, and the demo starter chips. Capture on the same viewport as the rest of the set. |
 | `fpl-advisor-demo.mov` | demo video — see note below | Flow: squad load → pitch → proactive brief → breakdown tabs → Ask The Scout. **Stale for this version** (predates the verdict bar / dialog) — a re-record is a noted follow-up. |
 
 ## Demo video — inline player on GitHub

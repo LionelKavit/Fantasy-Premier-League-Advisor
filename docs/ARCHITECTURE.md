@@ -27,6 +27,7 @@ flowchart TB
 - **Base phase** (`/api/plan/base`) — deterministic only. Builds the squad analysis and composite scores; returns the pitch. Fast, no LLM. The client renders the **glanceable verdict bar** above the fold from the merged plan once insights land (so the captain/transfer are final, never swapped mid-flight), with an **Open FPL Transfers** deep link that hands off to the FPL transfers screen.
 - **Insights phase** (`/api/plan/insights`) — runs the optimizer + captain logic, then the LLM syntheses. Cached per `manager:gw:freeTransfers:horizon`.
 - **Player detail** (`/api/player/[id]`) — a lightweight, on-demand route behind the **player dialog** (opened from a pitch token or a This-Week transfer name). It reuses the warm bootstrap + element-summary caches the insights phase already populated, so for an analyzed player it issues **no new FPL request**; returns name, age, nationality, form, last-week minutes/points, and expected next points, plus the `opta_code` that builds the **View on Premier League** link.
+- **Demo mode** (`demo=1`, no manager ID) — for an ID-less visitor, `buildDemoSquad` (`lib/demo/`) synthesizes a **season-aware** sample "dream team": a budget-valid (≤£100m, ≤3/club, 2-5-5-3) XV ranked by FPL's `ep_next` in-season, or by last-season points off-season (the season is decided by the **gameweek calendar**, not `ep_next` presence — the summer feed still carries stale `ep_next`). The same routes serve it: base returns the pitch + ratings + deterministic captain; insights run **captaincy only** (the optimizer — transfers, long-term horizon, chips — is never invoked); the brief and chat run with demo grounding. The deterministic spine survives an LLM outage, and the opening brief falls back to a deterministic welcome.
 
 ## The deterministic engine
 
@@ -52,11 +53,13 @@ total = squash( Σ wᵢ · signalᵢ  +  trendAdj + llmAdj − suspensionPenalty
 
 **Syntheses** (`lib/optimizer/synthesis.ts`, `lib/captain/synthesis.ts`, the chip orchestrator `lib/optimizer/chip-orchestrator.ts`, and the opening brief `lib/scout/brief.ts`) turn the deterministic results into prose — the transfer verdict, the captaincy call, the chip plan, and the proactive opening brief. They are:
 - **Persona-unified** — all share `lib/llm/persona.ts` (the *Pocket Scout* identity) as their system instruction.
-- **Knowledge-grounded** — curated markdown (`lib/knowledge/chips.md`, `rank-strategy.md`) is injected so chip timing and effective-ownership reasoning reflect expert principles, not generic model priors.
+- **Knowledge-grounded** — curated markdown (`lib/knowledge/chips.md`, `rank-strategy.md`, and `rules.md`) is injected so chip timing, effective-ownership reasoning, and the FPL rules reflect curated content, not generic (and possibly stale) model priors.
 - **Format-safe** — several return structured JSON that the UI renders; the persona explicitly defers to each task's output format.
 - **Prompt-cached** — `cache_control` marks the stable system / agent prefixes so repeated prefixes (notably the agentic chat's multi-round loop) bill at the cache-read rate.
 
 **Agentic Scout chat** (`lib/scout/`) — Ask The Scout is the **hero conversation**: it opens proactively with a deadline-aware brief, then runs a stateless tool-use loop where the model calls tools (`get_plan`, `score_player`, `simulate_transfer`, `simulate_captain`) to fetch *real* numbers rather than hallucinate them, streaming the reply token-by-token. It's grounded in the committed chip plan, your held chips, **and the curated knowledge base** (`chips.md` + `rank-strategy.md`, injected via `loadKnowledge`) — with the committed chip plan held **authoritative over** those principles for the chip decision, so the chat reasons with expert principles but never issues a competing chip verdict to the panels.
+
+In **demo mode** the chat keeps the same Scout persona but answers as a general FPL analyst about a *sample* squad — no manager, rank, or held chips — and is additionally grounded in the current **FPL rules** (`rules.md`), so rule/scoring/chip questions come from curated rules rather than stale training data. It's tuned for brevity (a lower `max_tokens` and a ~2-sentence format), and its system prefix carries no per-visitor data, so the prompt cache is shared across all demo visitors (see [Caching](#caching--state)).
 
 ### Knowledge & grounding
 
@@ -65,6 +68,7 @@ total = squash( Σ wᵢ · signalᵢ  +  trendAdj + llmAdj − suspensionPenalty
 | Rotation / injury | predicted-lineup news (fetched, LLM-extracted → structured) | dynamic data | `LlmContextSignals` → composite + captain |
 | Chip timing | `lib/knowledge/chips.md` | static principles | the **chip orchestrator** → chip plan · the **Scout chat** |
 | Rank / EO | `lib/knowledge/rank-strategy.md` | static principles | captain + transfer narratives · the **Scout chat** |
+| FPL rules | `lib/knowledge/rules.md` | static mechanics | the **demo Scout chat** (current rules — squad, scoring, transfers, chips) |
 | Persona | `lib/llm/persona.ts` | identity | every reasoning call + the chat |
 
 Static knowledge files are read at runtime, so they're explicitly copied into the Docker image (see [Deployment](#deployment)).
@@ -72,6 +76,8 @@ Static knowledge files are read at runtime, so they're explicitly copied into th
 ## Caching & state
 
 In-memory, per-process, TTL'd: the analysis context (per manager), the insights result (per request signature), team news (per gameweek), and the FPL HTTP cache (~1h). This is why Pocket Scout runs as **one instance**, not horizontally-scaled serverless — the caches and the 30–60s LLM requests both want a single long-lived process.
+
+The **demo** context is bootstrap-derived, so it's cached once (a single entry, not per manager). And because the demo chat's system prompt carries no per-visitor data, its **prompt cache is shared across all demo visitors** (vs the per-manager prefix of the ID-based chat), so demo turns bill at the cache-read rate; demo replies also use a lower token cap.
 
 ## Deployment
 

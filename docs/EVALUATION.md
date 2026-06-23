@@ -65,6 +65,7 @@ The strength signal was **worse in every position** — decisively so for defend
 - **Calibrate-first.** Every model change is gated by a report-only calibration on the backtest before it touches runtime — which is exactly how the fixture idea was caught.
 - **Spec-first.** Built with [OpenSpec](https://github.com/Fission-AI/OpenSpec): ~45 change proposals under `openspec/changes/archive/`, each with the rationale, design, and as-built outcome — *including the no-ships and report-only results*.
 - **Honest about limits.** The numbers above are within-position rank correlation on a point-in-time backtest, and deterministic-floor for the squad replays — not a live A/B. They're presented with those caveats rather than as marketing.
+- **Scope note.** Demo mode's sample "dream team" is selected by a simple season-aware heuristic (FPL's `ep_next` in-season, last-season points off-season) — a display convenience for ID-less visitors, **not** an evaluated or backtested model; nothing in this document depends on it.
 
 ## Reproduce
 
