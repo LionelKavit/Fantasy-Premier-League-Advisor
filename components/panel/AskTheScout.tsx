@@ -19,6 +19,34 @@ const TOOL_LABELS: Record<string, string> = {
   simulate_captain: "Simulating captaincy…",
 };
 
+// Rotating placeholders while the Scout is thinking — the opening brief gets
+// squad-flavoured copy; a follow-up reply gets generic working copy.
+const BRIEF_PHRASES = [
+  "Scout is analyzing your squad…",
+  "Reviewing your fixtures…",
+  "Weighing your transfer options…",
+  "Sizing up the captaincy call…",
+  "Preparing your weekly brief…",
+];
+const REPLY_PHRASES = ["Thinking…", "Consulting your squad…", "Crunching the numbers…"];
+
+function ThinkingIndicator({ phrases }: { phrases: string[] }) {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setI((n) => n + 1), 2200);
+    return () => clearInterval(id);
+  }, []);
+  const idx = i % phrases.length; // guard against a phrase-list swap (brief → reply)
+  return (
+    <div className="flex items-center gap-1.5 px-1 text-xs text-muted-foreground">
+      <Loader2 className="size-3 animate-spin" />
+      <span key={idx} className="animate-in fade-in duration-700">
+        {phrases[idx]}
+      </span>
+    </div>
+  );
+}
+
 export function AskTheScout({
   teamId,
   freeTransfers,
@@ -189,10 +217,9 @@ export function AskTheScout({
               <Bubble role="assistant" text={streamingText} streaming />
             ) : (
               !activeTool && (
-                <div className="flex items-center gap-1.5 px-1 text-xs text-muted-foreground">
-                  <Loader2 className="size-3 animate-spin" />
-                  Thinking…
-                </div>
+                <ThinkingIndicator
+                  phrases={messages.length === 0 ? BRIEF_PHRASES : REPLY_PHRASES}
+                />
               )
             )}
           </div>

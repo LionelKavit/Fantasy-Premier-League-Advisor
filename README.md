@@ -18,10 +18,12 @@ Enter your FPL manager ID and Pocket Scout scouts your squad: transfer recommend
 
 ## What it does
 
+- **Glanceable verdict** — one always-visible line above the fold spans the pitch and chat: *"This week: João Pedro → Watkins · Captain Haaland · Play your Bench Boost"*, with an **Open FPL Transfers** deep link at the end. Derived deterministically and shown only once the decision is final (no mid-flight captain swap).
 - **Pitch & ratings** — every squad player scored 0–10 by a position-aware composite model (anchored on FPL's expected points, corrected by form, fixtures, value, and underlying stats).
-- **Ask The Scout (the hero)** — the conversation is the primary surface: the Scout opens with a proactive, deadline-aware brief, then answers "what if?" via real tool calls (`simulate_transfer`, `score_player`, …), grounded in your committed plan so it never invents numbers or contradicts the panels.
+- **Ask The Scout (the hero)** — the conversation is the primary surface: the Scout opens with a proactive, deadline-aware brief, then answers "what if?" via real tool calls (`simulate_transfer`, `score_player`, …), grounded in your committed plan **and the curated knowledge base**, so it never invents numbers or contradicts the panels.
+- **Act on it** — close the last mile: click any pitch player or transfer name for a **detail dialog** (age, nationality, form, last-week minutes/points, expected next points) with a **View on Premier League** link; the verdict bar hands you off to the FPL transfers screen.
 - **Breakdown** — a collapsible drawer with three tabs:
-  - *This Week* — a transfer recommendation gated on *projected points* (it holds rather than churning), plus EO-aware captaincy.
+  - *This Week* — clear sections in order: **Transfer · Captaincy · Chip · Restructure** — a transfer recommendation gated on *projected points* (it holds rather than churning), EO-aware captaincy, and the chip call in its own section (so a Bench Boost never hides your free transfer).
   - *Long Term* — a multi-gameweek horizon.
   - *Chips* — an LLM-orchestrated chip plan (play now / hold / sequenced windows), grounded in chip principles and the deterministic candidate windows.
 
@@ -42,7 +44,8 @@ flowchart LR
   FPL[(FPL API)] --> BASE
   NEWS[(Team news)] -.-> OPT
   KB[(Knowledge:<br/>chips · rank)] -.-> SYN
-  PITCH --> UI[Conversation-first UI<br/>pitch · chat · breakdown]
+  KB -.-> CHAT
+  PITCH --> UI[Conversation-first UI<br/>verdict bar · pitch · chat · breakdown · player dialog]
   SYN --> UI
   CHAT[Ask The Scout<br/>proactive brief + tool-use loop] --> UI
 ```
@@ -61,11 +64,11 @@ It's built **eval-first**: a point-in-time backtest harness over 10 seasons of F
 
 ## Screenshots
 
-| Ask The Scout — the proactive opening brief | Ask The Scout — a tool-grounded follow-up |
+| Ask The Scout — a tool-grounded follow-up | Player detail dialog — click any player to inspect |
 |---|---|
-| ![Opening brief](docs/images/fpl-advisor-chat.png) | ![Follow-up answer](docs/images/fpl-advisor-chat-continued.png) |
+| ![Follow-up answer](docs/images/fpl-advisor-chat-continued.png) | ![Player detail dialog](docs/images/fpl-advisor-player-dialog.png) |
 
-| This Week — the move, restructure & captaincy | Chips — the orchestrated chip plan |
+| This Week — Transfer · Captaincy · Chip · Restructure | Chips — the orchestrated chip plan |
 |---|---|
 | ![This Week breakdown](docs/images/fpl-advisor-this-week.png) | ![Chips plan](docs/images/fpl-advisor-chips.png) |
 

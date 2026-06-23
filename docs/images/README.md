@@ -7,14 +7,14 @@ as one coherent story.
 
 | File | Used as | Shows |
 |---|---|---|
-| `fpl-advisor-hero.png` | README hero | The landing: pitch (left) + Ask The Scout hero with the proactive brief and starter chips (right). |
-| `fpl-advisor-chat.png` | Screenshots — opening brief | The chat panel with the Scout's proactive, deadline-aware opening brief + the contextual starter chips. |
-| `fpl-advisor-chat-continued.png` | Screenshots — tool-grounded answer | The chat after a follow-up ("Why Haaland over Anderson?") — a crisp, answer-first reply citing real numbers. |
-| `fpl-advisor-this-week.png` | Screenshots — This Week | Breakdown on **This Week**: the recommended move, restructure chains, and EO-aware captaincy. |
+| `fpl-advisor-hero.png` | README hero | The landing: the **glanceable verdict bar** across the top (transfer · captain · chip + Open FPL Transfers), pitch (left) + Ask The Scout hero with the proactive brief and starter chips (right). |
+| `fpl-advisor-chat-continued.png` | Screenshots — tool-grounded answer | The chat after a follow-up ("Why Haaland over Anderson?") — a crisp, answer-first reply citing real numbers (verdict bar visible). The standalone opening-brief shot was dropped — the hero already shows the brief. |
+| `fpl-advisor-this-week.png` | Screenshots — This Week | Breakdown on **This Week**, now four sections in order: **Transfer · Captaincy · Chip · Restructure** (the chip call in its own section). |
+| `fpl-advisor-player-dialog.png` | Screenshots — player dialog | The player detail dialog (opened from a pitch token / This-Week name): age, nationality + flag, form, last-week mins/pts, exp. next pts, and the **View on Premier League** button. |
 | `fpl-advisor-chips.png` | Screenshots — Chips | Breakdown on **Chips**: chips-left row + reasons list, play-now highlighted (no gameweek axis). |
 | `fpl-advisor-long-term.png` | spare | Breakdown on **Long Term** (final-GW empty state here — swap in a mid-season shot for a populated horizon). |
 | `fpl-advisor-login.png` | spare | The entry screen (manager-ID form). |
-| `fpl-advisor-demo.mov` | demo video — see note below | Flow: squad load → pitch → proactive brief → breakdown tabs → Ask The Scout. |
+| `fpl-advisor-demo.mov` | demo video — see note below | Flow: squad load → pitch → proactive brief → breakdown tabs → Ask The Scout. **Stale for this version** (predates the verdict bar / dialog) — a re-record is a noted follow-up. |
 
 ## Demo video — inline player on GitHub
 
