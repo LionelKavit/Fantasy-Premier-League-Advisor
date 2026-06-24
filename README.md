@@ -30,14 +30,19 @@ https://github.com/user-attachments/assets/93f5c5eb-443b-4edb-b4d6-2a8c6037cfe0
 
 ## What it does
 
-- **Glanceable verdict** — one always-visible line above the fold spans the pitch and chat: *"This week: Sánchez → Raya +1 more transfer · Captain Haaland · Play your Bench Boost"*, with an **Open FPL Transfers** deep link at the end. Derived deterministically and shown only once the decision is final (no mid-flight captain swap).
+- **Glanceable verdict** — one always-visible scout verdit as a top banner: *"This week: Sánchez → Raya +1 more transfer · Captain Haaland · Play your Bench Boost"*, with an **Open FPL Transfers** deep link at the end.
+  
 - **Pitch & ratings** — every squad player scored 0–10 by a position-aware composite model (anchored on FPL's expected points, corrected by form, fixtures, value, and underlying stats).
-- **Ask The Scout (the hero)** — the conversation is the primary surface: the Scout opens with a proactive, deadline-aware brief, then answers "what if?" via real tool calls (`simulate_transfer`, `score_player`, …), grounded in your committed plan **and the curated knowledge base**, so it never invents numbers or contradicts the panels.
+
+- **Ask The Scout (the hero)** — the conversation is the primary surface: the Scout opens with a proactive, deadline-aware brief, then answers "what if?" via real tool calls (`simulate_transfer`, `score_player`, …), grounded in a committed plan **and the curated knowledge base**, so it never invents numbers.
+
 - **Act on it** — close the last mile: click any pitch player or transfer name for a **detail dialog** (age, nationality, form, last-week minutes/points, expected next points) with a **View on Premier League** link; the verdict bar hands you off to the FPL transfers screen.
+
 - **Breakdown** — a collapsible drawer with three tabs:
   - *This Week* — clear sections in order: **Transfer · Captaincy · Chip · Restructure** — up to **N free transfers** ("Make 3 free transfers"), chosen by an expected-points allocation that weighs straight swaps against a **restructure** (sell-to-fund-a-dream) and **holds rather than churns**; EO-aware captaincy; and the chip call in its own section (so a Bench Boost never hides your free transfers). The Restructure section lists alternative dream-funding chains, each priced against the free transfers you have left.
   - *Long Term* — a multi-gameweek horizon.
   - *Chips* — an LLM-orchestrated chip plan (play now / hold / sequenced windows), grounded in chip principles and the deterministic candidate windows.
+
 - **Explore without a team** — no FPL ID required: Pocket Scout builds a **season-aware sample "dream team"** (best XV by FPL's projected points in-season, last-season returns off-season) and you can **Ask The Scout** anything. The chat is the whole point in this mode — there's no personalized transfer plan, and the chat is grounded in the current FPL rules so it never answers from stale knowledge.
 
 Everything is delivered in one consistent voice — **Pocket Scout** — and grounded in curated expert knowledge (chip timing, effective-ownership strategy, and the FPL rules).
