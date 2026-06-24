@@ -26,6 +26,10 @@ export interface TransferAction {
 export type TransferHoldReason = "ep_unavailable" | "below_threshold" | "no_valid_targets";
 
 export interface SingleTransferResult {
+  // The committed free moves, in priority order (0..freeTransfers entries). Each
+  // clears the free-transfer ep bar; budget/club limits hold across the whole set.
+  // `bestSingle`/`bestSecond` are kept as freeMoves[0]/[1] for existing consumers.
+  freeMoves: ValidTransfer[];
   bestSingle: ValidTransfer | null;
   bestSecond: ValidTransfer | null;
   alternatives: ValidTransfer[];
@@ -47,12 +51,17 @@ export interface HitTransferResult {
   doubleHit: HitRecommendation | null;
 }
 
-export interface RestructureOption {
-  dreamTarget: ValidTransfer;
+export interface RestructureCandidate {
+  dreamTarget: ValidTransfer;        // weak → dream upgrade
+  downgradeTransfer: ValidTransfer;  // funder → cheaper replacement (frees the cash)
   downgradedPlayer: ScoredPlayer;
   downgradeReplacement: ScoredPlayer;
-  fundingChain: ValidTransfer[];
-  netScoreChange: number;
+  netEp: number;                     // expected-points gain of the whole two-move chain
+}
+
+// A restructure surfaced in the (non-chosen) Restructure section, priced against the
+// free transfers remaining after the recommended moves.
+export interface RestructureOption extends RestructureCandidate {
   totalCost: number;
 }
 

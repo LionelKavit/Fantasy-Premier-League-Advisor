@@ -13,8 +13,10 @@ function primaryHeadline(action: TransferAction): string {
   switch (action.type) {
     case "ROLL":
       return "Roll your transfer";
-    case "FREE":
-      return "Make 1 free transfer";
+    case "FREE": {
+      const n = action.transfers.length;
+      return `Make ${n} free transfer${n === 1 ? "" : "s"}`;
+    }
     case "HIT_SINGLE":
       return "Take a −4 hit";
     case "HIT_DOUBLE":
@@ -56,7 +58,7 @@ function TransferLine({ move }: { move: GroupedMove }) {
   );
 }
 
-export function ThisWeekDetail({ plan }: { plan: GameweekPlan }) {
+export function ThisWeekDetail({ plan, demo = false }: { plan: GameweekPlan; demo?: boolean }) {
   const openDialog = useOpenPlayerDialog();
   const { transfers, captaincy } = plan;
   const restructure = transfers?.restructureOptions ?? [];
@@ -77,7 +79,9 @@ export function ThisWeekDetail({ plan }: { plan: GameweekPlan }) {
     <div className="flex flex-col gap-3">
       {/* Transfer — the week's actual transfers: the chip draft for a transfer chip
           (Wildcard / Free Hit), otherwise the normal primaryRecommendation. The chip
-          announcement lives in its own Chip section below, never here. */}
+          announcement lives in its own Chip section below, never here. Hidden in demo
+          (no personalized transfer strategy — captaincy only). */}
+      {!demo && (
       <Section title="Transfer" icon={<Repeat className="size-3.5" />}>
         {!transfers ? (
           <p className="text-sm text-muted-foreground">Transfer analysis unavailable.</p>
@@ -118,6 +122,7 @@ export function ThisWeekDetail({ plan }: { plan: GameweekPlan }) {
           </div>
         )}
       </Section>
+      )}
 
       {/* Captaincy */}
       <Section title="Captaincy" icon={<Crown className="size-3.5" />}>
@@ -216,8 +221,8 @@ export function ThisWeekDetail({ plan }: { plan: GameweekPlan }) {
                           buy {o.downgradeReplacement.player.webName}
                         </button>
                         <span className="text-xs tabular-nums">
-                          net {o.netScoreChange >= 0 ? "+" : ""}
-                          {o.netScoreChange.toFixed(2)} · {o.totalCost === 0 ? "free" : `−${o.totalCost} pts`}
+                          net pts gain {o.netEp >= 0 ? "+" : ""}
+                          {o.netEp.toFixed(1)} · {o.totalCost === 0 ? "free" : `−${o.totalCost} pts`}
                         </span>
                       </div>
                     </li>

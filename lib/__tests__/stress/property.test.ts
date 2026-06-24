@@ -17,7 +17,7 @@ import {
 import { stubApiKey, clearApiKey, mockClaudeMalformed, mockClaudeJson, restoreClaude } from "../mock-claude";
 
 const positions: Position[] = ["GK", "DEF", "MID", "FWD"];
-const noSingle: SingleTransferResult = { bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null, holdReason: null };
+const noSingle: SingleTransferResult = { freeMoves: [], bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null, holdReason: null };
 const noHit: HitTransferResult = { singleHit: null, doubleHit: null };
 const counts = () => new Map<number, number>();
 
@@ -77,7 +77,7 @@ describe("invariants", () => {
     const weak = makeScoredPlayer({ total: 0.3, player: { id: 13, position: "MID", price: 5 } });
     const analysis = makeSquadAnalysisResult({
       bank: 2.0,
-      weakest3: [
+      weakSpots: [
         {
           player: weak, whyWeak: ["x"],
           targets: [

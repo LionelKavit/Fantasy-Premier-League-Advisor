@@ -19,7 +19,7 @@ const ctx = {
     currentGw: 20,
     rankedSquad: [],
     picks: [],
-    weakest3: [],
+    weakSpots: [],
     bank: 1.5,
     chipsRemaining: { wildcard: 0, freeHit: 0, benchBoost: 0, tripleCaptain: 0 },
   },

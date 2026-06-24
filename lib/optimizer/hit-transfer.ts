@@ -9,13 +9,9 @@ export function evaluateHitTransfers(
   freeTransfers: number,
   singleResult: SingleTransferResult
 ): HitTransferResult {
-  const usedIds = new Set<string>();
-  if (singleResult.bestSingle) {
-    usedIds.add(transferKey(singleResult.bestSingle));
-  }
-  if (singleResult.bestSecond) {
-    usedIds.add(transferKey(singleResult.bestSecond));
-  }
+  // Exclude every committed free move (0..N) so a move already taken for free is
+  // never re-offered as a paid hit.
+  const usedIds = new Set<string>(singleResult.freeMoves.map(transferKey));
 
   const remaining = validTransfers.filter((vt) => !usedIds.has(transferKey(vt)));
 

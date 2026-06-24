@@ -22,6 +22,8 @@ export interface AskParams {
   messages: AskMessage[];
   /** The committed chip plan from the displayed plan — grounds chip answers. */
   chipPlan?: ChipPlanLine[];
+  /** Demo mode — general advice about a sample squad (no team_id sent). */
+  demo?: boolean;
 }
 
 interface AskEvent {
@@ -41,10 +43,11 @@ export async function streamAsk(params: AskParams, handlers: AskHandlers = {}): 
   await postNdjsonStream(
     "/api/ask",
     {
-      team_id: params.teamId,
+      team_id: params.demo ? undefined : params.teamId,
       freeTransfers: params.freeTransfers,
       messages: params.messages,
       chipPlan: params.chipPlan,
+      demo: params.demo,
     },
     (raw) => {
       const event = raw as unknown as AskEvent;

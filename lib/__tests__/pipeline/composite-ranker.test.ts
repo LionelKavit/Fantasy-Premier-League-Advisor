@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { computeCompositeScore } from "../../pipeline/composite-scorer";
-import { rankSquad, identifyWeakest3 } from "../../pipeline/squad-ranker";
+import { rankSquad, identifyWeakSpots } from "../../pipeline/squad-ranker";
 import { PIPELINE_CONFIG } from "../../config";
 import type { Position } from "../../types";
 import {
@@ -61,7 +61,7 @@ describe("computeCompositeScore", () => {
   });
 });
 
-describe("rankSquad / identifyWeakest3", () => {
+describe("rankSquad / identifyWeakSpots", () => {
   it("sorts by composite total descending", () => {
     const squad = [
       makeScoredPlayer({ total: 0.3 }),
@@ -72,14 +72,20 @@ describe("rankSquad / identifyWeakest3", () => {
     expect(ranked.map((s) => s.score.total)).toEqual([0.9, 0.6, 0.3]);
   });
 
-  it("returns the three lowest as weak spots, each with reasons", () => {
+  it("returns the weakest spots (top-5 by default), each with reasons", () => {
     const squad = Array.from({ length: 15 }, (_, i) => makeScoredPlayer({ total: 0.9 - i * 0.05 }));
     const ranked = rankSquad(squad);
-    const weak = identifyWeakest3(ranked);
-    expect(weak).toHaveLength(3);
+    const weak = identifyWeakSpots(ranked);
+    expect(weak).toHaveLength(5); // defaults to PIPELINE_CONFIG.maxWeakSpots
     for (const w of weak) expect(w.whyWeak.length).toBeGreaterThan(0);
-    // The weakest overall should be among the three.
+    // Worst-first ordering: the weakest overall leads the list.
     const lowest = Math.min(...ranked.map((s) => s.score.total));
-    expect(weak.some((w) => w.player.score.total === lowest)).toBe(true);
+    expect(weak[0].player.score.total).toBe(lowest);
+  });
+
+  it("honours an explicit weak-spot count", () => {
+    const squad = Array.from({ length: 15 }, (_, i) => makeScoredPlayer({ total: 0.9 - i * 0.05 }));
+    const weak = identifyWeakSpots(rankSquad(squad), 3);
+    expect(weak).toHaveLength(3);
   });
 });

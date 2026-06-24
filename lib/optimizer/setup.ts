@@ -51,7 +51,7 @@ export function buildValidTransfers(
 ): ValidTransfer[] {
   const validTransfers: ValidTransfer[] = [];
 
-  for (const ws of analysis.weakest3) {
+  for (const ws of analysis.weakSpots) {
     for (const target of ws.targets) {
       if (!target.fitsBudget) continue;
 

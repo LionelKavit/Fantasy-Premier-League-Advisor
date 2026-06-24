@@ -9,7 +9,7 @@
 import type { Pick, ElementSummary } from "../../lib/types";
 import type { ScoredPlayer, LlmContextSignals } from "../../lib/pipeline/types";
 import { scorePlayerLite } from "../../lib/pipeline/lite-scoring";
-import { rankSquad, identifyWeakest3, findCandidates } from "../../lib/pipeline/squad-ranker";
+import { rankSquad, identifyWeakSpots, findCandidates } from "../../lib/pipeline/squad-ranker";
 import { buildValidTransfers } from "../../lib/optimizer/setup";
 import { load, teams, fixtures, realized, buildPlayer, allElementIds } from "./reconstruct";
 
@@ -31,12 +31,12 @@ for (let gw = 4; gw <= 38; gw++) {
   const scoredCache = new Map(scored.map((sp) => [sp.player.id, sp]));
   const teamCounts = new Map<number, number>();
   for (const sp of scored) teamCounts.set(sp.player.teamId, (teamCounts.get(sp.player.teamId) ?? 0) + 1);
-  const weakest3 = identifyWeakest3(rankSquad(scored));
+  const weakSpots = identifyWeakSpots(rankSquad(scored));
   const universe = allElementIds.map((id) => buildPlayer(id, gw));
-  for (const ws of weakest3)
+  for (const ws of weakSpots)
     ws.targets = findCandidates(ws.player, universe, bank, teamCounts, scoredCache, fixtures, teams, gw, EMPTY_ES, EMPTY_LLM, 1);
   const valid = buildValidTransfers(
-    { rankedSquad: scored, weakest3, picks: prev.picks, chipsRemaining: { wildcard: 0, freeHit: 0, benchBoost: 0, tripleCaptain: 0 }, bank, currentGw: gw, generatedAt: "" },
+    { rankedSquad: scored, weakSpots, picks: prev.picks, chipsRemaining: { wildcard: 0, freeHit: 0, benchBoost: 0, tripleCaptain: 0 }, bank, currentGw: gw, generatedAt: "" },
     bank, teamCounts);
   for (const vt of valid)
     pairs.push({ gain: vt.gw1Gain, realized: gainOver(vt.candidate.player.id, vt.weakPlayer.player.id, gw, 3) });

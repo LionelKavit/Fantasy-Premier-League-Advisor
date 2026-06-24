@@ -104,9 +104,11 @@ The Expert principles above are general guidance; the committed Chip plan has al
 export function buildScoutSystemPrompt(
   sc: ScoutContext,
   freeTransfers: number,
-  chipPlan?: ChipPlanLine[]
+  chipPlan?: ChipPlanLine[],
+  demo = false
 ): string {
   const a = sc.ctx.analysis;
+  if (demo) return buildDemoScoutSystemPrompt();
   const manager = sc.ctx.managerProfile.entry.name;
   return `${SCOUT_PERSONA}
 
@@ -121,14 +123,65 @@ Never invent prices, scores, projections, ownership or transfer legality — cal
 ## Current situation
 GW${a.currentGw}, £${a.bank.toFixed(1)}m in the bank, ${freeTransfers} free transfer(s) available.
 
-## How to format your answer
-This renders in a narrow chat column. Be crisp:
-- Lead with the answer. Your FIRST sentence states the verdict or direct answer — not setup, not "it depends", not caveats. The reasoning comes after.
-- Default to 2–4 sentences (~90 words). Go longer ONLY if the manager explicitly asks you to walk through it or explain in depth.
-- Use at most ONE short bullet list ("- "), and only to compare 3+ options or lay out a couple of factors. Never stack multiple prose paragraphs — if you're starting a third paragraph, cut instead.
-- Do NOT use Markdown tables — they don't fit. Compare options in a sentence or that one short list.
-- No headings. Use **bold** sparingly — only the headline pick or a key figure, never whole sentences or scattered asterisks.
+${FORMAT_GUIDE}
 
 ## What to say
 The manager can already see their squad, the recommended transfer, restructure options and captaincy on screen. Don't just restate those — answer the actual question and add the reasoning: why this option over the alternatives, the key trade-off or risk, and context the raw numbers don't show (recent form vs underlying, fixtures, ownership/template, timing). Reference specific players, gameweeks and numbers.${heldChipsBlock(a.chipsRemaining, a.currentGw)}${chipPlanBlock(chipPlan, a.currentGw)}${expertKnowledgeBlock()}${chipVerdictAuthorityClause(chipPlan)}`;
+}
+
+// Shared narrow-column formatting rules (identical for the manager and demo chats).
+const FORMAT_GUIDE = `## How to format your answer
+This renders in a narrow chat column. Be crisp:
+- Lead with the answer. Your FIRST sentence states the verdict or direct answer — not setup, not "it depends", not caveats. The reasoning comes after.
+- Default to 2–4 sentences (~90 words). Go longer ONLY if the user explicitly asks you to walk through it or explain in depth.
+- Use at most ONE short bullet list ("- "), and only to compare 3+ options or lay out a couple of factors. Never stack multiple prose paragraphs — if you're starting a third paragraph, cut instead.
+- Do NOT use Markdown tables — they don't fit. Compare options in a sentence or that one short list.
+- No headings. Use **bold** sparingly — only the headline pick or a key figure, never whole sentences or scattered asterisks.`;
+
+// Demo brevity — deliberately tighter than the manager FORMAT_GUIDE (this is a free,
+// public demo). Paired with a lower max_tokens cap in chat.ts.
+const DEMO_FORMAT_GUIDE = `## How to answer
+This is a public demo in a narrow chat column — be brief and lead with the answer.
+- Keep it to about TWO sentences (~45 words). Go longer only if the visitor explicitly asks you to explain in depth.
+- Use at most ONE short bullet list, and only if it's genuinely the clearest way to compare options. No headings, no tables.
+- Use **bold** only for a headline pick or a key figure.`;
+
+/** Current FPL rules (mechanics) — grounds the demo chat so it never answers rule
+ * questions from stale training knowledge. Additive: missing file → "". */
+function fplRulesBlock(): string {
+  const rules = loadKnowledge("rules");
+  if (!rules) return "";
+  return `
+
+## FPL rules (current — use these, not your own assumptions)
+For ANY question about squad limits, scoring, transfers, or chips, answer from these current rules; your own knowledge of FPL's rules may be out of date.
+${rules}`;
+}
+
+/**
+ * Demo-mode system prompt: a sample squad, no manager. General FPL advice only —
+ * never "your squad"/rank/held chips; simulate_transfer is a hypothetical teaching
+ * tool, never a "you should transfer" verdict. Grounded in the current FPL rules
+ * plus the chips/rank principles.
+ *
+ * Deliberately CONSTANT (no per-request data — no gameweek number, no squad) so the
+ * cached system prefix is byte-identical for every demo visitor and the prompt cache
+ * is shared globally (not per-session). See chat.ts for the cache breakpoints; the
+ * persona + rules + chips + rank prefix clears the model's minimum-cacheable size.
+ */
+function buildDemoScoutSystemPrompt(): string {
+  return `${SCOUT_PERSONA}
+
+You are operating here as the in-app chat assistant in DEMO mode — this OVERRIDES the line above about "one FPL manager" and "their real squad". There is NO manager and no real team: the squad on screen is a SAMPLE "dream team" built from the numbers to showcase Pocket Scout.
+
+## Scope
+Answer questions about FPL — players, captaincy, fixtures, value, the rules, and general strategy, including this sample squad. Give GENERAL advice; never refer to "your team", "your squad", a manager's rank, or held chips (there are none). When the sample squad and its numbers come from a finished season (the off-season), make clear you're reasoning off last season's data rather than a live projection. If asked anything unrelated to FPL, politely decline in one sentence and steer back.
+
+## Grounding
+Never invent prices, scores, projections or ownership — call the tools to get real numbers. Use score_player / compare_players / simulate_captain for "who's better / who to captain" questions. simulate_transfer is a HYPOTHETICAL teaching tool: explain the projected-points effect of a swap, but never tell the visitor they "should" make a transfer — there is no team to manage.${fplRulesBlock()}${expertKnowledgeBlock()}
+
+${DEMO_FORMAT_GUIDE}
+
+## What to say
+The visitor can see the sample squad and its 0–10 ratings on screen. Answer the actual question with reasoning: why one option over another and the key trade-off. Reference specific players and numbers, but stay brief.`;
 }

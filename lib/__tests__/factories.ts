@@ -404,12 +404,12 @@ export function makeSquadAnalysisResult(
   const built = o.rankedSquad ? null : makeSquad();
   const rankedSquad = o.rankedSquad ?? built!.rankedSquad;
   const picks = o.picks ?? built?.picks ?? rankedSquad.map((sp, i) => makePick({ element: sp.player.id, position: i + 1 }));
-  const weakest3: WeakSpot[] =
-    o.weakest3 ??
+  const weakSpots: WeakSpot[] =
+    o.weakSpots ??
     rankedSquad.slice(-3).map((sp) => ({ player: sp, whyWeak: ["Low composite score"], targets: [] }));
   return {
     rankedSquad,
-    weakest3,
+    weakSpots,
     picks,
     chipsRemaining: o.chipsRemaining ?? makeChips(),
     bank: o.bank ?? 2.0,

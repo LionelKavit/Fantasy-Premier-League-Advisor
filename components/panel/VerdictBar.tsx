@@ -4,7 +4,7 @@ import type { GameweekPlan } from "@/lib/plan/types";
 import { buildVerdict } from "@/lib/client/moves";
 import { FPL_TRANSFERS_URL } from "@/lib/client/fpl-links";
 import { buttonVariants } from "@/components/ui/button";
-import { ArrowUpRight, Crown, Loader2, Repeat, Zap } from "lucide-react";
+import { ArrowUpRight, Crown, Loader2, Repeat, Sparkles, Zap } from "lucide-react";
 
 /**
  * The glanceable, always-visible verdict — the week's decision in one line,
@@ -12,8 +12,37 @@ import { ArrowUpRight, Crown, Loader2, Repeat, Zap } from "lucide-react";
  * the end. The verdict waits for the insights phase (so the captain/transfer are
  * final and never swap mid-flight); until then it shows a placeholder. The
  * "Open FPL Transfers" action is available throughout.
+ *
+ * In demo mode there's no personalized verdict — it becomes a season-aware banner
+ * (no transfer/chip line, no per-manager deep link).
  */
-export function VerdictBar({ plan, loading }: { plan: GameweekPlan; loading: boolean }) {
+export function VerdictBar({
+  plan,
+  loading,
+  demo = false,
+}: {
+  plan: GameweekPlan;
+  loading: boolean;
+  demo?: boolean;
+}) {
+  if (demo) {
+    const banner =
+      plan.demoSeason === "offseason"
+        ? "The Scout's dream XV — built from last season's returns"
+        : `Dream XV for GW${plan.currentGw} — enter your ID for yours`;
+    return (
+      <div className="rounded-lg border border-fpl-green/30 bg-fpl-purple text-white shadow-sm">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 px-4 py-3 text-sm">
+          <span className="text-[11px] font-bold uppercase tracking-wide text-fpl-pink">Demo</span>
+          <span className="flex items-center gap-1.5 font-semibold text-white">
+            <Sparkles className="size-3.5 text-fpl-green" />
+            {banner}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   const verdict = loading ? null : buildVerdict(plan);
 
   return (

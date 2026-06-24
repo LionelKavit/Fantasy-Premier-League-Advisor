@@ -89,10 +89,20 @@ describe("evaluateSingleTransfer", () => {
     expect(r.rollReason).toMatch(/below the .*free-transfer bar/i);
   });
 
+  it("reports the banked transfers on a roll, capped at the 5-transfer max", () => {
+    const roll = (ft: number) => evaluateSingleTransfer([vt(1, 2, 1.0)], mp, ft).rollReason;
+    expect(roll(1)).toContain("bank 2 free transfers"); // 1 + 1
+    expect(roll(3)).toContain("bank 4 free transfers"); // 3 + 1
+    expect(roll(5)).toContain("bank 5 free transfers"); // capped, not 6
+  });
+
   it("requires a hit transfer to out-project its 4-pt cost", () => {
     // freeTransfers=0 → any move is a hit. Δep +3 < 4 → hold; Δep +5 > 4 → go.
     expect(evaluateSingleTransfer([vt(1, 2, 3)], mp, 0).bestSingle).toBeNull();
-    expect(evaluateSingleTransfer([vt(1, 2, 5)], mp, 0).bestSingle?.candidate.player.id).toBe(2);
+    const go = evaluateSingleTransfer([vt(1, 2, 5)], mp, 0);
+    expect(go.bestSingle?.candidate.player.id).toBe(2);
+    // At 0 FT the move is a hit, not a free move — freeMoves stays empty.
+    expect(go.freeMoves).toEqual([]);
   });
 
   it("sets a typed holdReason for each hold path (transfer-ep-notice)", () => {
@@ -134,8 +144,27 @@ describe("evaluateSingleTransfer", () => {
     const two = evaluateSingleTransfer(list, mp, 2);
     expect(two.bestSingle?.weakPlayer.player.id).toBe(1);
     expect(two.bestSecond?.weakPlayer.player.id).toBe(9); // different weak player
+    expect(two.freeMoves.map((m) => m.weakPlayer.player.id)).toEqual([1, 9]);
     const one = evaluateSingleTransfer(list, mp, 1);
     expect(one.bestSecond).toBeNull();
+    expect(one.freeMoves).toHaveLength(1);
+  });
+
+  it("stacks up to N free moves across distinct weak players (FT=3+)", () => {
+    // Four distinct weak players, each with a bar-clearing upgrade.
+    const list = [vt(1, 2, 5), vt(3, 4, 4), vt(5, 6, 3), vt(7, 8, 2)];
+    const three = evaluateSingleTransfer(list, mp, 3);
+    expect(three.freeMoves.map((m) => m.weakPlayer.player.id)).toEqual([1, 3, 5]);
+    const five = evaluateSingleTransfer(list, mp, 5);
+    // Only four worthwhile moves exist → stops early at four, doesn't pad to five.
+    expect(five.freeMoves).toHaveLength(4);
+  });
+
+  it("does not stack a move that fails the free-transfer bar", () => {
+    // Second-best move's Δep is +1.0 (< 1.5 bar) → excluded from the stack.
+    const list = [vt(1, 2, 5), vt(3, 4, 1.0)];
+    const r = evaluateSingleTransfer(list, mp, 3);
+    expect(r.freeMoves).toHaveLength(1);
   });
 
   it("unlocks a second transfer using budget freed by the first (cascade)", () => {
@@ -147,11 +176,13 @@ describe("evaluateSingleTransfer", () => {
     };
     // Weak B's only target (£9.0m) is over budget at bank £1.0m, but affordable
     // after the £3.0m is freed (adjusted bank £4.0m; 9 ≤ 5 + 4).
-    const weakB = makeScoredPlayer({ total: 0.3, player: { id: 3, teamId: 3, price: 5.0 } });
-    const dream = makeScoredPlayer({ total: 0.7, player: { id: 4, teamId: 4, price: 9.0 } });
+    const weakB = makeScoredPlayer({ total: 0.3, player: { id: 3, teamId: 3, price: 5.0, epNext: 2 } });
+    // epNext 8 vs weakB 2 → Δep +6 clears the free-transfer bar, so the unlocked
+    // move qualifies as a genuine second free transfer (not just budget-affordable).
+    const dream = makeScoredPlayer({ total: 0.7, player: { id: 4, teamId: 4, price: 9.0, epNext: 8 } });
     const analysis = makeSquadAnalysisResult({
       bank: 1.0,
-      weakest3: [
+      weakSpots: [
         { player: bestSingle.weakPlayer, whyWeak: ["x"], targets: [] },
         { player: weakB, whyWeak: ["x"], targets: [{ candidate: dream, gw1Gain: 4, gw5Gain: 4, fitsBudget: false, restructureNeeded: true }] },
         { player: makeScoredPlayer({ total: 0.31 }), whyWeak: ["x"], targets: [] },
@@ -160,6 +191,7 @@ describe("evaluateSingleTransfer", () => {
 
     const cascade = evaluateSingleTransfer([bestSingle], mp, 2, analysis, 1.0, counts());
     expect(cascade.bestSecond?.candidate.player.id).toBe(4); // unlocked only by freed budget
+    expect(cascade.freeMoves.map((m) => m.candidate.player.id)).toEqual([2, 4]);
 
     // Without the analysis/bank context, the over-budget target stays hidden.
     const noContext = evaluateSingleTransfer([bestSingle], mp, 2);

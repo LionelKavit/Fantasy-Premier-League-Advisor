@@ -8,9 +8,11 @@ import { loadKnowledge } from "../knowledge";
 import { SCOUT_PERSONA } from "../llm/persona";
 
 export async function synthesizeCaptainPick(
-  inputs: CaptainSynthesisInput
+  inputs: CaptainSynthesisInput,
+  opts: { demo?: boolean } = {}
 ): Promise<CaptainResult> {
-  const failSafe = buildFailSafe(inputs);
+  const demo = opts.demo ?? false;
+  const failSafe = buildFailSafe(inputs, demo);
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -22,7 +24,7 @@ export async function synthesizeCaptainPick(
   }
 
   try {
-    const prompt = buildPrompt(inputs);
+    const prompt = buildPrompt(inputs, demo);
     const text = await llm.complete({ prompt, maxTokens: 2048, system: SCOUT_PERSONA });
 
     const parsed = parseResult(text, inputs);
@@ -43,23 +45,30 @@ export async function synthesizeCaptainPick(
   }
 }
 
-export function buildPrompt(inputs: CaptainSynthesisInput): string {
+export function buildPrompt(inputs: CaptainSynthesisInput, demo = false): string {
   const { managerProfile, rankedCandidates, viceCaptain, differentialOption, horizon, tripleCaptainAdvice, currentGw } = inputs;
   const rp = managerProfile.riskProfile;
 
-  const strategyBias =
-    rp.rankTrend === "rising"
+  // Demo mode has no manager behind the squad — keep the captaincy reasoning
+  // general (no rank, no rank-chasing bias), so the prose never implies ownership.
+  const strategyBias = demo
+    ? "Balanced — weigh the safe, high-floor pick against differential upside on merit."
+    : rp.rankTrend === "rising"
       ? "Protect rank — favor the template (highly-owned, safe) captain unless a differential is clearly superior."
       : rp.rankTrend === "falling" && rp.gwsRemaining < 10
         ? "Chase rank — be willing to endorse a differential captain to gain ground."
         : "Balanced — weigh the safe pick against differential upside.";
 
-  const rankPrinciples = loadKnowledge("rank-strategy");
+  const rankPrinciples = demo ? null : loadKnowledge("rank-strategy");
   const principlesBlock = rankPrinciples
     ? `\n## Expert rank principles (apply these)\n${rankPrinciples}\n`
     : "";
 
-  return `Pick this manager's captain for GW${currentGw}. They are ranked ${rp.currentRank} (trend: ${rp.rankTrend}, ${rp.gwsRemaining} GWs remaining).
+  const opening = demo
+    ? `Pick the captain for GW${currentGw} from this sample squad (a general showcase team, not a specific manager's). Speak generally — never reference a manager's rank or "your team".`
+    : `Pick this manager's captain for GW${currentGw}. They are ranked ${rp.currentRank} (trend: ${rp.rankTrend}, ${rp.gwsRemaining} GWs remaining).`;
+
+  return `${opening}
 
 Strategy guidance: ${strategyBias}
 ${principlesBlock}
@@ -141,8 +150,13 @@ function validateConfidence(raw: unknown): "high" | "medium" | "low" {
   return "medium";
 }
 
-function buildFailSafe(inputs: CaptainSynthesisInput): CaptainResult {
+function buildFailSafe(inputs: CaptainSynthesisInput, demo = false): CaptainResult {
   const captain = inputs.rankedCandidates[0];
+  const narrativeSummary = captain
+    ? demo
+      ? `Top projected captain this gameweek: ${captain.player.player.webName}.`
+      : `Automated pick: captain ${captain.player.player.webName} (highest projected return this gameweek). Review manually.`
+    : "No viable captain candidate found.";
   return {
     captain,
     viceCaptain: inputs.viceCaptain,
@@ -150,9 +164,7 @@ function buildFailSafe(inputs: CaptainSynthesisInput): CaptainResult {
     rankedCandidates: inputs.rankedCandidates,
     tripleCaptainAdvice: inputs.tripleCaptainAdvice,
     confidence: "low",
-    narrativeSummary: captain
-      ? `Automated pick: captain ${captain.player.player.webName} (highest projected return this gameweek). Review manually.`
-      : "No viable captain candidate found.",
+    narrativeSummary,
     alerts: [], // risk alerts computed centrally (lib/alerts); system notices appended by callers
     currentGw: inputs.currentGw,
     generatedAt: new Date().toISOString(),

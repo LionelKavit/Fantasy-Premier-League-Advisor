@@ -7,6 +7,7 @@ import { ManagerIdForm } from "@/components/ManagerIdForm";
 import { Header } from "@/components/Header";
 import { Pitch } from "@/components/pitch/Pitch";
 import { AlertsCard } from "@/components/panel/AlertsCard";
+import { DemoCta } from "@/components/panel/DemoCta";
 import { VerdictBar } from "@/components/panel/VerdictBar";
 import { PlayerDialogProvider } from "@/components/panel/PlayerDialog";
 import { FullBreakdown } from "@/components/panel/FullBreakdown";
@@ -14,20 +15,23 @@ import { AskTheScout } from "@/components/panel/AskTheScout";
 import { Skeleton } from "@/components/states/Skeleton";
 import { ErrorCard } from "@/components/states/ErrorCard";
 import type { AskMessage } from "@/lib/client/ask";
+import { FREE_TRANSFER_RANGE, clampFt } from "@/lib/config";
 
 type Status = "idle" | "loading" | "loaded" | "error";
 type Lens = "this-week" | "long-term" | "chips";
+type Mode = "manager" | "demo";
 
 const LS_ID = "fpl:lastId";
 const LS_FT = "fpl:ft";
 
 export default function Home() {
   const [managerId, setManagerId] = useState("");
-  const [freeTransfers, setFreeTransfers] = useState(1);
-  // The FT value the displayed plan was actually computed with. The toggle moves
+  const [freeTransfers, setFreeTransfers] = useState<number>(FREE_TRANSFER_RANGE.default);
+  // The FT value the displayed plan was actually computed with. The field moves
   // `freeTransfers` (the selection); `appliedFt` only changes when an analysis runs.
-  const [appliedFt, setAppliedFt] = useState(1);
+  const [appliedFt, setAppliedFt] = useState<number>(FREE_TRANSFER_RANGE.default);
   const [status, setStatus] = useState<Status>("idle");
+  const [mode, setMode] = useState<Mode>("manager");
   const [plan, setPlan] = useState<GameweekPlan | null>(null);
   const [error, setError] = useState("");
   const [lens, setLens] = useState<Lens>("this-week");
@@ -37,7 +41,9 @@ export default function Home() {
   // Bumped once per completed analysis — signals the chat to fire its opening brief.
   const [briefNonce, setBriefNonce] = useState(0);
 
-  const load = useCallback(async (id: string, ft: number, opts: { force?: boolean } = {}) => {
+  const load = useCallback(async (id: string, ft: number, opts: { force?: boolean; demo?: boolean } = {}) => {
+    const demo = opts.demo ?? false;
+    setMode(demo ? "demo" : "manager");
     setManagerId(id);
     setFreeTransfers(ft);
     setAppliedFt(ft); // this analysis is the new applied baseline → clears any pending state
@@ -48,14 +54,14 @@ export default function Home() {
     setInsightsLoading(false);
     try {
       // Phase 1 — paint the pitch immediately from the deterministic base.
-      const base = await fetchPlanBase(id, ft);
+      const base = await fetchPlanBase(id, ft, { demo });
       setPlan(base);
       setStatus("loaded");
       setInsightsLoading(true);
 
       // Phase 2 — fill in the LLM-derived verdict/detail when it arrives.
       try {
-        const insights = await fetchPlanInsights(id, ft, { force: opts.force });
+        const insights = await fetchPlanInsights(id, ft, { force: opts.force, demo });
         setPlan((prev) => {
           if (!prev) return prev;
           const capId = insights.captaincy?.captain.player.player.id ?? null;
@@ -89,7 +95,9 @@ export default function Home() {
   // idle→loading transition here is intentional, not a cascading render).
   useEffect(() => {
     const savedId = localStorage.getItem(LS_ID) ?? "";
-    const savedFt = Number(localStorage.getItem(LS_FT)) || 1;
+    // clampFt coerces a missing/NaN value to the default and keeps 0 (a valid count)
+    // instead of `Number(...) || 1`, which silently rewrote a stored 0 to 1.
+    const savedFt = clampFt(parseInt(localStorage.getItem(LS_FT) ?? ""));
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (savedId) load(savedId, savedFt);
   }, [load]);
@@ -100,6 +108,10 @@ export default function Home() {
     load(id, ft);
   };
 
+  // Demo mode — explore a sample squad with no manager ID. Deliberately NOT
+  // persisted (no localStorage write), so a refresh returns to the form.
+  const handleExplore = () => load("", freeTransfers, { demo: true });
+
   // The toggle only updates the selection (persisted). Analysis re-runs on
   // Re-analyze, which reads this value — never automatically here.
   const handleFreeTransfers = (n: number) => {
@@ -108,6 +120,7 @@ export default function Home() {
   };
 
   const changeManager = () => {
+    setMode("manager"); // exit demo if we were in it
     setStatus("idle");
     setPlan(null);
   };
@@ -119,6 +132,7 @@ export default function Home() {
           initialId={managerId}
           initialFreeTransfers={freeTransfers}
           onSubmit={handleSubmit}
+          onExplore={handleExplore}
         />
       </main>
     );
@@ -140,9 +154,10 @@ export default function Home() {
     );
   }
 
-  const transferOutIds = new Set(
-    plan.transfers?.primaryRecommendation.transfers.map((t) => t.weakPlayer.player.id) ?? []
-  );
+  const demo = mode === "demo";
+  const transferOutIds = demo
+    ? new Set<number>()
+    : new Set(plan.transfers?.primaryRecommendation.transfers.map((t) => t.weakPlayer.player.id) ?? []);
 
   // Selection changed but not yet analyzed → Re-analyze is pending.
   const ftPending = freeTransfers !== appliedFt;
@@ -158,10 +173,11 @@ export default function Home() {
         onChangeManager={changeManager}
         busy={insightsLoading}
         dirty={ftPending}
+        demo={demo}
       />
       {/* Glanceable verdict — full-width, above the fold, spanning both columns */}
       <div className="mx-auto w-full max-w-6xl px-4 pt-6">
-        <VerdictBar plan={plan} loading={insightsLoading} />
+        <VerdictBar plan={plan} loading={insightsLoading} demo={demo} />
       </div>
 
       {/* 2×2 lens — row 1: pitch | conversation (stretched to the pitch's height);
@@ -183,10 +199,11 @@ export default function Home() {
             briefNonce={briefNonce}
             messages={chat}
             onMessagesChange={setChat}
+            demo={demo}
           />
         </div>
 
-        {/* Row 2 left — the collapsible This Week + Long Term plan */}
+        {/* Row 2 left — the collapsible breakdown (captaincy-only in demo) */}
         <FullBreakdown
           open={breakdownOpen}
           onToggle={() => setBreakdownOpen((o) => !o)}
@@ -194,10 +211,11 @@ export default function Home() {
           onLensChange={setLens}
           plan={plan}
           loading={insightsLoading}
+          demo={demo}
         />
 
-        {/* Row 2 right — alerts, under the conversation */}
-        <AlertsCard plan={plan} />
+        {/* Row 2 right — alerts (manager) or the conversion CTA (demo) */}
+        {demo ? <DemoCta onEnterId={changeManager} /> : <AlertsCard plan={plan} />}
       </div>
     </main>
     </PlayerDialogProvider>

@@ -11,6 +11,7 @@ import type {
 } from "../types";
 import type { OptimizerResult } from "../optimizer/types";
 import type { CaptainResult } from "../captain/types";
+import type { DemoSeason } from "../demo/squad";
 
 // The once-computed inputs shared by the optimizer and captain pipelines.
 // Structural superset of both OptimizerContext and CaptainContext.
@@ -21,6 +22,8 @@ export interface AnalysisContext {
   teams: Team[];
   fixtures: Fixture[];
   gwFlags: GameweekFlags[];
+  // Set only on the demo context — which metric the sample squad was ranked on.
+  demoSeason?: DemoSeason;
 }
 
 // Lean per-player projection for rendering the pitch (display fields only).
@@ -66,4 +69,6 @@ export interface GameweekPlan {
   manager: { name: string; overallRank: number | null; teamName: string };
   alerts: string[];
   generatedAt: string;
+  // Present only for the demo plan — drives the shell's season-aware banner copy.
+  demoSeason?: DemoSeason;
 }

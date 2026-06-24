@@ -1,6 +1,6 @@
 import type { GameweekPlan, SquadPlayerView, AnalysisContext, PlanInsights } from "./types";
 import type { CaptainSynthesisInput, CaptainResult } from "../captain/types";
-import { getCachedAnalysisContext, buildLiteBaseContext } from "./context";
+import { getCachedAnalysisContext, buildLiteBaseContext, getCachedDemoContext } from "./context";
 import { runOptimizerWithContext } from "../optimizer";
 import { orchestrateChips } from "../optimizer/chip-orchestrator";
 import { computeCaptainSynthesisInput } from "../captain";
@@ -23,6 +23,21 @@ export async function runGameweekPlanBase(
   options: PlanOptions
 ): Promise<GameweekPlan> {
   const ctx = await buildLiteBaseContext(teamId);
+  return baseFromContext(ctx, teamId, options);
+}
+
+// Demo base: same pitch + ratings + deterministic captain, built on the
+// manager-less demo context. `teamId` 0 marks it as the sample squad.
+export async function runDemoPlanBase(options: PlanOptions): Promise<GameweekPlan> {
+  const ctx = await getCachedDemoContext();
+  return baseFromContext(ctx, 0, options);
+}
+
+function baseFromContext(
+  ctx: AnalysisContext,
+  teamId: number,
+  options: PlanOptions
+): GameweekPlan {
   const { captainId, viceId } = deterministicCaptainIds(ctx, options.captainHorizon);
   const entry = ctx.managerProfile.entry;
 
@@ -42,6 +57,7 @@ export async function runGameweekPlanBase(
     },
     alerts: [],
     generatedAt: new Date().toISOString(),
+    demoSeason: ctx.demoSeason,
   };
 }
 
@@ -133,6 +149,82 @@ async function computeInsights(
   return { transfers, captaincy, alerts: [...riskAlerts, ...alerts] };
 }
 
+// ── Demo insights: captaincy only ────────────────────────────────────────────
+// No optimizer (no transfer rec, long-term horizon, or chip plan) — there's no
+// real squad to improve and no held-chip state. Just the captain pipeline, with
+// the demo flag so the prose stays general (no rank / "your squad").
+const demoInsightsCache = new Map<string, InsightsCacheEntry>();
+
+export async function runDemoPlanInsights(
+  options: PlanOptions,
+  opts: { force?: boolean } = {}
+): Promise<PlanInsights> {
+  const ctx = await getCachedDemoContext();
+  const horizon = options.captainHorizon ?? CAPTAIN_CONFIG.horizonLengthDefault;
+  const key = `${ctx.analysis.currentGw}:${horizon}`;
+
+  if (!opts.force) {
+    const hit = demoInsightsCache.get(key);
+    if (hit && Date.now() - hit.ts < INSIGHTS_TTL_MS) return hit.promise;
+  }
+
+  const promise = computeDemoInsights(ctx, options);
+  demoInsightsCache.set(key, { promise, ts: Date.now() });
+  try {
+    return await promise;
+  } catch (e) {
+    demoInsightsCache.delete(key);
+    throw e;
+  }
+}
+
+async function computeDemoInsights(
+  ctx: AnalysisContext,
+  options: PlanOptions
+): Promise<PlanInsights> {
+  const alerts: string[] = [];
+
+  let captainInput: CaptainSynthesisInput | null = null;
+  try {
+    captainInput = computeCaptainSynthesisInput(ctx, options.captainHorizon);
+  } catch (e) {
+    alerts.push(`Captain pipeline failed: ${errMsg(e)}`);
+  }
+
+  let captaincy: CaptainResult | null = null;
+  if (captainInput) {
+    try {
+      captaincy = await synthesizeCaptainPick(captainInput, { demo: true });
+    } catch (e) {
+      alerts.push(`Captain pipeline failed: ${errMsg(e)}`);
+    }
+  }
+
+  const riskAlerts = computeRiskAlerts({ analysis: ctx.analysis, transfers: null, captaincy });
+  return { transfers: null, captaincy, alerts: [...riskAlerts, ...alerts] };
+}
+
+/** Merged demo plan (base + captaincy insights) — used by the demo brief route. */
+export async function runDemoPlan(options: PlanOptions): Promise<GameweekPlan> {
+  const insights = await runDemoPlanInsights(options);
+  const ctx = await getCachedDemoContext(); // cache hit (insights built it)
+
+  const captainId = insights.captaincy?.captain.player.player.id ?? null;
+  const viceId = insights.captaincy?.viceCaptain?.player.player.id ?? null;
+  const ids = captainId
+    ? { captainId, viceId }
+    : deterministicCaptainIds(ctx, options.captainHorizon);
+
+  const base = baseFromContext(ctx, 0, options);
+  return {
+    ...base,
+    transfers: insights.transfers,
+    captaincy: insights.captaincy,
+    squad: buildSquadView(ctx, ids),
+    alerts: insights.alerts,
+  };
+}
+
 // ── Merged plan (back-compat) ────────────────────────────────────────────────
 // Same full `GameweekPlan` as before — built from the FULL cached context (not
 // the lightweight base), so the squad is full-scored and the armband reflects
@@ -198,7 +290,7 @@ function buildSquadView(
   );
   const { captainId, viceId } = caps;
   const weakIds = new Set(
-    ctx.analysis.weakest3.map((w) => w.player.player.id)
+    ctx.analysis.weakSpots.map((w) => w.player.player.id)
   );
 
   return [...ctx.analysis.picks]
@@ -235,7 +327,8 @@ function errMsg(reason: unknown): string {
   return reason instanceof Error ? reason.message : "Unknown error";
 }
 
-/** Test-only: clear the insights cache. */
+/** Test-only: clear the insights caches. */
 export function _clearInsightsCache(): void {
   insightsCache.clear();
+  demoInsightsCache.clear();
 }

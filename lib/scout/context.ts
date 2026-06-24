@@ -1,7 +1,7 @@
 import type { Player, ElementSummary } from "../types";
 import type { ScoredPlayer, LlmContextSignals, TrendSignals } from "../pipeline/types";
 import type { AnalysisContext } from "../plan/types";
-import { getCachedAnalysisContext } from "../plan/context";
+import { getCachedAnalysisContext, getCachedDemoContext } from "../plan/context";
 import { computeStatisticalSignals } from "../pipeline/statistical-scoring";
 import { computeFixtureSignals } from "../pipeline/fixture-analyzer";
 import { computeMarketSignals } from "../pipeline/market-dynamics";
@@ -51,7 +51,7 @@ export function buildScoutContext(ctx: AnalysisContext): ScoutContext {
   // already exist — the squad and each weak spot's evaluated targets.
   const scoredById = new Map<number, ScoredPlayer>();
   for (const sp of ctx.analysis.rankedSquad) scoredById.set(sp.player.id, sp);
-  for (const ws of ctx.analysis.weakest3) {
+  for (const ws of ctx.analysis.weakSpots) {
     for (const t of ws.targets) scoredById.set(t.candidate.player.id, t.candidate);
   }
 
@@ -89,6 +89,25 @@ export async function getScoutContext(teamId: number): Promise<ScoutContext> {
     return sc;
   } catch (e) {
     cache.delete(teamId); // don't cache failures
+    throw e;
+  }
+}
+
+// Demo chat grounding: the same ScoutContext, built on the manager-less demo
+// context. One cache entry (the demo team is bootstrap-derived) — never keyed by
+// a real teamId.
+let demoScoutCache: { promise: Promise<ScoutContext>; ts: number } | null = null;
+
+export async function getDemoScoutContext(): Promise<ScoutContext> {
+  if (demoScoutCache && Date.now() - demoScoutCache.ts < CACHE_TTL_MS) {
+    return demoScoutCache.promise;
+  }
+  const promise = getCachedDemoContext().then(buildScoutContext);
+  demoScoutCache = { promise, ts: Date.now() };
+  try {
+    return await promise;
+  } catch (e) {
+    demoScoutCache = null; // don't cache failures
     throw e;
   }
 }

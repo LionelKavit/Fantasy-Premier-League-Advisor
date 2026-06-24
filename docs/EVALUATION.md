@@ -44,6 +44,7 @@ So the app's captaincy modestly **beat the human** over a season and outscored e
 
 - **A points-based hold gate.** Recommend a transfer only if its projected gain (`Δep = in − out`) clears a bar — **~1.5 pts** for a free transfer, **>4** for a hit (the exact cost of a hit). The bar was *derived*: the data's noise floor is ~0.5 pts, and the free-transfer opportunity cost pushes it to ~1.5 — which also matches the community heuristic.
 - **Hold when `ep_next` is unavailable**, because transfers chosen on the composite alone are negative-EV.
+- **One currency, across the whole plan.** That same expected-points bar now governs the full free-transfer allocation: with 0–5 free transfers, the optimizer picks the max-ep set of straight swaps (1 transfer) and **restructures** (2 transfers) net of the ~1.5-pt banking opportunity, so a marginal move is banked and a restructure is only taken when it out-projects the swaps it would replace — the hold discipline generalized from one move to N.
 
 Result: the over-transferring collapsed from **34/35 → 0/35**, and the net-loss disappeared.
 
@@ -65,6 +66,7 @@ The strength signal was **worse in every position** — decisively so for defend
 - **Calibrate-first.** Every model change is gated by a report-only calibration on the backtest before it touches runtime — which is exactly how the fixture idea was caught.
 - **Spec-first.** Built with [OpenSpec](https://github.com/Fission-AI/OpenSpec): ~45 change proposals under `openspec/changes/archive/`, each with the rationale, design, and as-built outcome — *including the no-ships and report-only results*.
 - **Honest about limits.** The numbers above are within-position rank correlation on a point-in-time backtest, and deterministic-floor for the squad replays — not a live A/B. They're presented with those caveats rather than as marketing.
+- **Scope note.** Demo mode's sample "dream team" is selected by a simple season-aware heuristic (FPL's `ep_next` in-season, last-season points off-season) — a display convenience for ID-less visitors, **not** an evaluated or backtested model; nothing in this document depends on it.
 
 ## Reproduce
 

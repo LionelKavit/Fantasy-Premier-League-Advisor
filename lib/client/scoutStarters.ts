@@ -46,3 +46,20 @@ export function buildScoutStarters(plan: GameweekPlan): string[] {
 
   return starters;
 }
+
+/**
+ * Demo-mode starters — general questions about the sample squad, not "your
+ * transfer"/"your squad". Reuses the same chip UI; the season-aware draft prompt
+ * leans into the off-season "build for next year" framing.
+ */
+export function buildDemoStarters(plan: GameweekPlan): string[] {
+  const captain = plan.captaincy?.captain.player.player.webName;
+  return [
+    captain ? `Why is ${captain} the captain pick?` : "Who's the best captain here?",
+    "Best value pick in this squad?",
+    "Salah or Saka?",
+    plan.demoSeason === "offseason"
+      ? "Who would you draft for 2026-27?"
+      : "Who would you build a team around?",
+  ];
+}

@@ -6,7 +6,7 @@ import {
   makeGameweekFlags, makeInjuredPlayer,
 } from "../factories";
 
-const noSingle: SingleTransferResult = { bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null, holdReason: null };
+const noSingle: SingleTransferResult = { freeMoves: [], bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null, holdReason: null };
 const noHit: HitTransferResult = { singleHit: null, doubleHit: null };
 
 function beneficial(n: number): ValidTransfer[] {

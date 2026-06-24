@@ -45,3 +45,15 @@ The chips-remaining model SHALL correctly reflect the two-sets-per-season rule, 
 #### Scenario: First-half chips expire at the GW19 deadline
 - **WHEN** the GW19 deadline passes and an unused first-half chip exists
 - **THEN** `deriveChipsRemaining` no longer counts it (verify FPL's `bootstrap-static` `chips` stops advertising the expired chip, or otherwise adjust the derivation) so the chip narrative never recommends a chip the manager can no longer play
+
+### Requirement: Restructure is coherent with the long-term plan
+The Restructure section (This Week) and the Long Term transfer-horizon view SHALL share context so they do not present contradictory stories. A restructure's dream upgrade SHALL be judged over the planning horizon, not only the next-gameweek ep delta, reflecting that a restructure is a multi-week investment.
+
+#### Scenario: The restructure dream is evaluated over the horizon
+- **WHEN** a restructure chain is evaluated once the season is live and the horizon is meaningful
+- **THEN** the dream upgrade's value is assessed over the multi-gameweek planning horizon (the same projection the Long Term tab uses), not only the single next-GW ep delta
+- **AND** a dream the horizon flags as WAIT (or never surfaces as a worthwhile target) is not pitched as a buy-now restructure
+
+#### Scenario: The two tabs tell one story
+- **WHEN** a restructure is recommended, or a premium target appears in the transfer horizon
+- **THEN** the Long Term view and the Restructure section reference the same target and timing — the dream a restructure funds is consistent with (and visible in) the long-term plan, never contradicting it

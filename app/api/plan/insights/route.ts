@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { runGameweekPlanInsights } from "@/lib/plan";
-import { CAPTAIN_CONFIG } from "@/lib/config";
+import { runGameweekPlanInsights, runDemoPlanInsights } from "@/lib/plan";
+import { CAPTAIN_CONFIG, FREE_TRANSFER_RANGE, clampFt } from "@/lib/config";
 import type { ApiErrorResponse } from "@/lib/types";
 
 // Slow LLM phase: optimizer + captaincy + long-term syntheses. Cached per
@@ -10,8 +10,9 @@ export async function GET(request: NextRequest) {
   const freeTransfersParam = request.nextUrl.searchParams.get("free_transfers");
   const horizonParam = request.nextUrl.searchParams.get("horizon");
   const force = request.nextUrl.searchParams.get("force") === "1";
+  const demo = request.nextUrl.searchParams.get("demo") === "1";
 
-  if (!teamId) {
+  if (!demo && !teamId) {
     return NextResponse.json(
       { error: "team_id is required", status: 400 } satisfies ApiErrorResponse,
       { status: 400 }
@@ -19,18 +20,16 @@ export async function GET(request: NextRequest) {
   }
 
   const freeTransfers = freeTransfersParam
-    ? Math.min(2, Math.max(1, parseInt(freeTransfersParam)))
-    : 1;
+    ? clampFt(parseInt(freeTransfersParam))
+    : FREE_TRANSFER_RANGE.default;
   const captainHorizon = horizonParam
     ? Math.min(10, Math.max(1, parseInt(horizonParam)))
     : CAPTAIN_CONFIG.horizonLengthDefault;
 
   try {
-    const result = await runGameweekPlanInsights(
-      parseInt(teamId),
-      { freeTransfers, captainHorizon },
-      { force }
-    );
+    const result = demo
+      ? await runDemoPlanInsights({ freeTransfers, captainHorizon }, { force })
+      : await runGameweekPlanInsights(parseInt(teamId!), { freeTransfers, captainHorizon }, { force });
     return NextResponse.json(result);
   } catch (e) {
     const message = e instanceof Error ? e.message : "Unknown error";
