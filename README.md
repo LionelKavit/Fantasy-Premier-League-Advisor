@@ -14,13 +14,17 @@ Every gameweek, millions of FPL managers face the same dread: a transfer to make
 - **It holds when holding is right.** Every move is judged in **expected points**; if nothing clears the bar, it tells you to roll — the opposite of the churn most tools nudge you toward.
 - **It shows its work.** A deterministic 0–10 model does the maths; the **Ask The Scout** chat fetches *real* numbers via tool calls, so it never invents a stat or contradicts the panels.
 
-## Demo
+## Watch the Pocket Scout in action
 
 <!-- For an INLINE video player on GitHub: open this README in the github.com editor, drag
      docs/images/fpl-advisor-demo.mov into the text area — GitHub uploads it to its CDN and
      inserts a player URL — then replace the link below with that URL. (A repo-relative .mov
      renders as a download link, not a player.) -->
-▶️ **[Watch the 90-second demo](docs/images/fpl-advisor-demo.mov)** — squad load → pitch paints → the Scout opens with a proactive brief → breakdown (This Week · Long Term · Chips) → Ask The Scout.
+
+
+https://github.com/user-attachments/assets/93f5c5eb-443b-4edb-b4d6-2a8c6037cfe0
+
+
 
 ---
 
