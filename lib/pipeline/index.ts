@@ -16,7 +16,7 @@ import { computeMarketSignals } from "./market-dynamics";
 import { batchComputeLlmContext } from "./llm-context";
 import { getCachedTeamNews } from "../news/team-news";
 import { computeCompositeScore } from "./composite-scorer";
-import { rankSquad, identifyWeakest3, findCandidates } from "./squad-ranker";
+import { rankSquad, identifyWeakSpots, findCandidates } from "./squad-ranker";
 
 export async function runSquadAnalysisPipeline(
   teamId: number
@@ -126,7 +126,7 @@ export async function runSquadAnalysisPipeline(
 
   // Step 9: Rank and identify weaknesses
   const ranked = rankSquad(scoredSquad);
-  const weakSpots = identifyWeakest3(ranked);
+  const weakSpots = identifyWeakSpots(ranked);
 
   // Step 10: Find replacement candidates for each weak spot
   const scoredCache = new Map<number, ScoredPlayer>();
@@ -157,7 +157,7 @@ export async function runSquadAnalysisPipeline(
 
   return {
     rankedSquad: ranked,
-    weakest3: weakSpots,
+    weakSpots,
     picks: picksResponse.picks,
     chipsRemaining: managerProfile.chipsRemaining,
     bank,

@@ -16,7 +16,7 @@ export function findRestructureOptions(
 ): RestructureOption[] {
   const dreamTargets: { weak: ScoredPlayer; candidate: ScoredPlayer }[] = [];
 
-  for (const ws of analysis.weakest3) {
+  for (const ws of analysis.weakSpots) {
     for (const target of ws.targets) {
       if (target.restructureNeeded) {
         dreamTargets.push({
@@ -29,7 +29,7 @@ export function findRestructureOptions(
 
   if (dreamTargets.length === 0) return [];
 
-  const weakIds = new Set(analysis.weakest3.map((ws) => ws.player.player.id));
+  const weakIds = new Set(analysis.weakSpots.map((ws) => ws.player.player.id));
   const downgradeCandidates = analysis.rankedSquad
     .slice(3)
     .filter((sp) => !weakIds.has(sp.player.id));
@@ -73,7 +73,9 @@ export function findRestructureOptions(
 
       if (netScoreChange <= 0) continue;
 
-      const totalCost = freeTransfers >= 2 ? 0 : 4;
+      // A restructure spends two transfers (downgrade a funder + buy the dream),
+      // so the points cost is one −4 hit for each move beyond the free allowance.
+      const totalCost = Math.max(0, 2 - freeTransfers) * 4;
 
       const dreamTransfer: ValidTransfer = {
         weakPlayer: dt.weak,

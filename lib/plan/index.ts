@@ -290,7 +290,7 @@ function buildSquadView(
   );
   const { captainId, viceId } = caps;
   const weakIds = new Set(
-    ctx.analysis.weakest3.map((w) => w.player.player.id)
+    ctx.analysis.weakSpots.map((w) => w.player.player.id)
   );
 
   return [...ctx.analysis.picks]

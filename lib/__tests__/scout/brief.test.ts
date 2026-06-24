@@ -84,7 +84,7 @@ describe("buildBriefGrounding", () => {
     expect(g.currentGw).toBe(20);
     expect(g.managerName).toBe("Kavit Mehta");
     expect(g.transfer?.type).toBe("FREE");
-    expect(g.transfer?.headline).toBe("Make one free transfer");
+    expect(g.transfer?.headline).toBe("Make 1 free transfer");
     expect(g.transfer?.moves).toEqual([{ out: "Mbeumo", in: "Saka" }]);
     expect(g.captain?.name).toBe("Haaland");
     expect(g.captain?.vice).toBe("Salah");
@@ -133,7 +133,7 @@ describe("composeDeterministicBrief — same shape, short, no markdown", () => {
     const text = composeDeterministicBrief(buildBriefGrounding(makePlan()));
     expect(text).toMatch(/^Right Kavit —/);
     expect(text).toContain("Sat 14 Feb, 11:30 GMT");
-    expect(text).toContain("Make one free transfer: Mbeumo → Saka.");
+    expect(text).toContain("Make 1 free transfer: Mbeumo → Saka.");
     expect(text).toContain("Captain Haaland, Salah as vice.");
     expect(SENTENCE_COUNT(text)).toBeLessThanOrEqual(4);
     expect(HAS_MARKDOWN(text)).toBe(false);

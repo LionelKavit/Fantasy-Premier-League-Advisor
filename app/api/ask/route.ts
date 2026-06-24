@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ApiErrorResponse } from "@/lib/types";
 import { llm } from "@/lib/llm/client";
+import { FREE_TRANSFER_RANGE, clampFt } from "@/lib/config";
 import { getScoutContext, getDemoScoutContext } from "@/lib/scout/context";
 import { runScoutConversation, type ScoutTurn } from "@/lib/scout/chat";
 import type { ChipPlanLine } from "@/lib/scout/system-prompt";
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const freeTransfers = Math.min(2, Math.max(1, body.freeTransfers ?? 1));
+  const freeTransfers = clampFt(body.freeTransfers ?? FREE_TRANSFER_RANGE.default);
 
   let sc;
   try {

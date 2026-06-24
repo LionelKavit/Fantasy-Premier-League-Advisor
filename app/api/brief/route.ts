@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type { ApiErrorResponse } from "@/lib/types";
 import { llm } from "@/lib/llm/client";
 import { runGameweekPlan, runDemoPlan } from "@/lib/plan";
+import { FREE_TRANSFER_RANGE, clampFt } from "@/lib/config";
 import {
   buildBriefGrounding,
   streamOpeningBrief,
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const freeTransfers = Math.min(2, Math.max(1, body.freeTransfers ?? 1));
+  const freeTransfers = clampFt(body.freeTransfers ?? FREE_TRANSFER_RANGE.default);
 
   // Demo: a welcome brief that NEVER shows an error in the bubble — falls back to
   // the deterministic demo brief on no-key or any pre-token failure.

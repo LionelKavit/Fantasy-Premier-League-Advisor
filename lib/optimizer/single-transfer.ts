@@ -2,7 +2,7 @@ import type { ManagerProfile } from "../types";
 import type { SquadAnalysisResult } from "../pipeline/types";
 import type { ValidTransfer, SingleTransferResult } from "./types";
 import { validateTransfer } from "./setup";
-import { TRANSFER_THRESHOLDS } from "../config";
+import { TRANSFER_THRESHOLDS, FREE_TRANSFER_RANGE } from "../config";
 
 export function evaluateSingleTransfer(
   validTransfers: ValidTransfer[],
@@ -14,6 +14,7 @@ export function evaluateSingleTransfer(
 ): SingleTransferResult {
   if (validTransfers.length === 0) {
     return {
+      freeMoves: [],
       bestSingle: null,
       bestSecond: null,
       alternatives: [],
@@ -44,12 +45,13 @@ export function evaluateSingleTransfer(
   const clearsThreshold = deltaEp !== null && deltaEp > epBar;
 
   if (!clearsThreshold) {
-    const banked = freeTransfers + 1 > 2 ? 2 : freeTransfers + 1;
+    const banked = Math.min(FREE_TRANSFER_RANGE.max, freeTransfers + 1);
     const reason =
       deltaEp !== null
         ? `Best available upgrade projects +${deltaEp.toFixed(1)} pts — below the ${epBar}-pt ${needsHit ? "hit" : "free-transfer"} bar to spend a transfer.`
         : `No ep_next projection available to justify a transfer (composite alone doesn't reliably rank transfers).`;
     return {
+      freeMoves: [],
       bestSingle: null,
       bestSecond: null,
       alternatives: [],
@@ -62,80 +64,100 @@ export function evaluateSingleTransfer(
   const bestSingle = best;
   const alternatives = sorted.slice(1, 4);
 
-  let bestSecond: ValidTransfer | null = null;
-  if (freeTransfers >= 2 && bestSingle) {
-    bestSecond = findBestSecond(
-      bestSingle,
-      sorted,
-      analysis,
-      bank,
-      squadTeamCounts
-    );
-  }
+  // Stack up to `freeTransfers` free moves. Only when at least one transfer is free
+  // — at 0 FT the seed move is a hit (handled via bestSingle + the hit evaluator),
+  // so there are no free moves to commit.
+  const freeMoves =
+    freeTransfers >= 1
+      ? buildFreeMoves(best, sorted, freeTransfers, analysis, bank, squadTeamCounts)
+      : [];
+  const bestSecond = freeMoves[1] ?? null;
 
   const savingsOption = findSavingsOption(validTransfers);
 
-  return { bestSingle, bestSecond, alternatives, savingsOption, rollReason: null, holdReason: null };
+  return { freeMoves, bestSingle, bestSecond, alternatives, savingsOption, rollReason: null, holdReason: null };
 }
 
-function findBestSecond(
-  bestSingle: ValidTransfer,
+// Whether a transfer's projected-points edge clears the free-transfer bar. Applied
+// to EVERY stacked free move, so a marginal extra move is banked, not forced.
+function clearsFreeTransferBar(vt: ValidTransfer): boolean {
+  const inEp = vt.candidate.player.epNext;
+  const outEp = vt.weakPlayer.player.epNext;
+  if (inEp === null || outEp === null) return false;
+  return inEp - outEp > TRANSFER_THRESHOLDS.freeTransferEp;
+}
+
+// Greedily stack free transfers on top of the seed move: each iteration picks the
+// best remaining legal + worthwhile move from any weak spot, re-deriving the running
+// bank and club counts after each pick, until `freeTransfers` is reached or nothing
+// else clears the bar. Generalizes the old single "best second" (incl. its budget
+// unlock) to N moves. Without squad context it falls back to the supplied list.
+function buildFreeMoves(
+  seed: ValidTransfer,
   sortedValid: ValidTransfer[],
+  freeTransfers: number,
   analysis?: SquadAnalysisResult,
   bank?: number,
   squadTeamCounts?: Map<number, number>
-): ValidTransfer | null {
-  const bestWeakId = bestSingle.weakPlayer.player.id;
+): ValidTransfer[] {
+  const moves: ValidTransfer[] = [seed];
+  if (freeTransfers <= 1) return moves;
 
-  const fromExisting = sortedValid.find(
-    (vt) => vt.weakPlayer.player.id !== bestWeakId && vt.gw1Gain > 0
-  );
+  const usedWeakIds = new Set<number>([seed.weakPlayer.player.id]);
+  const usedCandidateIds = new Set<number>([seed.candidate.player.id]);
 
+  // No squad context → can't re-validate budget/club limits after each move, so
+  // stack the next-best moves from the supplied list that sell a different player
+  // and still clear the free-transfer bar.
   if (!analysis || bank === undefined || !squadTeamCounts) {
-    return fromExisting ?? null;
+    for (const vt of sortedValid) {
+      if (moves.length >= freeTransfers) break;
+      if (usedWeakIds.has(vt.weakPlayer.player.id)) continue;
+      if (usedCandidateIds.has(vt.candidate.player.id)) continue;
+      if (vt.gw1Gain <= 0 || !clearsFreeTransferBar(vt)) continue;
+      moves.push(vt);
+      usedWeakIds.add(vt.weakPlayer.player.id);
+      usedCandidateIds.add(vt.candidate.player.id);
+    }
+    return moves;
   }
 
-  const adjustedBank =
-    bank + bestSingle.weakPlayer.player.price - bestSingle.candidate.player.price;
+  let runningBank = bank;
+  const runningCounts = new Map(squadTeamCounts);
+  const applyMove = (m: ValidTransfer) => {
+    runningBank += m.weakPlayer.player.price - m.candidate.player.price;
+    const sellTeam = m.weakPlayer.player.teamId;
+    runningCounts.set(sellTeam, (runningCounts.get(sellTeam) ?? 1) - 1);
+    const buyTeam = m.candidate.player.teamId;
+    runningCounts.set(buyTeam, (runningCounts.get(buyTeam) ?? 0) + 1);
+    usedWeakIds.add(m.weakPlayer.player.id);
+    usedCandidateIds.add(m.candidate.player.id);
+  };
+  applyMove(seed);
 
-  const adjustedCounts = new Map(squadTeamCounts);
-  const sellTeam = bestSingle.weakPlayer.player.teamId;
-  adjustedCounts.set(sellTeam, (adjustedCounts.get(sellTeam) ?? 1) - 1);
-  const buyTeam = bestSingle.candidate.player.teamId;
-  adjustedCounts.set(buyTeam, (adjustedCounts.get(buyTeam) ?? 0) + 1);
-
-  let bestUnlocked: ValidTransfer | null = null;
-
-  for (const ws of analysis.weakest3) {
-    if (ws.player.player.id === bestWeakId) continue;
-
-    for (const target of ws.targets) {
-      if (target.fitsBudget) continue;
-
-      const vt = validateTransfer(
-        ws.player,
-        target.candidate,
-        adjustedBank,
-        adjustedCounts,
-        { gw1Gain: target.gw1Gain, gw5Gain: target.gw5Gain }
-      );
-      if (!vt) continue;
-
-      if (vt.gw1Gain <= 0) continue;
-
-      if (!bestUnlocked || vt.gw1Gain > bestUnlocked.gw1Gain) {
-        bestUnlocked = vt;
+  while (moves.length < freeTransfers) {
+    let bestNext: ValidTransfer | null = null;
+    for (const ws of analysis.weakSpots) {
+      if (usedWeakIds.has(ws.player.player.id)) continue;
+      for (const target of ws.targets) {
+        if (usedCandidateIds.has(target.candidate.player.id)) continue;
+        const vt = validateTransfer(
+          ws.player,
+          target.candidate,
+          runningBank,
+          runningCounts,
+          { gw1Gain: target.gw1Gain, gw5Gain: target.gw5Gain }
+        );
+        if (!vt || vt.gw1Gain <= 0 || !clearsFreeTransferBar(vt)) continue;
+        if (!bestNext || vt.gw1Gain > bestNext.gw1Gain) bestNext = vt;
       }
     }
+    if (!bestNext) break;
+    moves.push(bestNext);
+    applyMove(bestNext);
   }
 
-  if (!fromExisting && !bestUnlocked) return null;
-  if (!fromExisting) return bestUnlocked;
-  if (!bestUnlocked) return fromExisting;
-
-  return bestUnlocked.gw1Gain > fromExisting.gw1Gain
-    ? bestUnlocked
-    : fromExisting;
+  return moves;
 }
 
 function findSavingsOption(

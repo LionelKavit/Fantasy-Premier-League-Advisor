@@ -26,6 +26,10 @@ export interface TransferAction {
 export type TransferHoldReason = "ep_unavailable" | "below_threshold" | "no_valid_targets";
 
 export interface SingleTransferResult {
+  // The committed free moves, in priority order (0..freeTransfers entries). Each
+  // clears the free-transfer ep bar; budget/club limits hold across the whole set.
+  // `bestSingle`/`bestSecond` are kept as freeMoves[0]/[1] for existing consumers.
+  freeMoves: ValidTransfer[];
   bestSingle: ValidTransfer | null;
   bestSecond: ValidTransfer | null;
   alternatives: ValidTransfer[];

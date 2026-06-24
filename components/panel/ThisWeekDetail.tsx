@@ -13,8 +13,10 @@ function primaryHeadline(action: TransferAction): string {
   switch (action.type) {
     case "ROLL":
       return "Roll your transfer";
-    case "FREE":
-      return "Make 1 free transfer";
+    case "FREE": {
+      const n = action.transfers.length;
+      return `Make ${n} free transfer${n === 1 ? "" : "s"}`;
+    }
     case "HIT_SINGLE":
       return "Take a −4 hit";
     case "HIT_DOUBLE":

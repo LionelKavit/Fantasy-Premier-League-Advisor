@@ -1,14 +1,14 @@
 import { describe, it, expect } from "vitest";
-import { identifyWeakest3, findCandidates } from "../../pipeline/squad-ranker";
+import { identifyWeakSpots, findCandidates } from "../../pipeline/squad-ranker";
 import type { ScoredPlayer, LlmContextSignals } from "../../pipeline/types";
 import type { ElementSummary, Player } from "../../types";
 import { makeScoredPlayer, makePlayer, makeAvailability } from "../factories";
 
-const reasons = (weak: ReturnType<typeof identifyWeakest3>) => weak.flatMap((w) => w.whyWeak).join(" | ");
+const reasons = (weak: ReturnType<typeof identifyWeakSpots>) => weak.flatMap((w) => w.whyWeak).join(" | ");
 
-describe("identifyWeakest3 — whyWeak reasons", () => {
+describe("identifyWeakSpots — whyWeak reasons", () => {
   it("flags poor fixtures, SELL trend, and rotation risk", () => {
-    const r = reasons(identifyWeakest3([
+    const r = reasons(identifyWeakSpots([
       makeScoredPlayer({ total: 0.3, fixtureSignals: { gw5AvgFdr: 4.0 } }),
       makeScoredPlayer({ total: 0.2, trendSignals: { classification: "SELL" } }),
       makeScoredPlayer({ total: 0.1, llmSignals: { rotationRisk: 0.7 } }),
@@ -19,7 +19,7 @@ describe("identifyWeakest3 — whyWeak reasons", () => {
   });
 
   it("flags injury (with news), suspension (with threshold), and low value", () => {
-    const r = reasons(identifyWeakest3([
+    const r = reasons(identifyWeakSpots([
       makeScoredPlayer({ total: 0.3, llmSignals: { injurySeverity: 0.6 }, player: { availability: makeAvailability({ news: "Hamstring" }) } }),
       makeScoredPlayer({ total: 0.2, statisticalSignals: { suspensionRisk: 0.8 }, player: { yellowCards: 4 } }),
       makeScoredPlayer({ total: 0.1, statisticalSignals: { valueScore: 0.3 } }),
@@ -30,7 +30,7 @@ describe("identifyWeakest3 — whyWeak reasons", () => {
   });
 
   it("flags poor form, defensive xGC, and minutes risk", () => {
-    const r = reasons(identifyWeakest3([
+    const r = reasons(identifyWeakSpots([
       makeScoredPlayer({ total: 0.3, statisticalSignals: { formSignal: 2.0 } }),
       makeScoredPlayer({ total: 0.2, player: { position: "DEF" }, statisticalSignals: { xgcRate: 1.6 } }),
       makeScoredPlayer({ total: 0.1, statisticalSignals: { minutesReliability: 0.4 }, player: { availability: makeAvailability({ chanceOfPlayingNext: 30 }) } }),
@@ -41,7 +41,7 @@ describe("identifyWeakest3 — whyWeak reasons", () => {
   });
 
   it("flags SELL_RISK and falls back when nothing else applies", () => {
-    const r = reasons(identifyWeakest3([
+    const r = reasons(identifyWeakSpots([
       makeScoredPlayer({ total: 0.3, trendSignals: { classification: "SELL_RISK" } }),
       makeScoredPlayer({ total: 0.2 }),
       makeScoredPlayer({ total: 0.1 }),

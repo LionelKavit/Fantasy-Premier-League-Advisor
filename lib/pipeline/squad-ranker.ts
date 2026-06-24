@@ -25,8 +25,14 @@ export function rankSquad(scoredPlayers: ScoredPlayer[]): ScoredPlayer[] {
   return [...scoredPlayers].sort((a, b) => b.score.total - a.score.total);
 }
 
-export function identifyWeakest3(rankedSquad: ScoredPlayer[]): WeakSpot[] {
-  const weakest = rankedSquad.slice(-3).reverse();
+// The squad's weakest spots, worst-first. `count` defaults to the optimizer's
+// transfer-stacking ceiling so a manager with up to 5 free transfers has a weak
+// spot (and replacement targets) to consider for each.
+export function identifyWeakSpots(
+  rankedSquad: ScoredPlayer[],
+  count: number = PIPELINE_CONFIG.maxWeakSpots
+): WeakSpot[] {
+  const weakest = rankedSquad.slice(-count).reverse();
   return weakest.map((sp) => ({
     player: sp,
     whyWeak: generateWeakReasons(sp),

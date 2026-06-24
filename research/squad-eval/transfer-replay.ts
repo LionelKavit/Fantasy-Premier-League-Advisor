@@ -19,7 +19,7 @@ import { join } from "node:path";
 import type { Pick, ManagerProfile, ElementSummary } from "../../lib/types";
 import type { ScoredPlayer, SquadAnalysisResult, LlmContextSignals } from "../../lib/pipeline/types";
 import { scorePlayerLite } from "../../lib/pipeline/lite-scoring";
-import { rankSquad, identifyWeakest3, findCandidates } from "../../lib/pipeline/squad-ranker";
+import { rankSquad, identifyWeakSpots, findCandidates } from "../../lib/pipeline/squad-ranker";
 import { buildValidTransfers } from "../../lib/optimizer/setup";
 import { evaluateSingleTransfer } from "../../lib/optimizer/single-transfer";
 import { CACHE, load, teams, fixtures, staticById, realized, buildPlayer, allElementIds } from "./reconstruct";
@@ -58,17 +58,17 @@ function decide(gw: number): Row | null {
   for (const sp of scoredSquad) teamCounts.set(sp.player.teamId, (teamCounts.get(sp.player.teamId) ?? 0) + 1);
 
   const ranked = rankSquad(scoredSquad);
-  const weakest3 = identifyWeakest3(ranked);
+  const weakSpots = identifyWeakSpots(ranked);
 
   // Candidate universe, point-in-time.
   const universe = allElementIds.map((id) => buildPlayer(id, gw));
-  for (const ws of weakest3) {
+  for (const ws of weakSpots) {
     ws.targets = findCandidates(ws.player, universe, bank, teamCounts, scoredCache,
       fixtures, teams, gw, EMPTY_ES, EMPTY_LLM, 1);
   }
 
   const analysis: SquadAnalysisResult = {
-    rankedSquad: ranked, weakest3, picks: squad,
+    rankedSquad: ranked, weakSpots, picks: squad,
     chipsRemaining: { wildcard: 0, freeHit: 0, benchBoost: 0, tripleCaptain: 0 },
     bank, currentGw: gw, generatedAt: "",
   };

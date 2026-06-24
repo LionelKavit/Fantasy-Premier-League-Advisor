@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchBootstrap, fetchPicks, buildManagerProfile } from "@/lib/fpl-api";
 import { detectCurrentGameweek } from "@/lib/gameweek";
+import { FREE_TRANSFER_RANGE, clampFt } from "@/lib/config";
 import type { ApiErrorResponse } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
   const teamId = request.nextUrl.searchParams.get("team_id");
-  const freeTransfers = parseInt(
-    request.nextUrl.searchParams.get("free_transfers") ?? "1"
+  const freeTransfers = clampFt(
+    parseInt(
+      request.nextUrl.searchParams.get("free_transfers") ??
+        String(FREE_TRANSFER_RANGE.default)
+    )
   );
 
   if (!teamId) {

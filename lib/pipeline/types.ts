@@ -98,7 +98,7 @@ export interface TransferCandidate {
 
 export interface SquadAnalysisResult {
   rankedSquad: ScoredPlayer[];
-  weakest3: WeakSpot[];
+  weakSpots: WeakSpot[];
   picks: Pick[];
   chipsRemaining: ChipsRemaining;
   bank: number;

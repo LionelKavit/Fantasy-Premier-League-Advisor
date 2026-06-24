@@ -16,7 +16,7 @@ const rising: ValidTransfer = {
   priceDelta: 0, gw1Gain: 1, gw5Gain: 1, scoreDiffPct: 10,
 };
 const singleResult: SingleTransferResult = {
-  bestSingle: rising, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null, holdReason: null,
+  freeMoves: [rising], bestSingle: rising, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null, holdReason: null,
 };
 const hitResult: HitTransferResult = { singleHit: null, doubleHit: null };
 
@@ -24,7 +24,7 @@ function makeInput(): SynthesisInput {
   const doubtful = makeScoredPlayer({ player: { webName: "Doubt", availability: makeAvailability({ status: "doubtful", chanceOfPlayingNext: 50 }) } });
   const analysis = makeSquadAnalysisResult({
     rankedSquad: [doubtful, makeScoredPlayer({ total: 0.5 })],
-    weakest3: [
+    weakSpots: [
       { player: makeScoredPlayer({ player: { position: "MID" } }), whyWeak: ["x"], targets: [] },
       { player: makeScoredPlayer({ player: { position: "MID" } }), whyWeak: ["x"], targets: [] },
       { player: makeScoredPlayer({ player: { position: "FWD" } }), whyWeak: ["x"], targets: [] },
@@ -154,7 +154,7 @@ describe("synthesizeRecommendation — fail-safe", () => {
   it("recommends ROLL in the fail-safe when there is no best single", async () => {
     clearApiKey();
     const input = makeInput();
-    input.singleResult = { bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: "roll", holdReason: null };
+    input.singleResult = { freeMoves: [], bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: "roll", holdReason: null };
     const r = await synthesizeRecommendation(input);
     expect(r.primaryRecommendation.type).toBe("ROLL");
   });

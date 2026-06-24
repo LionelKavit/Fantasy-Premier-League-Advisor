@@ -157,7 +157,7 @@ function getPlan(sc: ScoutContext, freeTransfers: number) {
     bank: analysis.bank,
     freeTransfers,
     chipsRemaining: analysis.chipsRemaining,
-    weakSpots: analysis.weakest3.map((w) => ({
+    weakSpots: analysis.weakSpots.map((w) => ({
       player: w.player.player.webName,
       position: w.player.player.position,
       whyWeak: w.whyWeak,

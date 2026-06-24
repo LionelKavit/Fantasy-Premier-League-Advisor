@@ -20,7 +20,7 @@ function vt(weakId: number, candId: number, gw1: number, o: VtOpts = {}): ValidT
 }
 
 const noSingle: SingleTransferResult = {
-  bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null, holdReason: null,
+  freeMoves: [], bestSingle: null, bestSecond: null, alternatives: [], savingsOption: null, rollReason: null, holdReason: null,
 };
 const counts = (m: Record<number, number> = {}) => new Map<number, number>(Object.entries(m).map(([k, v]) => [Number(k), v]));
 
@@ -39,7 +39,7 @@ describe("evaluateHitTransfers — single hit", () => {
 
   it("excludes transfers already consumed as free", () => {
     const used = vt(1, 2, 9);
-    const single: SingleTransferResult = { ...noSingle, bestSingle: used };
+    const single: SingleTransferResult = { ...noSingle, freeMoves: [used], bestSingle: used };
     const r = evaluateHitTransfers([used, vt(5, 6, 5.5)], 2, counts(), 1, single);
     expect(r.singleHit!.transfers[0].candidate.player.id).toBe(6); // not the consumed 1→2
   });
