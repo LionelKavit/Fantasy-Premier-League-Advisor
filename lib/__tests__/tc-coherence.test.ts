@@ -30,6 +30,7 @@ const horizonEntry = (
 });
 
 const emptySingle: SingleTransferResult = {
+  freeMoves: [],
   bestSingle: null,
   bestSecond: null,
   alternatives: [],

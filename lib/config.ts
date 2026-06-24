@@ -113,6 +113,25 @@ export const TRANSFER_THRESHOLDS = {
   hitCostEp: 4,
 };
 
+// Free-transfer count the manager can hold: FPL banks 0 (both used) to 5 (the cap).
+// Single source of truth for every clamp (API routes, persistence) and the UI field.
+export const FREE_TRANSFER_RANGE = { min: 0, max: 5, default: 1 } as const;
+
+/** True only for a whole number within the inclusive 0–5 free-transfer range. */
+export function isValidFt(n: number): boolean {
+  return (
+    Number.isInteger(n) &&
+    n >= FREE_TRANSFER_RANGE.min &&
+    n <= FREE_TRANSFER_RANGE.max
+  );
+}
+
+/** Coerce any number into the 0–5 range; non-finite values fall back to the default. */
+export function clampFt(n: number): number {
+  if (!Number.isFinite(n)) return FREE_TRANSFER_RANGE.default;
+  return Math.min(FREE_TRANSFER_RANGE.max, Math.max(FREE_TRANSFER_RANGE.min, Math.trunc(n)));
+}
+
 export const LLM_SIGNAL_RANGES: Record<string, [number, number]> = {
   rotationRisk: [0, 1],
   oopBonus: [0, 0.10],
@@ -127,6 +146,9 @@ export const PIPELINE_CONFIG = {
   candidatesPerWeakSpot: 5,
   fdrRunLength: 5,
   insufficientDataFallbackScore: 0.3,
+  // Weak spots surfaced for transfer analysis — matches FREE_TRANSFER_RANGE.max so
+  // up to 5 stacked free transfers each have a distinct weak spot to act on.
+  maxWeakSpots: 5,
 };
 
 export const OPPONENT_ABSENCE_MULTIPLIER: Record<Position, number> = {

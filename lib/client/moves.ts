@@ -60,7 +60,11 @@ function transferSegment(plan: GameweekPlan): string {
 
   const [first, ...rest] = groups;
   const move = `${first.out} → ${first.candidates.join(" / ")}`;
-  return rest.length > 0 ? `${move} +${rest.length} more` : move;
+  // Name the count as transfers so it doesn't read as another candidate for the
+  // first move (e.g. "Sánchez → Raya +1 more transfer", not "…Raya +1 more").
+  return rest.length > 0
+    ? `${move} +${rest.length} more transfer${rest.length > 1 ? "s" : ""}`
+    : move;
 }
 
 function chipSegment(plan: GameweekPlan): string {

@@ -56,12 +56,12 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 /** Headline verb for a transfer action (mirrors the This Week panel's wording). */
-function transferHeadline(type: TransferType): string {
+function transferHeadline(type: TransferType, moveCount: number): string {
   switch (type) {
     case "ROLL":
       return "Roll your transfer";
     case "FREE":
-      return "Make one free transfer";
+      return `Make ${moveCount} free transfer${moveCount === 1 ? "" : "s"}`;
     case "HIT_SINGLE":
       return "Take a −4 hit";
     case "HIT_DOUBLE":
@@ -97,7 +97,10 @@ export function buildBriefGrounding(plan: GameweekPlan): BriefGrounding {
   const transfer: BriefTransfer | null = t
     ? {
         type: t.primaryRecommendation.type,
-        headline: transferHeadline(t.primaryRecommendation.type),
+        headline: transferHeadline(
+          t.primaryRecommendation.type,
+          t.primaryRecommendation.transfers.length
+        ),
         moves: t.primaryRecommendation.transfers.map((v) => ({
           out: v.weakPlayer.player.webName,
           in: v.candidate.player.webName,

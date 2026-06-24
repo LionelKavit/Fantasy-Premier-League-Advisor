@@ -22,7 +22,7 @@ const ctx = {
     currentGw: 1,
     rankedSquad: [],
     picks: [],
-    weakest3: [],
+    weakSpots: [],
     bank: 0,
     chipsRemaining: { wildcard: 0, freeHit: 0, benchBoost: 0, tripleCaptain: 0 },
     deadline: null,

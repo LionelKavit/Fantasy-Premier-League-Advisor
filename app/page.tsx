@@ -15,6 +15,7 @@ import { AskTheScout } from "@/components/panel/AskTheScout";
 import { Skeleton } from "@/components/states/Skeleton";
 import { ErrorCard } from "@/components/states/ErrorCard";
 import type { AskMessage } from "@/lib/client/ask";
+import { FREE_TRANSFER_RANGE, clampFt } from "@/lib/config";
 
 type Status = "idle" | "loading" | "loaded" | "error";
 type Lens = "this-week" | "long-term" | "chips";
@@ -25,10 +26,10 @@ const LS_FT = "fpl:ft";
 
 export default function Home() {
   const [managerId, setManagerId] = useState("");
-  const [freeTransfers, setFreeTransfers] = useState(1);
-  // The FT value the displayed plan was actually computed with. The toggle moves
+  const [freeTransfers, setFreeTransfers] = useState<number>(FREE_TRANSFER_RANGE.default);
+  // The FT value the displayed plan was actually computed with. The field moves
   // `freeTransfers` (the selection); `appliedFt` only changes when an analysis runs.
-  const [appliedFt, setAppliedFt] = useState(1);
+  const [appliedFt, setAppliedFt] = useState<number>(FREE_TRANSFER_RANGE.default);
   const [status, setStatus] = useState<Status>("idle");
   const [mode, setMode] = useState<Mode>("manager");
   const [plan, setPlan] = useState<GameweekPlan | null>(null);
@@ -94,7 +95,9 @@ export default function Home() {
   // idle→loading transition here is intentional, not a cascading render).
   useEffect(() => {
     const savedId = localStorage.getItem(LS_ID) ?? "";
-    const savedFt = Number(localStorage.getItem(LS_FT)) || 1;
+    // clampFt coerces a missing/NaN value to the default and keeps 0 (a valid count)
+    // instead of `Number(...) || 1`, which silently rewrote a stored 0 to 1.
+    const savedFt = clampFt(parseInt(localStorage.getItem(LS_FT) ?? ""));
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (savedId) load(savedId, savedFt);
   }, [load]);

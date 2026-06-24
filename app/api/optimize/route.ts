@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runOptimizerPipeline } from "@/lib/optimizer";
+import { FREE_TRANSFER_RANGE, clampFt } from "@/lib/config";
 import type { ApiErrorResponse } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
@@ -14,8 +15,8 @@ export async function GET(request: NextRequest) {
   }
 
   const freeTransfers = freeTransfersParam
-    ? Math.min(2, Math.max(1, parseInt(freeTransfersParam)))
-    : 1;
+    ? clampFt(parseInt(freeTransfersParam))
+    : FREE_TRANSFER_RANGE.default;
 
   try {
     const result = await runOptimizerPipeline(

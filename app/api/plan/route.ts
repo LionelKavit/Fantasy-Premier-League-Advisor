@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runGameweekPlan } from "@/lib/plan";
-import { CAPTAIN_CONFIG } from "@/lib/config";
+import { CAPTAIN_CONFIG, FREE_TRANSFER_RANGE, clampFt } from "@/lib/config";
 import type { ApiErrorResponse } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
   }
 
   const freeTransfers = freeTransfersParam
-    ? Math.min(2, Math.max(1, parseInt(freeTransfersParam)))
-    : 1;
+    ? clampFt(parseInt(freeTransfersParam))
+    : FREE_TRANSFER_RANGE.default;
   const captainHorizon = horizonParam
     ? Math.min(10, Math.max(1, parseInt(horizonParam)))
     : CAPTAIN_CONFIG.horizonLengthDefault;

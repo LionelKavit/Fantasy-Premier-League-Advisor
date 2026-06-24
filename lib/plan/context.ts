@@ -3,7 +3,7 @@ import type { Player, ManagerProfile } from "../types";
 import type { ScoredPlayer, SquadAnalysisResult } from "../pipeline/types";
 import { fetchBootstrap, fetchFixtures, fetchPicks, buildManagerProfile } from "../fpl-api";
 import { runSquadAnalysisPipeline } from "../pipeline";
-import { rankSquad, identifyWeakest3 } from "../pipeline/squad-ranker";
+import { rankSquad, identifyWeakSpots } from "../pipeline/squad-ranker";
 import { scorePlayerLite } from "../pipeline/lite-scoring";
 import { detectGameweekFlags } from "../gameweek";
 import { buildDemoSquad, deriveDemoSeason } from "../demo/squad";
@@ -60,11 +60,11 @@ export async function buildLiteBaseContext(teamId: number): Promise<AnalysisCont
   );
 
   const rankedSquad = rankSquad(scored);
-  const weakest3 = identifyWeakest3(rankedSquad); // weak players only; targets stay empty
+  const weakSpots = identifyWeakSpots(rankedSquad); // weak players only; targets stay empty
 
   const analysis: SquadAnalysisResult = {
     rankedSquad,
-    weakest3,
+    weakSpots,
     picks: picksResponse.picks,
     chipsRemaining: managerProfile.chipsRemaining,
     bank: picksResponse.entry_history.bank,
@@ -100,11 +100,11 @@ export async function buildDemoContext(): Promise<AnalysisContext> {
   );
 
   const rankedSquad = rankSquad(scored);
-  const weakest3 = identifyWeakest3(rankedSquad); // weak spots only; no transfer targets
+  const weakSpots = identifyWeakSpots(rankedSquad); // weak spots only; no transfer targets
 
   const analysis: SquadAnalysisResult = {
     rankedSquad,
-    weakest3,
+    weakSpots,
     picks: picks.picks,
     chipsRemaining: { wildcard: 0, freeHit: 0, benchBoost: 0, tripleCaptain: 0 },
     bank: picks.entry_history.bank,

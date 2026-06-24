@@ -41,6 +41,39 @@ describe("buildVerdict", () => {
     expect(v.chip).toBe("Hold your chips");
   });
 
+  it("summarizes multiple transfers as '+N more transfer(s)', counting moves not candidates", () => {
+    const mv = (id: number, out: string, cand: string, gain: number) => ({
+      weakPlayer: { player: { id, webName: out } },
+      candidate: { player: { webName: cand } },
+      gw1Gain: gain,
+    });
+    const three = buildVerdict(
+      plan({
+        transfers: {
+          primaryRecommendation: {
+            type: "FREE",
+            transfers: [mv(1, "Sánchez", "Raya", 5), mv(2, "João Pedro", "Calvert-Lewin", 4), mv(3, "Ballard", "Senesi", 3)],
+          },
+          chipPlan: [],
+        } as unknown as GameweekPlan["transfers"],
+      })
+    );
+    expect(three.transfer).toBe("Sánchez → Raya +2 more transfers");
+
+    const two = buildVerdict(
+      plan({
+        transfers: {
+          primaryRecommendation: {
+            type: "FREE",
+            transfers: [mv(1, "Sánchez", "Raya", 5), mv(2, "João Pedro", "Calvert-Lewin", 4)],
+          },
+          chipPlan: [],
+        } as unknown as GameweekPlan["transfers"],
+      })
+    );
+    expect(two.transfer).toBe("Sánchez → Raya +1 more transfer");
+  });
+
   it("expresses a hold as 'Roll your transfer'", () => {
     const v = buildVerdict(
       plan({

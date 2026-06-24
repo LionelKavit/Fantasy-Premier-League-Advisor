@@ -94,8 +94,8 @@ ${JSON.stringify(validTransfers.map(vt => ({
 
 ### Single Transfer Result
 ${JSON.stringify({
-  bestSingle: singleResult.bestSingle ? formatTransfer(singleResult.bestSingle) : null,
-  bestSecond: singleResult.bestSecond ? formatTransfer(singleResult.bestSecond) : null,
+  // The committed free moves to make this week (0..${freeTransfers}); play all of them.
+  freeMoves: singleResult.freeMoves.map(formatTransfer),
   rollReason: singleResult.rollReason,
   savingsOption: singleResult.savingsOption ? formatTransfer(singleResult.savingsOption) : null,
   alternatives: singleResult.alternatives.map(formatTransfer),
@@ -120,7 +120,7 @@ ${JSON.stringify(restructureOptions.map(ro => ({
   dreamTarget: ro.dreamTarget.candidate.player.webName,
   downgrade: ro.downgradedPlayer.player.webName,
   replacement: ro.downgradeReplacement.player.webName,
-  netScoreChange: ro.netScoreChange.toFixed(3),
+  netEp: ro.netEp.toFixed(2),
   totalCost: ro.totalCost,
 })), null, 2)}
 
@@ -147,7 +147,9 @@ The narrativeSummary is shown ALONGSIDE the structured recommendation — the ch
 
 For hitVerdict.reasoning: explain the judgement (is the points hit worth it and why), not just the verdict.
 
-For secondaryRecommendation: suggest a plan for next week if applicable (e.g. a WAIT-timed horizon transfer, or rolling for 2 FTs).
+For a FREE recommendation the manager has ${freeTransfers} free transfer(s); freeMoves lists the moves worth making now (it may be fewer than ${freeTransfers} — any unused transfers are banked/rolled, up to the 5-transfer cap). Treat all of freeMoves as the primary action.
+
+For secondaryRecommendation: suggest a plan for next week if applicable (e.g. a WAIT-timed horizon transfer, or banking an unused transfer).
 
 ## Output Schema
 {
@@ -239,9 +241,9 @@ function mapTransferAction(
     case "FREE":
       return {
         type: "FREE",
-        transfers: singleResult.bestSingle ? [singleResult.bestSingle] : [],
+        transfers: singleResult.freeMoves,
         netPointsCost: 0,
-        netGain: singleResult.bestSingle?.gw1Gain ?? 0,
+        netGain: singleResult.freeMoves.reduce((sum, vt) => sum + vt.gw1Gain, 0),
         breakEvenGw: null,
       };
     case "HIT_SINGLE":
@@ -282,12 +284,12 @@ function buildFailSafe(inputs: SynthesisInput): OptimizerResult {
   const { singleResult, chipRecommendations, restructureOptions, horizon } = inputs;
 
   let primaryRecommendation: TransferAction;
-  if (singleResult.bestSingle) {
+  if (singleResult.freeMoves.length > 0) {
     primaryRecommendation = {
       type: "FREE",
-      transfers: [singleResult.bestSingle],
+      transfers: singleResult.freeMoves,
       netPointsCost: 0,
-      netGain: singleResult.bestSingle.gw1Gain,
+      netGain: singleResult.freeMoves.reduce((sum, vt) => sum + vt.gw1Gain, 0),
       breakEvenGw: null,
     };
   } else {

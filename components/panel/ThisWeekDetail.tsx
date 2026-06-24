@@ -13,8 +13,10 @@ function primaryHeadline(action: TransferAction): string {
   switch (action.type) {
     case "ROLL":
       return "Roll your transfer";
-    case "FREE":
-      return "Make 1 free transfer";
+    case "FREE": {
+      const n = action.transfers.length;
+      return `Make ${n} free transfer${n === 1 ? "" : "s"}`;
+    }
     case "HIT_SINGLE":
       return "Take a −4 hit";
     case "HIT_DOUBLE":
@@ -219,8 +221,8 @@ export function ThisWeekDetail({ plan, demo = false }: { plan: GameweekPlan; dem
                           buy {o.downgradeReplacement.player.webName}
                         </button>
                         <span className="text-xs tabular-nums">
-                          net {o.netScoreChange >= 0 ? "+" : ""}
-                          {o.netScoreChange.toFixed(2)} · {o.totalCost === 0 ? "free" : `−${o.totalCost} pts`}
+                          net pts gain {o.netEp >= 0 ? "+" : ""}
+                          {o.netEp.toFixed(1)} · {o.totalCost === 0 ? "free" : `−${o.totalCost} pts`}
                         </span>
                       </div>
                     </li>
