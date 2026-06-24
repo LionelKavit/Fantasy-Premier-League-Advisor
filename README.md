@@ -30,7 +30,7 @@ https://github.com/user-attachments/assets/93f5c5eb-443b-4edb-b4d6-2a8c6037cfe0
 
 ## What it does
 
-- **Glanceable verdict** — one always-visible scout verdit as a top banner: *"This week: Sánchez → Raya +1 more transfer · Captain Haaland · Play your Bench Boost"*, with an **Open FPL Transfers** deep link at the end.
+- **Glanceable verdict** — one always-visible scout verdict as a top banner: *"This week: Sánchez → Raya +1 more transfer · Captain Haaland · Play your Bench Boost"*, with an **Open FPL Transfers** deep link at the end.
   
 - **Pitch & ratings** — every squad player scored 0–10 by a position-aware composite model (anchored on FPL's expected points, corrected by form, fixtures, value, and underlying stats).
 
