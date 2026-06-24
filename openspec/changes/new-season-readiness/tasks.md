@@ -23,6 +23,13 @@
 **Capability:** new-season-readiness
 - After the GW19 deadline, confirm `deriveChipsRemaining` drops an unused first-half chip (check FPL `bootstrap-static` `chips` no longer advertises it; adjust the derivation if not). Prevents the chip narrative (`chip-strategist`) from recommending an expired chip.
 
+### Task 6: Restructure ↔ long-term coherence (season live)
+**Capability:** new-season-readiness
+- Judge the restructure **dream** over the planning horizon, not just next-GW ep: reuse `computeHorizon` / `HorizonEntry.cumulativeGain` (`lib/optimizer/horizon.ts`) for the dream leg in `findRestructureCandidates` (`lib/optimizer/restructure.ts`), so a restructure is pitched only when the premium pays off across the window. Keep the downgrade leg near-term.
+- Share context between the views so This Week's **Restructure** and the **Long Term** horizon never contradict: a recommended restructure's dream agrees with (and is visible in) the Long Term tab — surface the link in the UI (`components/panel/{ThisWeekDetail,LongTermDetail}.tsx`), e.g. the Restructure row carries the horizon timing.
+- Verify: a dream the horizon tags WAIT is not pitched as a buy-now restructure; the two tabs reference the same target/timing; `tsc`/`eslint`/`vitest` clean.
+
 ### Notes
 - Item 1 is the only pre-GW1, demo-facing piece — prioritize it.
 - Items 2–4 accrue value through the season; partial reports must state `n` and read as provisional.
+- Item 5 (restructure ↔ long-term) needs a meaningful in-season horizon — land it once early-GW fixtures + `ep_next` make the horizon real.

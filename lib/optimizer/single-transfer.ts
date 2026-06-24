@@ -1,8 +1,8 @@
 import type { ManagerProfile } from "../types";
 import type { SquadAnalysisResult } from "../pipeline/types";
-import type { ValidTransfer, SingleTransferResult } from "./types";
-import { validateTransfer } from "./setup";
+import type { ValidTransfer, SingleTransferResult, RestructureCandidate } from "./types";
 import { TRANSFER_THRESHOLDS, FREE_TRANSFER_RANGE } from "../config";
+import { allocateFreeTransfers } from "./allocate";
 
 export function evaluateSingleTransfer(
   validTransfers: ValidTransfer[],
@@ -10,9 +10,10 @@ export function evaluateSingleTransfer(
   freeTransfers: number,
   analysis?: SquadAnalysisResult,
   bank?: number,
-  squadTeamCounts?: Map<number, number>
+  squadTeamCounts?: Map<number, number>,
+  restructureCandidates: RestructureCandidate[] = []
 ): SingleTransferResult {
-  if (validTransfers.length === 0) {
+  if (validTransfers.length === 0 && restructureCandidates.length === 0) {
     return {
       freeMoves: [],
       bestSingle: null,
@@ -30,56 +31,94 @@ export function evaluateSingleTransfer(
     return b.gw5Gain - a.gw5Gain;
   });
 
-  // Transfer-vs-hold gate (transfer-hold-threshold): only recommend the top transfer if its
-  // projected points gain clears the bar — a hit must beat its 4-pt cost; a free move must
-  // beat the free-transfer opportunity cost. Composite gw1Gain is a squashed 0–1 score with
-  // no "worth it" line, so the decision is denominated in `ep_next` (expected points). When
-  // ep_next is unavailable we HOLD — transfers chosen on the composite alone are negative-EV
-  // (squad-eval calibration), so we don't spend a transfer without FPL's projection.
-  const best = sorted[0];
-  const inEp = best.candidate.player.epNext;
-  const outEp = best.weakPlayer.player.epNext;
+  // Transfer-vs-hold gate (transfer-hold-threshold): the decision is denominated in
+  // `ep_next` (expected points) — a hit must beat its 4-pt cost, a free move the
+  // free-transfer opportunity cost. Composite gw1Gain has no "worth it" line; when
+  // ep_next is unavailable we HOLD (composite-alone transfers are negative-EV).
+  const best = sorted[0] ?? null;
+  const inEp = best?.candidate.player.epNext ?? null;
+  const outEp = best?.weakPlayer.player.epNext ?? null;
   const deltaEp = inEp !== null && outEp !== null ? inEp - outEp : null;
   const needsHit = freeTransfers < 1;
   const epBar = needsHit ? TRANSFER_THRESHOLDS.hitCostEp : TRANSFER_THRESHOLDS.freeTransferEp;
-  const clearsThreshold = deltaEp !== null && deltaEp > epBar;
+  const seedClears = deltaEp !== null && deltaEp > epBar;
+  const hasContext = !!analysis && bank !== undefined && !!squadTeamCounts;
 
-  if (!clearsThreshold) {
-    const banked = Math.min(FREE_TRANSFER_RANGE.max, freeTransfers + 1);
-    const reason =
-      deltaEp !== null
-        ? `Best available upgrade projects +${deltaEp.toFixed(1)} pts — below the ${epBar}-pt ${needsHit ? "hit" : "free-transfer"} bar to spend a transfer.`
-        : `No ep_next projection available to justify a transfer (composite alone doesn't reliably rank transfers).`;
+  const alternatives = sorted.slice(1, 4);
+
+  // At 0 FT every move is a hit: there are no free moves to commit, and the top swap
+  // is recommended only if it out-projects the 4-pt hit (the hit evaluator handles the
+  // rest). Restructures at 0 FT surface in the section, not here.
+  if (needsHit) {
+    if (best && seedClears) {
+      return {
+        freeMoves: [],
+        bestSingle: best,
+        bestSecond: null,
+        alternatives,
+        savingsOption: findSavingsOption(validTransfers),
+        rollReason: null,
+        holdReason: null,
+      };
+    }
+    return rollResult(deltaEp, epBar, needsHit, freeTransfers, validTransfers);
+  }
+
+  // FT ≥ 1: choose the optimal free-move set (swaps + restructures) when we have squad
+  // context, else fall back to a swaps-only greedy stack over the supplied list.
+  const freeMoves = hasContext
+    ? allocateFreeTransfers(
+        validTransfers,
+        restructureCandidates,
+        analysis!.weakSpots,
+        freeTransfers,
+        bank!,
+        squadTeamCounts!
+      )
+    : best && seedClears
+      ? buildSwapFallback(best, sorted, freeTransfers)
+      : [];
+
+  if (freeMoves.length > 0) {
     return {
-      freeMoves: [],
-      bestSingle: null,
-      bestSecond: null,
-      alternatives: [],
+      freeMoves,
+      bestSingle: freeMoves[0],
+      bestSecond: freeMoves[1] ?? null,
+      alternatives,
       savingsOption: findSavingsOption(validTransfers),
-      rollReason: `${reason} Rolling to bank ${banked} free transfers next week.`,
-      holdReason: deltaEp === null ? "ep_unavailable" : "below_threshold",
+      rollReason: null,
+      holdReason: null,
     };
   }
 
-  const bestSingle = best;
-  const alternatives = sorted.slice(1, 4);
-
-  // Stack up to `freeTransfers` free moves. Only when at least one transfer is free
-  // — at 0 FT the seed move is a hit (handled via bestSingle + the hit evaluator),
-  // so there are no free moves to commit.
-  const freeMoves =
-    freeTransfers >= 1
-      ? buildFreeMoves(best, sorted, freeTransfers, analysis, bank, squadTeamCounts)
-      : [];
-  const bestSecond = freeMoves[1] ?? null;
-
-  const savingsOption = findSavingsOption(validTransfers);
-
-  return { freeMoves, bestSingle, bestSecond, alternatives, savingsOption, rollReason: null, holdReason: null };
+  return rollResult(deltaEp, epBar, needsHit, freeTransfers, validTransfers);
 }
 
-// Whether a transfer's projected-points edge clears the free-transfer bar. Applied
-// to EVERY stacked free move, so a marginal extra move is banked, not forced.
+// Build the roll/hold result with the deterministic reason text and typed holdReason.
+function rollResult(
+  deltaEp: number | null,
+  epBar: number,
+  needsHit: boolean,
+  freeTransfers: number,
+  validTransfers: ValidTransfer[]
+): SingleTransferResult {
+  const banked = Math.min(FREE_TRANSFER_RANGE.max, freeTransfers + 1);
+  const reason =
+    deltaEp !== null
+      ? `Best available upgrade projects +${deltaEp.toFixed(1)} pts — below the ${epBar}-pt ${needsHit ? "hit" : "free-transfer"} bar to spend a transfer.`
+      : `No ep_next projection available to justify a transfer (composite alone doesn't reliably rank transfers).`;
+  return {
+    freeMoves: [],
+    bestSingle: null,
+    bestSecond: null,
+    alternatives: [],
+    savingsOption: findSavingsOption(validTransfers),
+    rollReason: `${reason} Rolling to bank ${banked} free transfers next week.`,
+    holdReason: deltaEp === null ? "ep_unavailable" : "below_threshold",
+  };
+}
+
+// Whether a transfer's projected-points edge clears the free-transfer bar.
 function clearsFreeTransferBar(vt: ValidTransfer): boolean {
   const inEp = vt.candidate.player.epNext;
   const outEp = vt.weakPlayer.player.epNext;
@@ -87,76 +126,28 @@ function clearsFreeTransferBar(vt: ValidTransfer): boolean {
   return inEp - outEp > TRANSFER_THRESHOLDS.freeTransferEp;
 }
 
-// Greedily stack free transfers on top of the seed move: each iteration picks the
-// best remaining legal + worthwhile move from any weak spot, re-deriving the running
-// bank and club counts after each pick, until `freeTransfers` is reached or nothing
-// else clears the bar. Generalizes the old single "best second" (incl. its budget
-// unlock) to N moves. Without squad context it falls back to the supplied list.
-function buildFreeMoves(
+// Swaps-only greedy stack, used when no squad context is supplied (the optimal
+// allocator needs the bank/club state). Stacks the next-best bar-clearing move that
+// sells a different player, up to `freeTransfers`.
+function buildSwapFallback(
   seed: ValidTransfer,
   sortedValid: ValidTransfer[],
-  freeTransfers: number,
-  analysis?: SquadAnalysisResult,
-  bank?: number,
-  squadTeamCounts?: Map<number, number>
+  freeTransfers: number
 ): ValidTransfer[] {
   const moves: ValidTransfer[] = [seed];
   if (freeTransfers <= 1) return moves;
 
   const usedWeakIds = new Set<number>([seed.weakPlayer.player.id]);
   const usedCandidateIds = new Set<number>([seed.candidate.player.id]);
-
-  // No squad context → can't re-validate budget/club limits after each move, so
-  // stack the next-best moves from the supplied list that sell a different player
-  // and still clear the free-transfer bar.
-  if (!analysis || bank === undefined || !squadTeamCounts) {
-    for (const vt of sortedValid) {
-      if (moves.length >= freeTransfers) break;
-      if (usedWeakIds.has(vt.weakPlayer.player.id)) continue;
-      if (usedCandidateIds.has(vt.candidate.player.id)) continue;
-      if (vt.gw1Gain <= 0 || !clearsFreeTransferBar(vt)) continue;
-      moves.push(vt);
-      usedWeakIds.add(vt.weakPlayer.player.id);
-      usedCandidateIds.add(vt.candidate.player.id);
-    }
-    return moves;
+  for (const vt of sortedValid) {
+    if (moves.length >= freeTransfers) break;
+    if (usedWeakIds.has(vt.weakPlayer.player.id)) continue;
+    if (usedCandidateIds.has(vt.candidate.player.id)) continue;
+    if (vt.gw1Gain <= 0 || !clearsFreeTransferBar(vt)) continue;
+    moves.push(vt);
+    usedWeakIds.add(vt.weakPlayer.player.id);
+    usedCandidateIds.add(vt.candidate.player.id);
   }
-
-  let runningBank = bank;
-  const runningCounts = new Map(squadTeamCounts);
-  const applyMove = (m: ValidTransfer) => {
-    runningBank += m.weakPlayer.player.price - m.candidate.player.price;
-    const sellTeam = m.weakPlayer.player.teamId;
-    runningCounts.set(sellTeam, (runningCounts.get(sellTeam) ?? 1) - 1);
-    const buyTeam = m.candidate.player.teamId;
-    runningCounts.set(buyTeam, (runningCounts.get(buyTeam) ?? 0) + 1);
-    usedWeakIds.add(m.weakPlayer.player.id);
-    usedCandidateIds.add(m.candidate.player.id);
-  };
-  applyMove(seed);
-
-  while (moves.length < freeTransfers) {
-    let bestNext: ValidTransfer | null = null;
-    for (const ws of analysis.weakSpots) {
-      if (usedWeakIds.has(ws.player.player.id)) continue;
-      for (const target of ws.targets) {
-        if (usedCandidateIds.has(target.candidate.player.id)) continue;
-        const vt = validateTransfer(
-          ws.player,
-          target.candidate,
-          runningBank,
-          runningCounts,
-          { gw1Gain: target.gw1Gain, gw5Gain: target.gw5Gain }
-        );
-        if (!vt || vt.gw1Gain <= 0 || !clearsFreeTransferBar(vt)) continue;
-        if (!bestNext || vt.gw1Gain > bestNext.gw1Gain) bestNext = vt;
-      }
-    }
-    if (!bestNext) break;
-    moves.push(bestNext);
-    applyMove(bestNext);
-  }
-
   return moves;
 }
 

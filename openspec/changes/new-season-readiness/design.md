@@ -21,5 +21,13 @@ Either way: low-minute ranking must track `ep_next`, not collapse to a constant.
 ## 4. Calibration freshness check
 - Recompute the composite weight fit and the transfer-threshold curve on early-2026-27 data; compare to the shipped weights and `τ=1.5`. Refit/retune **only if** FPL's 2026-27 scoring rules or the meta moved them materially (document the comparison either way). Cheap to run; protects against silent drift from a rules change.
 
+## 5. Restructure ↔ long-term coherence
+**Current:** `findRestructureCandidates` (now ep-native, see archived `restructure-ep-allocation`) scores a chain on **next-GW** ep: `netEp = (dream − weak) + (replacement − funder)`. The Long Term tab (`LongTermDetail`) renders `computeHorizon` output — multi-GW `cumulativeGain` per target with a `BUY_NOW | WAIT | BUY_NOW_SELL_LATER` timing. The two are computed independently, so This Week can pitch "downgrade Dalot → fund Gabriel" while the horizon never mentions Gabriel, or tags him WAIT.
+
+**Direction (pick at implementation):**
+- Judge the restructure **dream** over the horizon, not just next-GW ep — reuse `computeHorizon` / `HorizonEntry.cumulativeGain` for the dream leg so a restructure is only pitched when the premium pays off across the planning window (a multi-week investment, which is what a downgrade-funded dream actually is). The downgrade leg can stay near-term (it's the funding sacrifice).
+- Share one context between the views: a recommended restructure's dream should appear in / agree with the Long Term horizon (same target + timing). Surface the link in the UI (e.g. the Restructure row notes the horizon timing, or the dream shows in both `ThisWeekDetail` and `LongTermDetail`) so the tabs read as one plan rather than two.
+- **Why season-gated:** the horizon is only meaningful with live fixtures + real `ep_next`; pre-season it's noise, so this lands once 2026-27 is underway alongside the other live items.
+
 ## Sequencing
-Item 1 before GW1 (demo-facing). Items 2 from GW1 (capture), 3 ~GW8+, 4 after a handful of GWs. All offline items reuse the existing `research/` harnesses.
+Item 1 before GW1 (demo-facing). Items 2 from GW1 (capture), 3 ~GW8+, 4 after a handful of GWs, 5 once the in-season horizon is meaningful (early GWs). All offline items reuse the existing `research/` harnesses.

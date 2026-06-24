@@ -221,8 +221,8 @@ export function ThisWeekDetail({ plan, demo = false }: { plan: GameweekPlan; dem
                           buy {o.downgradeReplacement.player.webName}
                         </button>
                         <span className="text-xs tabular-nums">
-                          net {o.netScoreChange >= 0 ? "+" : ""}
-                          {o.netScoreChange.toFixed(2)} · {o.totalCost === 0 ? "free" : `−${o.totalCost} pts`}
+                          net pts gain {o.netEp >= 0 ? "+" : ""}
+                          {o.netEp.toFixed(1)} · {o.totalCost === 0 ? "free" : `−${o.totalCost} pts`}
                         </span>
                       </div>
                     </li>

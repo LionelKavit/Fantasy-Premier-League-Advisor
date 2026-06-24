@@ -120,7 +120,7 @@ ${JSON.stringify(restructureOptions.map(ro => ({
   dreamTarget: ro.dreamTarget.candidate.player.webName,
   downgrade: ro.downgradedPlayer.player.webName,
   replacement: ro.downgradeReplacement.player.webName,
-  netScoreChange: ro.netScoreChange.toFixed(3),
+  netEp: ro.netEp.toFixed(2),
   totalCost: ro.totalCost,
 })), null, 2)}
 
