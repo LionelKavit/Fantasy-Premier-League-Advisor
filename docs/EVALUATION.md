@@ -44,6 +44,7 @@ So the app's captaincy modestly **beat the human** over a season and outscored e
 
 - **A points-based hold gate.** Recommend a transfer only if its projected gain (`Δep = in − out`) clears a bar — **~1.5 pts** for a free transfer, **>4** for a hit (the exact cost of a hit). The bar was *derived*: the data's noise floor is ~0.5 pts, and the free-transfer opportunity cost pushes it to ~1.5 — which also matches the community heuristic.
 - **Hold when `ep_next` is unavailable**, because transfers chosen on the composite alone are negative-EV.
+- **One currency, across the whole plan.** That same expected-points bar now governs the full free-transfer allocation: with 0–5 free transfers, the optimizer picks the max-ep set of straight swaps (1 transfer) and **restructures** (2 transfers) net of the ~1.5-pt banking opportunity, so a marginal move is banked and a restructure is only taken when it out-projects the swaps it would replace — the hold discipline generalized from one move to N.
 
 Result: the over-transferring collapsed from **34/35 → 0/35**, and the net-loss disappeared.
 

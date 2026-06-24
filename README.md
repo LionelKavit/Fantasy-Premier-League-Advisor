@@ -2,9 +2,17 @@
 
 **An agentic Fantasy Premier League advisor with a Premier League pundit's eye — grounded in real data, not vibes.**
 
-Enter your FPL manager ID and Pocket Scout scouts your squad: transfer recommendations, captaincy, and chip strategy, each explained the way a post-match analyst breaks down a game. A deterministic scoring engine does the maths; a knowledge-grounded LLM layer does the reasoning; and a **conversation-first** agentic chat — which opens with a proactive, deadline-aware brief — answers "what if?".
+Every gameweek, millions of FPL managers face the same dread: a transfer to make (or two, or five), a captain to pick, a chip you're terrified to waste — and a deadline counting down. So you crowd-source it: group chats, Reddit, ten browser tabs of conflicting "templates," none of which know *your* squad, *your* bank, or how many free transfers you're actually holding. You make the call on a hunch and find out on Saturday.
+
+**Pocket Scout is your personal scout.** Enter your FPL manager ID and it reads *your* team and tells you the highest-leverage move this week — transfers, captaincy, chips — and **explains why**, the way a post-match analyst breaks down a game. It's **personalized** (your squad, your bank, the exact free transfers you hold), **educated** (grounded in expert FPL principles and the live rules), and **deterministic** (a reproducible engine does the maths — same squad, same answer — not an LLM guessing).
 
 ![Pocket Scout — the pitch, the Scout's proactive brief, and the breakdown](docs/images/fpl-advisor-hero.png)
+
+### Why it beats a group chat
+
+- **It knows your constraints.** Tell it how many free transfers you have — anywhere from **0 to 5** — and it plans *within that budget*: up to that many **stacked transfers**, or a sell-to-fund-a-dream **restructure** when that out-projects straight swaps. It even **banks** a transfer rather than burn it on a marginal move.
+- **It holds when holding is right.** Every move is judged in **expected points**; if nothing clears the bar, it tells you to roll — the opposite of the churn most tools nudge you toward.
+- **It shows its work.** A deterministic 0–10 model does the maths; the **Ask The Scout** chat fetches *real* numbers via tool calls, so it never invents a stat or contradicts the panels.
 
 ## Demo
 
@@ -18,12 +26,12 @@ Enter your FPL manager ID and Pocket Scout scouts your squad: transfer recommend
 
 ## What it does
 
-- **Glanceable verdict** — one always-visible line above the fold spans the pitch and chat: *"This week: João Pedro → Watkins · Captain Haaland · Play your Bench Boost"*, with an **Open FPL Transfers** deep link at the end. Derived deterministically and shown only once the decision is final (no mid-flight captain swap).
+- **Glanceable verdict** — one always-visible line above the fold spans the pitch and chat: *"This week: Sánchez → Raya +1 more transfer · Captain Haaland · Play your Bench Boost"*, with an **Open FPL Transfers** deep link at the end. Derived deterministically and shown only once the decision is final (no mid-flight captain swap).
 - **Pitch & ratings** — every squad player scored 0–10 by a position-aware composite model (anchored on FPL's expected points, corrected by form, fixtures, value, and underlying stats).
 - **Ask The Scout (the hero)** — the conversation is the primary surface: the Scout opens with a proactive, deadline-aware brief, then answers "what if?" via real tool calls (`simulate_transfer`, `score_player`, …), grounded in your committed plan **and the curated knowledge base**, so it never invents numbers or contradicts the panels.
 - **Act on it** — close the last mile: click any pitch player or transfer name for a **detail dialog** (age, nationality, form, last-week minutes/points, expected next points) with a **View on Premier League** link; the verdict bar hands you off to the FPL transfers screen.
 - **Breakdown** — a collapsible drawer with three tabs:
-  - *This Week* — clear sections in order: **Transfer · Captaincy · Chip · Restructure** — a transfer recommendation gated on *projected points* (it holds rather than churning), EO-aware captaincy, and the chip call in its own section (so a Bench Boost never hides your free transfer).
+  - *This Week* — clear sections in order: **Transfer · Captaincy · Chip · Restructure** — up to **N free transfers** ("Make 3 free transfers"), chosen by an expected-points allocation that weighs straight swaps against a **restructure** (sell-to-fund-a-dream) and **holds rather than churns**; EO-aware captaincy; and the chip call in its own section (so a Bench Boost never hides your free transfers). The Restructure section lists alternative dream-funding chains, each priced against the free transfers you have left.
   - *Long Term* — a multi-gameweek horizon.
   - *Chips* — an LLM-orchestrated chip plan (play now / hold / sequenced windows), grounded in chip principles and the deterministic candidate windows.
 - **Explore without a team** — no FPL ID required: Pocket Scout builds a **season-aware sample "dream team"** (best XV by FPL's projected points in-season, last-season returns off-season) and you can **Ask The Scout** anything. The chat is the whole point in this mode — there's no personalized transfer plan, and the chat is grounded in the current FPL rules so it never answers from stale knowledge.
@@ -68,20 +76,23 @@ It's built **eval-first**: a point-in-time backtest harness over 10 seasons of F
 
 ## Screenshots
 
-| Ask The Scout — a tool-grounded follow-up | Player detail dialog — click any player to inspect |
+| Tell it your situation — enter **0–5 free transfers** | This Week — **Make N free transfers** + the ep-native Restructure |
 |---|---|
-| ![Follow-up answer](docs/images/fpl-advisor-chat-continued.png) | ![Player detail dialog](docs/images/fpl-advisor-player-dialog.png) |
+| ![Free-transfers field](docs/images/fpl-advisor-free-transfers.png) | ![This Week breakdown](docs/images/fpl-advisor-this-week.png) |
 
-| This Week — Transfer · Captaincy · Chip · Restructure | Chips — the orchestrated chip plan |
+**Expert, grounded chat — no hallucinations, no prompt injection.** Ask The Scout reasons over *real* numbers it fetches via tool calls, stays anchored to your committed plan and the curated knowledge base, and refuses to be talked out of the facts — so its answers never drift from the panels or invent stats.
+
+| Ask The Scout — a tool-grounded answer citing real numbers | …and it holds the line against off-topic / injection attempts |
 |---|---|
-| ![This Week breakdown](docs/images/fpl-advisor-this-week.png) | ![Chips plan](docs/images/fpl-advisor-chips.png) |
+| ![Grounded Scout answer](docs/images/fpl-advisor-scout-chat-1.png) | ![Scout resists prompt injection](docs/images/fpl-advisor-scout-chat-2.png) |
+
+| Player detail dialog — click any player to inspect | Get scouted — enter your manager ID, or explore without one |
+|---|---|
+| ![Player detail dialog](docs/images/fpl-advisor-player-dialog.png) | ![Entry screen](docs/images/fpl-advisor-login.png) |
 
 | Explore without a team — the demo dream team + Scout chat |
 |---|
 | ![Demo mode — Explore without a team](docs/images/fpl-advisor-demo-mode.png) |
-<!-- PLACEHOLDER: add docs/images/fpl-advisor-demo-mode.png — the Explore view
-     (DEMO header, season banner, the sample XI with armbands/ratings, demo starter
-     chips). Captured on the same viewport as the rest of the set. -->
 
 ## Quickstart
 
@@ -111,11 +122,11 @@ docker compose up --build
 
 ## Tech stack
 
-Next.js 16 (App Router) · React 19 · TypeScript · Tailwind + shadcn · Anthropic Claude (Sonnet, with prompt caching) · Vitest (317 tests) · Docker + Caddy · the public FPL API.
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind + shadcn · Anthropic Claude (Sonnet, with prompt caching) · Vitest (331 tests) · Docker + Caddy · the public FPL API.
 
 ## Project notes
 
-- **Spec-driven:** built with [OpenSpec](https://github.com/Fission-AI/OpenSpec) — ~45 documented change proposals live under `openspec/changes/archive/` (the paper trail behind every feature and eval decision).
+- **Spec-driven:** built with [OpenSpec](https://github.com/Fission-AI/OpenSpec) — ~50 documented change proposals live under `openspec/changes/archive/` (the paper trail behind every feature and eval decision).
 - **Status:** feature-complete demo; a couple of changes are intentionally parked for the 2026-27 season (forward evaluation + cold-start hardening).
 
 ## Documentation

@@ -2,20 +2,20 @@
 
 Screenshots and the demo video referenced from the root `README.md`.
 
-**Current set** (conversation-first UI) — all captured on the same manager (GW38) so the set reads
-as one coherent story.
+**Current set** (conversation-first UI) — capture on the same manager so the set reads as one coherent
+story. **For this branch, capture on a squad holding 3+ free transfers** so the multi-move plan shows.
 
 | File | Used as | Shows |
 |---|---|---|
-| `fpl-advisor-hero.png` | README hero | The landing: the **glanceable verdict bar** across the top (transfer · captain · chip + Open FPL Transfers), pitch (left) + Ask The Scout hero with the proactive brief and starter chips (right). |
-| `fpl-advisor-chat-continued.png` | Screenshots — tool-grounded answer | The chat after a follow-up ("Why Haaland over Anderson?") — a crisp, answer-first reply citing real numbers (verdict bar visible). The standalone opening-brief shot was dropped — the hero already shows the brief. |
-| `fpl-advisor-this-week.png` | Screenshots — This Week | Breakdown on **This Week**, now four sections in order: **Transfer · Captaincy · Chip · Restructure** (the chip call in its own section). |
+| `fpl-advisor-hero.png` | README hero | The landing: the **glanceable verdict bar** across the top (multi-move summary "… +N more transfers" · captain · chip + Open FPL Transfers), the header **0–5 free-transfer field**, pitch (left) + Ask The Scout hero with the proactive brief and starter chips (right). |
+| `fpl-advisor-free-transfers.png` | Screenshots — free transfers | A close-up of the header **free-transfer field (0–5)** with the inline **"Enter a value between 0 and 5"** guard — the personalization + guardrail beat. |
+| `fpl-advisor-scout-chat-1.png` | Screenshots — grounded chat | Ask The Scout giving a **tool-grounded answer citing real numbers**, anchored to the committed plan and knowledge base (no invented stats). |
+| `fpl-advisor-scout-chat-2.png` | Screenshots — grounded chat | The Scout **holding the line** — refusing to drift from the facts / panels on an off-topic or prompt-injection attempt. Together with `scout-chat-1` this makes the "expert, grounded, no-hallucination, no-injection" point. |
+| `fpl-advisor-this-week.png` | Screenshots — This Week | Breakdown on **This Week**: **Transfer · Captaincy · Chip · Restructure** — the Transfer headline reads **"Make N free transfers"** with several `out → in` lines, and the **Restructure** row reads **"net pts gain +X · −N pts"**. |
 | `fpl-advisor-player-dialog.png` | Screenshots — player dialog | The player detail dialog (opened from a pitch token / This-Week name): age, nationality + flag, form, last-week mins/pts, exp. next pts, and the **View on Premier League** button. |
-| `fpl-advisor-chips.png` | Screenshots — Chips | Breakdown on **Chips**: chips-left row + reasons list, play-now highlighted (no gameweek axis). |
-| `fpl-advisor-long-term.png` | spare | Breakdown on **Long Term** (final-GW empty state here — swap in a mid-season shot for a populated horizon). |
-| `fpl-advisor-login.png` | spare | The entry screen (manager-ID form, now with the "Explore without a team" CTA). |
-| `fpl-advisor-demo-mode.png` | Screenshots — demo mode | **⏳ PLACEHOLDER — to be supplied.** The Explore-without-a-team view: the **DEMO** header badge, the season-aware banner ("dream XV — built from last season's returns"), the sample XI with armbands + 0–10 ratings, and the demo starter chips. Capture on the same viewport as the rest of the set. |
-| `fpl-advisor-demo.mov` | demo video — see note below | Flow: squad load → pitch → proactive brief → breakdown tabs → Ask The Scout. **Stale for this version** (predates the verdict bar / dialog) — a re-record is a noted follow-up. |
+| `fpl-advisor-login.png` | Screenshots — entry | The entry screen: manager-ID form with the **"Explore without a team"** CTA. |
+| `fpl-advisor-demo-mode.png` | Screenshots — demo mode | The Explore-without-a-team view: the **DEMO** header badge, the season-aware banner ("dream XV — built from last season's returns"), the sample XI with armbands + 0–10 ratings, and the demo starter chips. |
+| `fpl-advisor-demo.mov` | demo video — see note below | Flow: squad load → pitch → proactive brief → breakdown tabs → Ask The Scout. **Not committed** (supply via GitHub's web UI for an inline player) and a re-record for this UI is a noted follow-up. |
 
 ## Demo video — inline player on GitHub
 
