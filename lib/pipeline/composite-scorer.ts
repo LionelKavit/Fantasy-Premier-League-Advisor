@@ -28,7 +28,13 @@ export function computeCompositeScore(
   position: Position,
   totalMinutes: number
 ): CompositeScore {
-  if (totalMinutes < PIPELINE_CONFIG.minMinutes) {
+  // Cold-start (new-season-readiness): below minMinutes the per-90 deterministic signals
+  // are noise, but FPL's `ep_next` projection is real from preseason — so keep ranking on
+  // the epNext anchor (and the fixture signal, which needs no accrued minutes) instead of
+  // collapsing every early-GW player to one constant. The flat fallback survives only for
+  // players FPL itself has no projection for.
+  const lowMinutes = totalMinutes < PIPELINE_CONFIG.minMinutes;
+  if (lowMinutes && !market.epNextAvailable) {
     return {
       total: PIPELINE_CONFIG.insufficientDataFallbackScore,
       breakdown: {},
@@ -40,6 +46,11 @@ export function computeCompositeScore(
   }
 
   const signalMap = buildSignalMap(stats, fixture, position);
+  if (lowMinutes) {
+    for (const key of Object.keys(signalMap)) {
+      if (key !== "fixture") signalMap[key] = 0;
+    }
+  }
   // Anchor the composite on FPL's epNext (the backtest's dominant signal): inject
   // it as a weighted category so the loop below includes it. `epNextSignal` already
   // falls back to a neutral 0.5 when `ep_next` is null.

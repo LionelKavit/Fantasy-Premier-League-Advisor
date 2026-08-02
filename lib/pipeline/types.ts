@@ -47,6 +47,9 @@ export interface MarketSignals {
   ownershipScore: number;
   transferMomentum: number;
   epNextSignal: number;
+  // Whether epNextSignal reflects a real FPL projection (false → it's the neutral 0.5
+  // placeholder); the cold-start path needs the distinction, since 0.5 is also a valid signal.
+  epNextAvailable: boolean;
   differentialValue: number;
 }
 

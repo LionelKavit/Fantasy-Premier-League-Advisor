@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Pocket Scout deadline-brief LaunchAgent — hourly tick; the script itself gates on the
+  live FPL deadline (acts only within 5h of it), so the hourly cadence needs no tuning.
+  launchd coalesces missed ticks on wake, so a sleeping Mac still fires when it wakes
+  inside the window (unlike cron).
+
+  Install (from the MAIN checkout, after this branch merges — adjust the path below if
+  the repo lives somewhere other than ~/Desktop/fpl-advisor):
+    cp scripts/com.pocketscout.deadline-brief.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.pocketscout.deadline-brief.plist
+  Uninstall:
+    launchctl unload ~/Library/LaunchAgents/com.pocketscout.deadline-brief.plist
+    rm ~/Library/LaunchAgents/com.pocketscout.deadline-brief.plist
+  Logs:
+    ~/Library/Logs/pocketscout-brief.log
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.pocketscout.deadline-brief</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>cd "$HOME/Desktop/fpl-advisor" &amp;&amp; npx tsx scripts/deadline-brief.ts >> "$HOME/Library/Logs/pocketscout-brief.log" 2>&amp;1</string>
+  </array>
+  <key>StartInterval</key>
+  <integer>3600</integer>
+  <key>RunAtLoad</key>
+  <true/>
+</dict>
+</plist>

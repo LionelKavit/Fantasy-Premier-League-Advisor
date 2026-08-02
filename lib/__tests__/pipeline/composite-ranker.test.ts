@@ -15,13 +15,41 @@ import {
 const positions: Position[] = ["GK", "DEF", "MID", "FWD"];
 
 describe("computeCompositeScore", () => {
-  it("returns the fallback score with empty breakdown below the minutes minimum", () => {
+  it("returns the fallback score below the minutes minimum only when ep_next is also unavailable", () => {
     const s = computeCompositeScore(
-      makeStatisticalSignals(), null, makeFixtureSignals(), makeMarketSignals(), makeLlmSignals(),
+      makeStatisticalSignals(), null, makeFixtureSignals(),
+      makeMarketSignals({ epNextAvailable: false }), makeLlmSignals(),
       "MID", PIPELINE_CONFIG.minMinutes - 1
     );
     expect(s.total).toBe(PIPELINE_CONFIG.insufficientDataFallbackScore);
     expect(Object.keys(s.breakdown)).toHaveLength(0);
+  });
+
+  it("ranks low-minute players on ep_next instead of a flat constant (cold-start)", () => {
+    const score = (epNextSignal: number) =>
+      computeCompositeScore(
+        makeStatisticalSignals(), null, makeFixtureSignals(),
+        makeMarketSignals({ epNextSignal }), makeLlmSignals(),
+        "MID", 0
+      );
+    const high = score(0.9);
+    const mid = score(0.5);
+    const low = score(0.1);
+    expect(high.total).toBeGreaterThan(mid.total);
+    expect(mid.total).toBeGreaterThan(low.total);
+    expect(high.total).not.toBe(PIPELINE_CONFIG.insufficientDataFallbackScore);
+  });
+
+  it("ignores the per-90 deterministic signals under low minutes (they are noise)", () => {
+    const score = (stats: ReturnType<typeof makeStatisticalSignals>) =>
+      computeCompositeScore(
+        stats, null, makeFixtureSignals(),
+        makeMarketSignals({ epNextSignal: 0.6 }), makeLlmSignals(),
+        "FWD", PIPELINE_CONFIG.minMinutes - 1
+      );
+    const hotStats = score(makeStatisticalSignals({ goalThreat: 0.8, formSignal: 10, valueScore: 1.2 }));
+    const coldStats = score(makeStatisticalSignals({ goalThreat: 0, formSignal: 0, valueScore: 0 }));
+    expect(hotStats.total).toBe(coldStats.total);
   });
 
   it("keeps the total within [0,1] for every position under extreme inputs", () => {

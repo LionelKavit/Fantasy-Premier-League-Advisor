@@ -141,6 +141,10 @@ export const LLM_SIGNAL_RANGES: Record<string, [number, number]> = {
 };
 
 export const PIPELINE_CONFIG = {
+  // Gates only the per-90 deterministic signals: below it the composite still anchors on
+  // `ep_next` + fixtures (cold-start fix, new-season-readiness), so early-GW ranking
+  // follows FPL's projection. `insufficientDataFallbackScore` applies only when `ep_next`
+  // is also unavailable.
   minMinutes: 270,
   candidatePoolPerPosition: 10,
   candidatesPerWeakSpot: 5,
