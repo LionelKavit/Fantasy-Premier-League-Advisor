@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# deadline-brief runner state (which GW was last emailed)
+scripts/.deadline-brief-state.json
 
 # vercel
 .vercel

@@ -68,11 +68,19 @@ describe("computeMarketSignals", () => {
   it("falls back to neutral epNextSignal when epNext is null", () => {
     const s = computeMarketSignals(makePlayer({ epNext: null }), 10);
     expect(s.epNextSignal).toBe(0.5);
+    expect(s.epNextAvailable).toBe(false);
   });
 
   it("falls back to neutral when maxEpNext is 0", () => {
     const s = computeMarketSignals(makePlayer({ epNext: 5 }), 0);
     expect(s.epNextSignal).toBe(0.5);
+    expect(s.epNextAvailable).toBe(false);
+  });
+
+  it("marks epNext available when a real projection exists", () => {
+    const s = computeMarketSignals(makePlayer({ epNext: 5 }), 10);
+    expect(s.epNextSignal).toBe(0.5);
+    expect(s.epNextAvailable).toBe(true);
   });
 
   it("handles zero transfer volume without NaN", () => {

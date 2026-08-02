@@ -284,6 +284,7 @@ export const makeMarketSignals = (o: Partial<MarketSignals> = {}): MarketSignals
   ownershipScore: 0.1,
   transferMomentum: 0,
   epNextSignal: 0.5,
+  epNextAvailable: true,
   differentialValue: 0.9,
   ...o,
 });

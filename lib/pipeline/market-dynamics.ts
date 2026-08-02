@@ -13,10 +13,8 @@ export function computeMarketSignals(player: Player, maxEpNext: number): MarketS
       ? (player.transfersInEvent - player.transfersOutEvent) / totalTransfers
       : 0;
 
-  const epNextSignal =
-    player.epNext !== null && maxEpNext > 0
-      ? player.epNext / maxEpNext
-      : 0.5;
+  const epNextAvailable = player.epNext !== null && maxEpNext > 0;
+  const epNextSignal = epNextAvailable ? player.epNext! / maxEpNext : 0.5;
 
   const differentialValue = 1 - ownershipScore;
 
@@ -25,6 +23,7 @@ export function computeMarketSignals(player: Player, maxEpNext: number): MarketS
     ownershipScore,
     transferMomentum,
     epNextSignal: Math.max(0, Math.min(1, epNextSignal)),
+    epNextAvailable,
     differentialValue,
   };
 }
