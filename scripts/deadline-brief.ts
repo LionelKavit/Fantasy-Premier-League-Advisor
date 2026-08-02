@@ -30,12 +30,18 @@ const STATE = join(ROOT, "scripts", ".deadline-brief-state.json");
 const WINDOW_HOURS = 5;
 const DEFAULT_TEAM_ID = 2558300;
 
+// Dotenv-style tolerance (Next.js accepts these, so .env.local may use them):
+// whitespace around `=` and single/double quotes around the value.
 function loadEnvLocal() {
   const envFile = join(ROOT, ".env.local");
   if (!existsSync(envFile)) return;
   for (const line of readFileSync(envFile, "utf8").split("\n")) {
-    const m = line.match(/^([A-Z_]+)=(.+)$/);
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim();
+    const m = line.match(/^\s*([A-Z_]+)\s*=\s*(.*)\s*$/);
+    if (!m) continue;
+    let v = m[2].trim();
+    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'")))
+      v = v.slice(1, -1);
+    if (v && !process.env[m[1]]) process.env[m[1]] = v;
   }
 }
 
