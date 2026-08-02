@@ -29,8 +29,13 @@ function loadEnvLocal() {
   const envFile = join(import.meta.dirname, "../../.env.local");
   if (!existsSync(envFile)) return;
   for (const line of readFileSync(envFile, "utf8").split("\n")) {
-    const m = line.match(/^ANTHROPIC_API_KEY=(.+)$/);
-    if (m) process.env.ANTHROPIC_API_KEY = m[1].trim();
+    // Dotenv-style tolerance: whitespace around `=`, quotes around the value.
+    const m = line.match(/^\s*ANTHROPIC_API_KEY\s*=\s*(.*)\s*$/);
+    if (!m) continue;
+    let v = m[1].trim();
+    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'")))
+      v = v.slice(1, -1);
+    if (v) process.env.ANTHROPIC_API_KEY = v;
   }
 }
 
