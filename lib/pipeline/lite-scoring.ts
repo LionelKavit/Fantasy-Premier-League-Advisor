@@ -24,11 +24,13 @@ export interface LiteScoreInputs {
 }
 
 /**
- * Lightweight composite score: statistical + fixture + market signals only,
- * with neutral trend/LLM. Pure compute — no per-player element-summary fetch and
- * no LLM call. Used for the fast base/pitch phase and for arbitrary Scout
- * lookups. (`computeStatisticalSignals` ignores the element summary anyway, so
- * the only delta from a full score is the trend + LLM-context adjustments.)
+ * The "lite" scoring tier — the ONLY implementation of it (scoring-path-consolidation):
+ * statistical + fixture + market signals with neutral trend/LLM. Pure compute — no
+ * per-player element-summary fetch and no LLM call. Used for the fast base/pitch
+ * phase, arbitrary Scout lookups, and the restructure replacement search. The
+ * statistical signals are identical to the full tier's (they read only bootstrap
+ * season-to-date fields), so the only delta from a "full" score is the trend +
+ * LLM-context adjustments.
  */
 export function scorePlayerLite(player: Player, inputs: LiteScoreInputs): ScoredPlayer {
   const { fixtures, teams, currentGw, maxEpNext } = inputs;
@@ -47,6 +49,7 @@ export function scorePlayerLite(player: Player, inputs: LiteScoreInputs): Scored
   return {
     player,
     score,
+    fidelity: "lite",
     statisticalSignals,
     fixtureSignals,
     trendSignals: null,

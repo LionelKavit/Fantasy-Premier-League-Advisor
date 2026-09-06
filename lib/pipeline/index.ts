@@ -14,6 +14,7 @@ import { computeTrendSignals } from "./trend-analyzer";
 import { computeFixtureSignals } from "./fixture-analyzer";
 import { computeMarketSignals } from "./market-dynamics";
 import { batchComputeLlmContext } from "./llm-context";
+import { NEUTRAL_LLM_SIGNALS } from "./lite-scoring";
 import { getCachedTeamNews } from "../news/team-news";
 import { computeCompositeScore } from "./composite-scorer";
 import { rankSquad, identifyWeakSpots, findCandidates } from "./squad-ranker";
@@ -88,9 +89,11 @@ export async function runSquadAnalysisPipeline(
     teamNews
   );
 
-  // Step 8: Score squad players
-  const scoredSquad: ScoredPlayer[] = squadPlayers.map((player) => {
-    const stats = computeStatisticalSignals(player, currentGw, elementSummaries.get(player.id));
+  // Step 8: Score squad players. The same scorer runs over the candidate pool so the
+  // live-eval dataset (research/squad-eval) gets every point-in-time row the pipeline
+  // computed, with real ep_next + LLM context; this does not feed the app's ranking.
+  const scorePlayer = (player: Player): ScoredPlayer => {
+    const stats = computeStatisticalSignals(player, currentGw);
     const fixtureSigs = computeFixtureSignals(player, fixtures, teams, currentGw);
     const market = computeMarketSignals(player, maxEpNext);
 
@@ -99,14 +102,7 @@ export async function runSquadAnalysisPipeline(
       ? computeTrendSignals(es.history, es.history_past)
       : null;
 
-    const llm = llmResults.get(player.id) ?? {
-      rotationRisk: 0,
-      oopBonus: 0,
-      injurySeverity: 0,
-      tacticalBoost: 0,
-      opponentKeyAbsence: 0,
-      setPieceHierarchy: { penaltyTaker: null, cornerTaker: null, freeKickTaker: null },
-    };
+    const llm = llmResults.get(player.id) ?? NEUTRAL_LLM_SIGNALS;
 
     const score = computeCompositeScore(
       stats, trendSigs, fixtureSigs, market, llm,
@@ -116,13 +112,16 @@ export async function runSquadAnalysisPipeline(
     return {
       player,
       score,
+      fidelity: "full",
       statisticalSignals: stats,
       fixtureSignals: fixtureSigs,
       trendSignals: trendSigs,
       marketSignals: market,
       llmSignals: llm,
     };
-  });
+  };
+  const scoredSquad: ScoredPlayer[] = squadPlayers.map(scorePlayer);
+  const scoredCandidatePool: ScoredPlayer[] = candidatePool.map(scorePlayer);
 
   // Step 9: Rank and identify weaknesses
   const ranked = rankSquad(scoredSquad);
@@ -164,6 +163,7 @@ export async function runSquadAnalysisPipeline(
     currentGw,
     deadline,
     generatedAt: new Date().toISOString(),
+    scoredCandidatePool,
   };
 }
 

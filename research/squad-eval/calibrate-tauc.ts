@@ -36,7 +36,7 @@ for (let gw = 4; gw <= 38; gw++) {
   for (const ws of weakSpots)
     ws.targets = findCandidates(ws.player, universe, bank, teamCounts, scoredCache, fixtures, teams, gw, EMPTY_ES, EMPTY_LLM, 1);
   const valid = buildValidTransfers(
-    { rankedSquad: scored, weakSpots, picks: prev.picks, chipsRemaining: { wildcard: 0, freeHit: 0, benchBoost: 0, tripleCaptain: 0 }, bank, currentGw: gw, generatedAt: "" },
+    { rankedSquad: scored, weakSpots, picks: prev.picks, chipsRemaining: { wildcard: 0, freeHit: 0, benchBoost: 0, tripleCaptain: 0 }, bank, currentGw: gw, deadline: null, generatedAt: "" },
     bank, teamCounts);
   for (const vt of valid)
     pairs.push({ gain: vt.gw1Gain, realized: gainOver(vt.candidate.player.id, vt.weakPlayer.player.id, gw, 3) });

@@ -6,10 +6,7 @@ import { PIPELINE_CONFIG } from "../config";
 // How many restructure chains to keep as candidates (fed to the allocator and, after
 // filtering out the chosen ones, shown in the Restructure section).
 const MAX_RESTRUCTURE_CANDIDATES = 6;
-import { computeStatisticalSignals } from "../pipeline/statistical-scoring";
-import { computeFixtureSignals } from "../pipeline/fixture-analyzer";
-import { computeMarketSignals } from "../pipeline/market-dynamics";
-import { computeCompositeScore } from "../pipeline/composite-scorer";
+import { scorePlayerLite } from "../pipeline/lite-scoring";
 
 // All viable restructure chains, in ep terms. A restructure is a two-transfer
 // maneuver: downgrade a funder to a cheaper replacement, freeing the cash to buy a
@@ -73,6 +70,11 @@ export function findRestructureCandidates(
       const totalBudget = dt.weak.player.price + analysis.bank + fundsFreed;
       if (totalBudget < dt.candidate.player.price) continue;
 
+      // Tiers are mixed in this chain (scoring-path-consolidation): `dt.candidate` and
+      // `downgraded` carry FULL pipeline scores (trend + LLM), `replacement` is LITE.
+      // That is safe only because the decision below is ep-denominated — `epNext` is
+      // identical across tiers. The composite enters only `buildTransfer`'s gw1Gain
+      // (display ordering) and the fallback-score filter in findCheapestReplacement.
       // ep deltas for both legs. Skip the whole chain if any projection is missing —
       // the same hold-on-missing-ep rule the straight-transfer gate uses.
       const dreamEp = dt.candidate.player.epNext;
@@ -150,52 +152,13 @@ function findCheapestReplacement(
     .sort((a, b) => a.price - b.price);
 
   for (const p of eligible) {
-    const stats = computeStatisticalSignals(p, currentGw);
-    const fixtureSigs = computeFixtureSignals(p, fixtures, teams, currentGw);
-    const market = computeMarketSignals(p, maxEpNext);
-    const score = computeCompositeScore(
-      stats,
-      null,
-      fixtureSigs,
-      market,
-      {
-        rotationRisk: 0,
-        oopBonus: 0,
-        injurySeverity: 0,
-        tacticalBoost: 0,
-        opponentKeyAbsence: 0,
-        setPieceHierarchy: {
-          penaltyTaker: null,
-          cornerTaker: null,
-          freeKickTaker: null,
-        },
-      },
-      p.position,
-      p.minutes
-    );
-
-    if (score.total < PIPELINE_CONFIG.insufficientDataFallbackScore) continue;
-
-    return {
-      player: p,
-      score,
-      statisticalSignals: stats,
-      fixtureSignals: fixtureSigs,
-      trendSignals: null,
-      marketSignals: market,
-      llmSignals: {
-        rotationRisk: 0,
-        oopBonus: 0,
-        injurySeverity: 0,
-        tacticalBoost: 0,
-        opponentKeyAbsence: 0,
-        setPieceHierarchy: {
-          penaltyTaker: null,
-          cornerTaker: null,
-          freeKickTaker: null,
-        },
-      },
-    };
+    // Lite tier via the ONE shared scorer (never a local copy): this walks the whole
+    // bootstrap pool and the restructure decision is ep-denominated, so full-fidelity
+    // trend/LLM context isn't bought here. The fallback-score filter below is the only
+    // place the (lite) composite influences which replacement is chosen.
+    const sp = scorePlayerLite(p, { fixtures, teams, currentGw, maxEpNext });
+    if (sp.score.total < PIPELINE_CONFIG.insufficientDataFallbackScore) continue;
+    return sp;
   }
 
   return null;

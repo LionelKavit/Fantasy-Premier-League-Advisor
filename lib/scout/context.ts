@@ -6,22 +6,11 @@ import { computeStatisticalSignals } from "../pipeline/statistical-scoring";
 import { computeFixtureSignals } from "../pipeline/fixture-analyzer";
 import { computeMarketSignals } from "../pipeline/market-dynamics";
 import { computeCompositeScore } from "../pipeline/composite-scorer";
-import { scorePlayerLite } from "../pipeline/lite-scoring";
+import { scorePlayerLite, NEUTRAL_LLM_SIGNALS } from "../pipeline/lite-scoring";
 import { computeTrendSignals } from "../pipeline/trend-analyzer";
 import { batchComputeLlmContext } from "../pipeline/llm-context";
 import { fetchElementSummary } from "../fpl-api";
 import { llm } from "../llm/client";
-
-// Neutral LLM signals — arbitrary (non-squad) players are scored without the
-// batched LLM context pass, so the chat stays a single deterministic build.
-const DEFAULT_LLM_SIGNALS: LlmContextSignals = {
-  rotationRisk: 0,
-  oopBonus: 0,
-  injurySeverity: 0,
-  tacticalBoost: 0,
-  opponentKeyAbsence: 0,
-  setPieceHierarchy: { penaltyTaker: null, cornerTaker: null, freeKickTaker: null },
-};
 
 // Request-shared grounding for the scout tools: the once-computed analysis plus
 // the indexes the tools need to resolve and score any FPL player cheaply.
@@ -170,13 +159,13 @@ export async function scorePlayerEnriched(
 
   // Single-player LLM context pass — skipped entirely without a key (the batch
   // helper would just return neutral defaults, so don't pay the call).
-  let llmSignals: LlmContextSignals = { ...DEFAULT_LLM_SIGNALS };
+  let llmSignals: LlmContextSignals = { ...NEUTRAL_LLM_SIGNALS };
   if (llm.hasApiKey()) {
     try {
       const map = await batchComputeLlmContext([player], [], sc.ctx.players);
-      llmSignals = map.get(player.id) ?? { ...DEFAULT_LLM_SIGNALS };
+      llmSignals = map.get(player.id) ?? { ...NEUTRAL_LLM_SIGNALS };
     } catch {
-      llmSignals = { ...DEFAULT_LLM_SIGNALS };
+      llmSignals = { ...NEUTRAL_LLM_SIGNALS };
     }
   }
 
@@ -190,9 +179,12 @@ export async function scorePlayerEnriched(
     player.minutes
   );
 
+  // "enriched" names the attempt: trend and/or LLM may have degraded to neutral above,
+  // which stays visible as `trendSignals === null` / neutral `llmSignals`.
   const scored: ScoredPlayer = {
     player,
     score,
+    fidelity: "enriched",
     statisticalSignals: stats,
     fixtureSignals,
     trendSignals,

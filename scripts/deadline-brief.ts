@@ -103,12 +103,21 @@ async function main() {
   const deadlineLabel = formatDeadline(target.deadline_time) ?? target.deadline_time;
   const moves = g.transfer?.moves ?? [];
   const primary = plan.transfers?.primaryRecommendation ?? null;
-  const gains = new Map(
-    (primary?.transfers ?? []).map((t) => [
-      `${t.weakPlayer.player.webName}→${t.candidate.player.webName}`,
-      t.gw1Gain,
-    ])
+  // Projected gain in EXPECTED POINTS — the quantity the transfer gate actually decides
+  // on (`epNext(in) − epNext(out)` vs the 1.5/4-pt bar). `gw1Gain`/`netGain` are
+  // composite-score deltas and must never be printed as "ep" (transfer-gain-units).
+  // Both players' epNext come from the same in-memory bootstrap the plan used.
+  const epDeltas = new Map<string, number | null>(
+    (primary?.transfers ?? []).map((t) => {
+      const inEp = t.candidate.player.epNext;
+      const outEp = t.weakPlayer.player.epNext;
+      return [
+        `${t.weakPlayer.player.webName}→${t.candidate.player.webName}`,
+        inEp !== null && outEp !== null ? inEp - outEp : null,
+      ];
+    })
   );
+  const signed = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(1)}`;
 
   const lines: string[] = [];
   lines.push(`GW ${target.id} · deadline ${deadlineLabel}`);
@@ -117,11 +126,19 @@ async function main() {
     lines.push("GW1: squad changes are unlimited until the deadline — the transfer plan below is moot; set your XI and armband.");
   } else if (g.transfer && moves.length > 0) {
     lines.push(`TRANSFERS — ${g.transfer.headline}`);
+    const deltas: (number | null | undefined)[] = [];
     for (const m of moves) {
-      const gain = gains.get(`${m.out}→${m.in}`);
-      lines.push(`  OUT ${m.out} → IN ${m.in}${gain !== undefined ? ` (+${gain.toFixed(1)} ep next GW)` : ""}`);
+      const d = epDeltas.get(`${m.out}→${m.in}`);
+      deltas.push(d);
+      lines.push(
+        `  OUT ${m.out} → IN ${m.in}` +
+          (d === undefined ? "" : d === null ? " (ep unavailable)" : ` (${signed(d)} ep next GW)`)
+      );
     }
-    if (primary && primary.netGain > 0) lines.push(`  Net projected gain: +${primary.netGain.toFixed(1)} ep`);
+    // Net line only when every move has a projection — never substitute the composite.
+    if (deltas.length > 0 && deltas.every((d): d is number => typeof d === "number")) {
+      lines.push(`  Net projected gain: ${signed(deltas.reduce((s, d) => s + d, 0))} ep`);
+    }
   } else {
     lines.push("TRANSFERS — Hold: no move clears the points bar this week; bank the transfer.");
   }

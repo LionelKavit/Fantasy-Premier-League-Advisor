@@ -4,6 +4,11 @@ export interface ValidTransfer {
   weakPlayer: ScoredPlayer;
   candidate: ScoredPlayer;
   priceDelta: number;
+  // COMPOSITE-score deltas (0–1 scale), NOT expected points — used for display ordering
+  // and the alternatives sort only (transfer-gain-units). The transfer DECISION is
+  // ep-denominated: `epNext(candidate) − epNext(weakPlayer)` against the 1.5/4-pt bar in
+  // `allocate.ts` (`epDelta`) / `single-transfer.ts` (`deltaEp`). Derive ep from the two
+  // players when presenting a gain in points; never print these as "ep".
   gw1Gain: number;
   gw5Gain: number;
   scoreDiffPct: number;
@@ -19,6 +24,9 @@ export interface TransferAction {
   type: TransferType;
   transfers: ValidTransfer[];
   netPointsCost: number;
+  // Σ `gw1Gain` over `transfers` — a COMPOSITE-score delta, not expected points
+  // (transfer-gain-units). Kept under this name because the synthesis JSON contract
+  // uses it. For a points figure, sum `epNext(candidate) − epNext(weakPlayer)`.
   netGain: number;
   breakEvenGw: number | null;
 }

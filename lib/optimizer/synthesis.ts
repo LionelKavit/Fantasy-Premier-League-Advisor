@@ -243,6 +243,7 @@ function mapTransferAction(
         type: "FREE",
         transfers: singleResult.freeMoves,
         netPointsCost: 0,
+        // Composite delta, not ep (transfer-gain-units) — see TransferAction.netGain.
         netGain: singleResult.freeMoves.reduce((sum, vt) => sum + vt.gw1Gain, 0),
         breakEvenGw: null,
       };
@@ -289,6 +290,7 @@ function buildFailSafe(inputs: SynthesisInput): OptimizerResult {
       type: "FREE",
       transfers: singleResult.freeMoves,
       netPointsCost: 0,
+      // Composite delta, not ep (transfer-gain-units) — see TransferAction.netGain.
       netGain: singleResult.freeMoves.reduce((sum, vt) => sum + vt.gw1Gain, 0),
       breakEvenGw: null,
     };
