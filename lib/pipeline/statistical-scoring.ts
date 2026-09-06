@@ -1,11 +1,13 @@
-import type { Player, ElementSummary } from "../types";
+import type { Player } from "../types";
 import type { StatisticalSignals } from "./types";
 import { SUSPENSION_THRESHOLDS } from "../config";
 
+// Reads only the bootstrap's season-to-date fields on `Player`. It does NOT take the
+// element summary: per-GW history feeds the trend analyzer, not these signals, so every
+// scoring tier gets identical statistical signals for a given player.
 export function computeStatisticalSignals(
   player: Player,
-  currentGw: number,
-  _elementSummary?: ElementSummary
+  currentGw: number
 ): StatisticalSignals {
   if (player.minutes === 0) {
     return {

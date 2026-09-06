@@ -75,9 +75,23 @@ export interface CompositeScore {
   position: Position;
 }
 
+// Which scoring tier produced a ScoredPlayer (scoring-path-consolidation). Required —
+// no default — so an unlabelled constructor fails to compile rather than passing off
+// a cheap score as a full one.
+//  - "full":     element-summary trend + batched LLM context (pipeline squad + candidate
+//                pool, `findCandidates`).
+//  - "enriched": lazily fetched trend + single-player LLM pass (scout `scorePlayerEnriched`);
+//                names the attempt — either input may have degraded to neutral on failure.
+//  - "lite":     neutral trend + neutral LLM (`scorePlayerLite`: plan base phase, scout
+//                lookups, restructure replacement search).
+// `computeStatisticalSignals` reads only bootstrap season-to-date fields, so trend + LLM
+// are the ONLY inputs that differ between tiers.
+export type ScoringFidelity = "full" | "lite" | "enriched";
+
 export interface ScoredPlayer {
   player: Player;
   score: CompositeScore;
+  fidelity: ScoringFidelity;
   statisticalSignals: StatisticalSignals;
   fixtureSignals: FixtureSignals;
   trendSignals: TrendSignals | null;
@@ -108,4 +122,9 @@ export interface SquadAnalysisResult {
   currentGw: number;
   deadline: string | null; // ISO deadline of the current gameweek (when picks lock)
   generatedAt: string;
+  // The transfer candidate pool (top-N per position by PPG, non-squad) scored the same
+  // way as the squad. Exposed for the offline live-eval dataset (research/squad-eval)
+  // — the composite calibration needs point-in-time rows with REAL ep_next, which the
+  // historical archive lacks. Optional: not every constructor (tests, replays) builds it.
+  scoredCandidatePool?: ScoredPlayer[];
 }

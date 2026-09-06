@@ -11,15 +11,7 @@ import { computeFixtureSignals } from "./fixture-analyzer";
 import { computeMarketSignals } from "./market-dynamics";
 import { computeTrendSignals } from "./trend-analyzer";
 import { computeCompositeScore } from "./composite-scorer";
-
-const DEFAULT_LLM: LlmContextSignals = {
-  rotationRisk: 0,
-  oopBonus: 0,
-  injurySeverity: 0,
-  tacticalBoost: 0,
-  opponentKeyAbsence: 0,
-  setPieceHierarchy: { penaltyTaker: null, cornerTaker: null, freeKickTaker: null },
-};
+import { NEUTRAL_LLM_SIGNALS } from "./lite-scoring";
 
 export function rankSquad(scoredPlayers: ScoredPlayer[]): ScoredPlayer[] {
   return [...scoredPlayers].sort((a, b) => b.score.total - a.score.total);
@@ -167,7 +159,9 @@ export function findCandidates(
         ? computeTrendSignals(es.history, es.history_past)
         : null;
 
-      const llm = llmCache.get(candidate.id) ?? DEFAULT_LLM;
+      // Full tier: element-summary trend + the batched LLM context the pipeline computed
+      // for the candidate pool (neutral only if a candidate somehow missed that pass).
+      const llm = llmCache.get(candidate.id) ?? NEUTRAL_LLM_SIGNALS;
 
       const score = computeCompositeScore(
         stats, trendSigs, fixtureSigs, market, llm,
@@ -177,6 +171,7 @@ export function findCandidates(
       sp = {
         player: candidate,
         score,
+        fidelity: "full",
         statisticalSignals: stats,
         fixtureSignals: fixtureSigs,
         trendSignals: trendSigs,

@@ -26,6 +26,7 @@ import type {
   LlmContextSignals,
   SquadAnalysisResult,
   WeakSpot,
+  ScoringFidelity,
 } from "../pipeline/types";
 import type { CaptainCandidate, CaptainScore } from "../captain/types";
 
@@ -308,6 +309,7 @@ export interface ScoredPlayerOverrides {
   trendSignals?: Partial<TrendSignals> | null;
   marketSignals?: Partial<MarketSignals>;
   llmSignals?: Partial<LlmContextSignals>;
+  fidelity?: ScoringFidelity;
 }
 
 export function makeScoredPlayer(o: ScoredPlayerOverrides = {}): ScoredPlayer {
@@ -324,6 +326,8 @@ export function makeScoredPlayer(o: ScoredPlayerOverrides = {}): ScoredPlayer {
   return {
     player,
     score,
+    // Test scaffolding default (production constructors must each label explicitly).
+    fidelity: o.fidelity ?? "full",
     statisticalSignals: makeStatisticalSignals(o.statisticalSignals),
     fixtureSignals: makeFixtureSignals(o.fixtureSignals),
     trendSignals: o.trendSignals === null ? null : makeTrendSignals(o.trendSignals ?? {}),

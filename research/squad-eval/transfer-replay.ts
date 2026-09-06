@@ -23,6 +23,7 @@ import { rankSquad, identifyWeakSpots, findCandidates } from "../../lib/pipeline
 import { buildValidTransfers } from "../../lib/optimizer/setup";
 import { evaluateSingleTransfer } from "../../lib/optimizer/single-transfer";
 import { CACHE, load, teams, fixtures, staticById, realized, buildPlayer, allElementIds } from "./reconstruct";
+import { summarizeTransfers, type TransferRow } from "./metrics";
 
 const TARGET_GWS = Array.from({ length: 35 }, (_, i) => i + 4); // decide for GW4..38 (squad from G-1)
 const PROFILE_STUB = {} as unknown as ManagerProfile; // evaluateSingleTransfer ignores it
@@ -39,12 +40,7 @@ function gainOver(inId: number, outId: number, gw: number, span: number): number
   return g;
 }
 
-interface Row {
-  gw: number; appHold: boolean; recIn: number; recOut: number; appG1: number; appG3: number;
-  mgrTransferred: boolean; mgrG1: number; mgrG3: number; mgrHit: number;
-}
-
-function decide(gw: number): Row | null {
+function decide(gw: number): TransferRow | null {
   const prev = load(`picks-${gw - 1}`) as { picks: Pick[]; entry_history: { bank: number } };
   const squad = prev.picks;
   if (squad.length < 15) return null;
@@ -70,7 +66,7 @@ function decide(gw: number): Row | null {
   const analysis: SquadAnalysisResult = {
     rankedSquad: ranked, weakSpots, picks: squad,
     chipsRemaining: { wildcard: 0, freeHit: 0, benchBoost: 0, tripleCaptain: 0 },
-    bank, currentGw: gw, generatedAt: "",
+    bank, currentGw: gw, deadline: null, generatedAt: "",
   };
   const valid = buildValidTransfers(analysis, bank, teamCounts);
   const { bestSingle } = evaluateSingleTransfer(valid, PROFILE_STUB, 1, analysis, bank, teamCounts);
@@ -88,26 +84,17 @@ function decide(gw: number): Row | null {
   const mgrG1 = mgrTs.reduce((s, t) => s + gainOver(t.element_in, t.element_out, gw, 1), 0) - mgrHit;
   const mgrG3 = mgrTs.reduce((s, t) => s + gainOver(t.element_in, t.element_out, gw, 3), 0) - mgrHit;
 
-  return { gw, appHold, recIn, recOut, appG1, appG3,
-    mgrTransferred: mgrTs.length > 0, mgrG1, mgrG3, mgrHit };
+  return {
+    gw, appHold, appMoves: appHold ? [] : [{ outId: recOut, inId: recIn }], appG1, appG3,
+    mgrTransferred: mgrTs.length > 0,
+    mgrMoves: mgrTs.map((t) => ({ outId: t.element_out, inId: t.element_in })),
+    mgrG1, mgrG3, mgrHit,
+  };
 }
 
+// ── Aggregate + report ── shared `summarizeTransfers` lives in metrics.ts ────
 function main() {
-  const rows = TARGET_GWS.map(decide).filter((r): r is Row => r !== null);
-  const n = rows.length;
-  const mean = (f: (r: Row) => number) => (rows.reduce((s, r) => s + f(r), 0) / n).toFixed(2);
-  const appTransfers = rows.filter((r) => !r.appHold).length;
-  const mgrTransfers = rows.filter((r) => r.mgrTransferred).length;
-
-  // Head-to-head on next-3 realized gain (app action vs manager action).
-  const wins = rows.filter((r) => r.appG3 > r.mgrG3).length;
-  const ties = rows.filter((r) => r.appG3 === r.mgrG3).length;
-  const losses = rows.filter((r) => r.appG3 < r.mgrG3).length;
-  const net3 = rows.reduce((s, r) => s + (r.appG3 - r.mgrG3), 0);
-  // No-op accuracy: when the manager transferred and lost points (next-3), did the app hold?
-  const mgrBadMoves = rows.filter((r) => r.mgrTransferred && r.mgrG3 < 0);
-  const appHeldOnBad = mgrBadMoves.filter((r) => r.appHold).length;
-
+  const rows = TARGET_GWS.map(decide).filter((r): r is TransferRow => r !== null);
   const name = (id: number) => (id < 0 ? "—" : staticById.get(id)?.webName ?? id);
   const out: string[] = [
     `# Transfer replay — manager 10815578, 2025-26 (decisions for GW4-38)`,
@@ -116,25 +103,7 @@ function main() {
     `**Caveats:** deterministic floor (\`ep_next\` absent, neutral LLM + trend); manager hit costs`,
     `exact (\`event_transfers_cost\`); app single transfer assumes 1 free transfer; no xP/vaastav.`,
     ``,
-    `### Decision points: ${n} gameweeks`,
-    `- App recommended a transfer in **${appTransfers}/${n}** GWs (held ${n - appTransfers}); you transferred in **${mgrTransfers}/${n}**.`,
-    ``,
-    `**Counterfactual gain vs holding** (realized in − out):`,
-    `| | next-1 GW | next-3 GW |`,
-    `|---|---|---|`,
-    `| App recommendation | ${mean((r) => r.appG1)} | ${mean((r) => r.appG3)} |`,
-    `| Your actual transfers (net of hits) | ${mean((r) => r.mgrG1)} | ${mean((r) => r.mgrG3)} |`,
-    ``,
-    `**Head-to-head (next-3 gain):** app ${wins}W / ${ties}T / ${losses}L vs you · net **${net3 >= 0 ? "+" : ""}${net3}** pts over the season`,
-    `**No-op accuracy:** of your ${mgrBadMoves.length} transfers that lost points (next-3), the app would have held **${appHeldOnBad}/${mgrBadMoves.length}**.`,
-    ``,
-    `## Per-gameweek detail`,
-    ``,
-    `| GW | app rec (out→in) | app +/- (3GW) | your move | your +/- (3GW, net) |`,
-    `|---|---|---|---|---|`,
-    ...rows.map((r) =>
-      `| ${r.gw} | ${r.appHold ? "hold" : `${name(r.recOut)}→${name(r.recIn)}`} | ${r.appHold ? "—" : r.appG3} | ${r.mgrTransferred ? "transfer" + (r.mgrHit ? ` (-${r.mgrHit})` : "") : "hold"} | ${r.mgrTransferred ? r.mgrG3 : "—"} |`),
-    ``,
+    ...summarizeTransfers(rows, name),
   ];
   const report = out.join("\n");
   writeFileSync(join(CACHE, "..", "transfer-report.md"), report);

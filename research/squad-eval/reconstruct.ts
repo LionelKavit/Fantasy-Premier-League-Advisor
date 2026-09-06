@@ -78,7 +78,8 @@ export function buildPlayer(id: number, gw: number): Player {
   const ownershipPct = totalPlayers > 0 ? (lastSelected / totalPlayers) * 100 : 0;
 
   return {
-    id, webName: st.webName, teamId: st.teamId, teamCode: 0, teamName: "", teamShortName: "",
+    id, webName: st.webName, fullName: st.webName, optaCode: null, birthDate: null, region: null,
+    teamId: st.teamId, teamCode: 0, teamName: "", teamShortName: "",
     position: st.position, price: (prior.at(-1)?.value ?? 0) / 10, form,
     expectedGoalsPer90: sum("expected_goals") / nineties,
     expectedAssistsPer90: sum("expected_assists") / nineties,

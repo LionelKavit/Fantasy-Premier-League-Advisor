@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     // Offline research tooling (composite-backtest) + cloned dataset — not part of the app.
     "research/**",
     "historical_data/**",
+    // Claude Code worktree checkouts — full copies of the repo, linted on their own branches.
+    ".claude/worktrees/**",
   ]),
 ]);
 

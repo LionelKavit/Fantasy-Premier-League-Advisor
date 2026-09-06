@@ -3,19 +3,9 @@ import type { LlmContextSignals } from "./types";
 import { LLM_SIGNAL_RANGES } from "../config";
 import { llm } from "../llm/client";
 import { playerNews, type TeamNews } from "../news/team-news";
-
-const DEFAULT_SIGNALS: LlmContextSignals = {
-  rotationRisk: 0,
-  oopBonus: 0,
-  injurySeverity: 0,
-  tacticalBoost: 0,
-  opponentKeyAbsence: 0,
-  setPieceHierarchy: {
-    penaltyTaker: null,
-    cornerTaker: null,
-    freeKickTaker: null,
-  },
-};
+// The one neutral LlmContextSignals placeholder (scoring-path-consolidation) — what this
+// module returns when the LLM is keyless, fails, or a player is missing from the batch.
+import { NEUTRAL_LLM_SIGNALS } from "./lite-scoring";
 
 export async function batchComputeLlmContext(
   players: Player[],
@@ -30,7 +20,7 @@ export async function batchComputeLlmContext(
     console.warn(
       "[llm-context] ANTHROPIC_API_KEY not set — using neutral defaults"
     );
-    for (const p of players) result.set(p.id, { ...DEFAULT_SIGNALS });
+    for (const p of players) result.set(p.id, { ...NEUTRAL_LLM_SIGNALS });
     return result;
   }
 
@@ -102,7 +92,7 @@ export async function batchComputeLlmContext(
 
     // Fill in any missing players with defaults
     for (const p of players) {
-      if (!result.has(p.id)) result.set(p.id, { ...DEFAULT_SIGNALS });
+      if (!result.has(p.id)) result.set(p.id, { ...NEUTRAL_LLM_SIGNALS });
     }
 
     // Anchor rotationRisk on the grounded start probability (team-news-grounding):
@@ -117,7 +107,7 @@ export async function batchComputeLlmContext(
     }
   } catch (error) {
     console.error("[llm-context] API call failed, using defaults:", error);
-    for (const p of players) result.set(p.id, { ...DEFAULT_SIGNALS });
+    for (const p of players) result.set(p.id, { ...NEUTRAL_LLM_SIGNALS });
   }
 
   return result;
