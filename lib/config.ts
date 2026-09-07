@@ -1,4 +1,5 @@
 import type { Position } from "./types";
+import scoringWeights from "./scoring-weights.json";
 
 // Data-fit weights (composite-clamp-relax): per-position ridge coefficients from the
 // composite-backtest dataset, at full magnitude (signed; incl. the negative price/`value`
@@ -7,58 +8,17 @@ import type { Position } from "./types";
 // `epNextSignal` is normalized the SAME way the runtime is (`epNext / poolMaxEpNext`), so
 // these coefficients transfer faithfully. They rank ~0.53 in the backtest — but ONLY with
 // the monotonic logistic squash below (a hard [0,1] clamp would tie the negative tail at 0).
-export const SCORING_WEIGHTS: Record<Position, Record<string, number>> = {
-  FWD: {
-    epNext: 11.8794,
-    assistPotential: 1.4233,
-    form: 2.3096,
-    fixture: 0.7787,
-    minutes: 1.1334,
-    goalThreat: -0.4541,
-    bonus: -3.0614,
-    value: -3.4376,
-  },
-  MID: {
-    epNext: 12.6451,
-    assistPotential: 1.452,
-    form: 3.7499,
-    fixture: 2.8487,
-    minutes: 0.8095,
-    goalThreat: -0.5482,
-    bonus: -2.8853,
-    value: -4.5302,
-  },
-  DEF: {
-    epNext: 10.4106,
-    xgcRate: 3.2131,
-    form: 3.6749,
-    fixture: 2.8699,
-    minutes: 2.9633,
-    cleanSheet: -1.131,
-    goalAssistSetPiece: -0.177,
-    bonus: -0.1112,
-    value: -3.4238,
-  },
-  GK: {
-    epNext: 11.54,
-    xgcRate: 5.005,
-    saves: 2.9682,
-    form: 6.063,
-    bonus: 5.0195,
-    fixture: 1.6599,
-    minutes: 1.9908,
-    cleanSheet: -1.6626,
-    suspensionPenalty: -1.4593,
-    value: -13.2387,
-  },
-};
+// Values live in lib/scoring-weights.json (composite-refit-gate): the refit loop writes
+// a candidate JSON on a `refit/*` branch and a human merges it — no code edit, no path to
+// main from automation. Re-exported here so every consumer keeps the same import.
+export const SCORING_WEIGHTS: Record<Position, Record<string, number>> = scoringWeights.SCORING_WEIGHTS;
 
 // Composite range mapping (composite-clamp-relax): a strictly-monotonic logistic
 // squash replaces the old hard `clamp01`. The raw weighted sum has wide range (epNext
 // coef ~40), so the base dominates the small additive trend/suspension terms and the
 // fit's ranking is preserved; the squash maps it to (0,1) for the "/10" display and
 // downstream [0,1] consumers. Calibrated from the training raw-score distribution.
-export const COMPOSITE_SQUASH = { center: 3.0965, scale: 1.8508 };
+export const COMPOSITE_SQUASH: { center: number; scale: number } = scoringWeights.COMPOSITE_SQUASH;
 
 export const NORMALIZATION_BOUNDS: Record<string, { min: number; max: number; inverted?: boolean }> = {
   goalThreat: { min: 0, max: 0.8 },

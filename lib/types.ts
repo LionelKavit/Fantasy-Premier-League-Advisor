@@ -287,6 +287,7 @@ export interface Gameweek {
   name: string;
   deadline_time: string;
   finished: boolean;
+  data_checked: boolean; // bonus/BPS finalised — the live-eval scoring trigger waits for this
   is_previous: boolean;
   is_current: boolean;
   is_next: boolean;

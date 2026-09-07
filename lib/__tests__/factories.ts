@@ -198,6 +198,7 @@ export function makeGameweek(o: Partial<Gameweek> = {}): Gameweek {
   return {
     id: 20,
     name: "Gameweek 20",
+    data_checked: false,
     deadline_time: "2026-01-01T00:00:00Z",
     finished: false,
     is_previous: false,

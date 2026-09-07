@@ -1,0 +1,51 @@
+{
+  "SCORING_WEIGHTS": {
+    "FWD": {
+      "epNext": 11.8794,
+      "assistPotential": 1.4233,
+      "form": 2.3096,
+      "fixture": 0.7787,
+      "minutes": 1.1334,
+      "goalThreat": -0.4541,
+      "bonus": -3.0614,
+      "value": -3.4376
+    },
+    "MID": {
+      "epNext": 12.6451,
+      "assistPotential": 1.452,
+      "form": 3.7499,
+      "fixture": 2.8487,
+      "minutes": 0.8095,
+      "goalThreat": -0.5482,
+      "bonus": -2.8853,
+      "value": -4.5302
+    },
+    "DEF": {
+      "epNext": 10.4106,
+      "xgcRate": 3.2131,
+      "form": 3.6749,
+      "fixture": 2.8699,
+      "minutes": 2.9633,
+      "cleanSheet": -1.131,
+      "goalAssistSetPiece": -0.177,
+      "bonus": -0.1112,
+      "value": -3.4238
+    },
+    "GK": {
+      "epNext": 11.54,
+      "xgcRate": 5.005,
+      "saves": 2.9682,
+      "form": 6.063,
+      "bonus": 5.0195,
+      "fixture": 1.6599,
+      "minutes": 1.9908,
+      "cleanSheet": -1.6626,
+      "suspensionPenalty": -1.4593,
+      "value": -13.2387
+    }
+  },
+  "COMPOSITE_SQUASH": {
+    "center": 3.0965,
+    "scale": 1.8508
+  }
+}

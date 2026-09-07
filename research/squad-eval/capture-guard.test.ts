@@ -20,13 +20,16 @@ function record(o: Partial<LiveCaptureRecord>): LiveCaptureRecord {
 describe("planCaptureWrite", () => {
   it("pre-deadline: writes the record and the clean pool file", () => {
     const p = planCaptureWrite({ gw: 4, deadline: DEADLINE, now: before, existing: null });
-    expect(p).toEqual({ postDeadline: false, writeRecord: true, poolFile: "gw04.csv", note: null });
+    expect(p).toEqual({
+      postDeadline: false, writeRecord: true, poolFile: "gw04.csv", universeFile: "gw04.universe.csv", note: null,
+    });
   });
 
   it("pre-deadline re-capture overwrites an earlier pre-deadline record (last clean capture wins)", () => {
     const p = planCaptureWrite({ gw: 4, deadline: DEADLINE, now: before, existing: record({}) });
     expect(p.writeRecord).toBe(true);
     expect(p.poolFile).toBe("gw04.csv");
+    expect(p.universeFile).toBe("gw04.universe.csv");
   });
 
   it("post-deadline with a clean record: keeps it, pool goes to the sidecar", () => {
@@ -34,6 +37,7 @@ describe("planCaptureWrite", () => {
     expect(p.postDeadline).toBe(true);
     expect(p.writeRecord).toBe(false);
     expect(p.poolFile).toBe("gw04.post-deadline.csv");
+    expect(p.universeFile).toBe("gw04.universe.post-deadline.csv");
     expect(p.note).toMatch(/preserved/);
   });
 
@@ -41,6 +45,7 @@ describe("planCaptureWrite", () => {
     const p = planCaptureWrite({ gw: 4, deadline: DEADLINE, now: after, existing: null });
     expect(p.writeRecord).toBe(true);
     expect(p.poolFile).toBe("gw04.post-deadline.csv");
+    expect(p.universeFile).toBe("gw04.universe.post-deadline.csv");
     expect(p.note).toMatch(/excluded from scoring/);
   });
 

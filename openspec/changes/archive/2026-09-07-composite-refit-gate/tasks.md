@@ -1,0 +1,30 @@
+## 1. Weights become data (land first, alone)
+
+- [x] 1.1 `lib/scoring-weights.json` with `SCORING_WEIGHTS` and `COMPOSITE_SQUASH` copied verbatim; `lib/config.ts` imports and re-exports them with the existing comments preserved.
+- [x] 1.2 `lib/pipeline/composite-scorer.ts`: optional final parameter `override?: { weights: Record<Position, Record<string, number>>; squash: { center: number; scale: number } }`; default = shipped JSON.
+- [x] 1.3 Verify: `tsc`/`eslint`/`vitest` green; `replay.ts` and `transfer-replay.ts` byte-identical; a unit test asserts that omitting the override reproduces the JSON-driven result and that an override changes it.
+
+## 2. Python: drift and live fit
+
+- [x] 2.1 `research/composite-backtest/fit_live.py`: load `research/squad-eval/live-dataset.parquet`; eligibility as `fit.py`; rolling holdout (last three labelled GWs); per-position ridge with `fit.py`'s FEATURES/EXTRA/ALPHAS; floors 200/100; squash by `fit.py`'s rule; write `out/live-fit.json`, `out/live-weights-candidate.json`, `out/live-fit.md`.
+- [x] 2.2 `research/composite-backtest/drift_live.py`: last-three-GW metrics for shipped `composite`, candidate (if present), raw `xP`, via `benchmark.per_group_metrics`; saturation share; projected-Δep vs realized next-1 summary parsed from `research/squad-eval/live-transfer-report.md`; write `out/live-drift.md` (+ `.json`).
+- [x] 2.3 Tests (`test_fit_live.py`, `test_drift_live.py`): holdout window selection, floors, squash rule, saturation count on a synthetic frame.
+
+## 3. Gate, counterfactual, branch, narrative, delivery
+
+- [x] 3.1 `scripts/refit-gate.ts`: read `live-fit.json` + previous run from state; evaluate the five criteria exactly as specified (constants in the script, documented as pre-registered, not env-configurable); persist streak; write `out/gate.json` with per-criterion results.
+- [x] 3.2 `scripts/rescore-counterfactual.ts`: rescore latest pool + universe rows via the override parameter; top-10 per position before/after with rank deltas; saturation; the `unavailable — decision layer is ep-denominated` line; write `refit-counterfactual.md`.
+- [x] 3.3 Branch mechanics: temp worktree from `origin/main`, write `lib/scoring-weights.json`, copy reports to `research/composite-backtest/out/refit-gw<NN>/`, commit, push, remove worktree; on any failure clean up and alert; never touch the main checkout.
+- [x] 3.4 `scripts/refit-pr-prompt.md` + CLI invocation (`claude -p`, read-only tool allowlist, 5-min timeout) → `refit-pr-body.md`; deterministic fallback body from `gate.json` + counterfactual.
+- [x] 3.5 Delivery: `gh pr create --draft` when available and authenticated; else Resend email with compare URL + body.
+- [x] 3.6 Hook into `scripts/live-eval-tick.ts` (from live-eval-automation): after datasets, run drift every time; run fit + gate when a new labelled GW exists; alert on gate pass.
+
+## 4. Verify
+
+- [x] 4.1 Synthetic end-to-end: fabricate a `live-dataset.parquet` (≥ 5 labelled GWs, all positions above floors) where the candidate is guaranteed to beat the shipped column; run drift → fit → gate twice (streak 1 then 2) → branch creation against a throwaway remote branch name; confirm branch diff is exactly the JSON + report dir; delete the test branch.
+- [x] 4.2 Negative cases: one position below floor → `insufficient`, gate fails; forced sign flip → gate fails naming the coefficient; single pass → streak 1, no branch.
+- [x] 4.3 Real run on current data (GW4 only): drift report shows shipped vs `ep_next` with candidate `insufficient` for all positions; no branch.
+- [x] 4.4 App gate green; research harness typechecks; Python tests green.
+- [x] 4.5 As-built note; close new-season-readiness Task 4's checkbox with a pointer here; archive via `/opsx:archive`.
+
+> **As-built (2026-09-07):** **Step 1 landed alone and proven:** `lib/scoring-weights.json` written by importing the live `config.ts` values (not retyped); `config.ts` re-exports; `computeCompositeScore` gained an optional `override` (3 tests in `weights-override.test.ts`); both replays byte-identical, 366/366 tests. **Python:** `fit_live.py` (rolling last-3 holdout, floors 200/100, fit.py's ridge/alpha/squash rule, candidate only when all four positions fitted, stale candidate removed) and `drift_live.py` (window metrics for shipped `composite` / candidate / `xP`, saturation on the latest GW, transfer-calibration line, gate streak) with 8 unit tests. **TS:** `scripts/refit-gate.ts` (pre-registered constants, criteria c1–c5, streak state in `out/gate-state.json` that does not double-count the same holdout window, counterfactual, worktree branch from `origin/main`, Claude CLI narrative with deterministic fallback, gh-or-compare-URL delivery, `gate-passed.flag` for the tick), `scripts/rescore-counterfactual.ts`, `scripts/refit-pr-prompt.md`. Tick hand-off now reports `fit: nothing new` (gate installed). **Deviation from the spec:** refit reports go to `research/composite-backtest/refits/<gwTag>/` — `out/` is gitignored, so the spec's `out/refit-gwNN/` could not be committed. **Verified:** real dry run on current data → every position `insufficient 0/0` (no labelled GW yet), drift headline `no labelled gameweeks yet`, no branch. Negatives: GK-below-floor → c1 ✗; label built against shipped signs → c4 ✗ naming `FWD.form 2.31 → −9.26` etc. Positive (synthetic rows generated from the shipped weight structure + an under-weighted form effect): run 1 → streak 1, no branch; same window re-run → streak stays 1; new window → **PASS**, branch `refit-test/gw12-2026-09-07` pushed differing from `origin/main` in exactly `lib/scoring-weights.json` + 8 files under `refits/gw12/`, worktree removed, flag written with the compare URL (no `gh`), narrative `fallback` (forced off); branch deleted, real outputs restored. Gate: `tsc` clean, `eslint` 0 errors, `vitest` 366/366. **Not exercised live:** the Claude CLI narrative under launchd (fallback path proven) and `gh pr create` (not installed — email/compare-URL path is the default).

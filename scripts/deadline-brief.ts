@@ -1,8 +1,10 @@
 /**
  * deadline-brief-email — hourly-ticked runner (launchd) that, inside the
- * `deadline − 5h → deadline` window for the next gameweek:
- *   1. refreshes the live-eval capture (safety net; manual capture stays primary), and
- *   2. emails the app's recommended transfers + captain via Resend — once per GW.
+ * `deadline − 5h → deadline` window for the next gameweek, emails the app's recommended
+ * transfers + captain via Resend — once per GW.
+ *
+ * It no longer runs the live-eval capture: that is owned by scripts/live-eval-tick.ts
+ * (live-eval-automation), so exactly one process writes live-log.json.
  *
  * Outside the window it exits quietly. Deadlines are read live from bootstrap-static
  * every tick, so FPL's moving deadlines need no schedule maintenance.
@@ -16,7 +18,6 @@
  * BRIEF_TEAM_ID (default 2558300), ANTHROPIC_API_KEY (optional — plan prose).
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { fetchBootstrap, fetchHistory, fetchTransferHistory } from "../lib/fpl-api";
@@ -24,33 +25,19 @@ import { deriveFreeTransfers } from "../lib/free-transfers";
 import { clampFt } from "../lib/config";
 import { runGameweekPlan } from "../lib/plan";
 import { buildBriefGrounding, formatDeadline } from "../lib/scout/brief";
+import { loadEnvLocal } from "./lib/env";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const STATE = join(ROOT, "scripts", ".deadline-brief-state.json");
 const WINDOW_HOURS = 5;
 const DEFAULT_TEAM_ID = 2558300;
 
-// Dotenv-style tolerance (Next.js accepts these, so .env.local may use them):
-// whitespace around `=` and single/double quotes around the value.
-function loadEnvLocal() {
-  const envFile = join(ROOT, ".env.local");
-  if (!existsSync(envFile)) return;
-  for (const line of readFileSync(envFile, "utf8").split("\n")) {
-    const m = line.match(/^\s*([A-Z_]+)\s*=\s*(.*)\s*$/);
-    if (!m) continue;
-    let v = m[2].trim();
-    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'")))
-      v = v.slice(1, -1);
-    if (v && !process.env[m[1]]) process.env[m[1]] = v;
-  }
-}
-
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 async function main() {
-  loadEnvLocal();
+  loadEnvLocal(ROOT);
   const teamId = Number(process.env.BRIEF_TEAM_ID) || DEFAULT_TEAM_ID;
   const now = new Date();
 
@@ -71,19 +58,7 @@ async function main() {
     return;
   }
 
-  // ── 1. Capture safety net (failure logged, never blocks the email) ──────────
-  const capture = spawnSync(
-    "npx",
-    ["tsx", join(ROOT, "research", "squad-eval", "capture.ts"), String(teamId)],
-    { cwd: ROOT, encoding: "utf8", timeout: 300_000 }
-  );
-  if (capture.status === 0) {
-    console.log(`Capture refreshed for GW ${target.id}.`);
-  } else {
-    console.error(`Capture failed (continuing to email): ${capture.stderr?.trim() || capture.stdout?.trim() || "unknown"}`);
-  }
-
-  // ── 2. Email brief — once per gameweek ──────────────────────────────────────
+  // ── Email brief — once per gameweek ──────────────────────────────────────
   const state: { lastEmailedGw?: number } = existsSync(STATE)
     ? JSON.parse(readFileSync(STATE, "utf8"))
     : {};
@@ -187,7 +162,7 @@ async function main() {
   const to = process.env.BRIEF_EMAIL_TO;
   if (!apiKey || !to) {
     console.error(
-      `Email unavailable — ${!apiKey ? "RESEND_API_KEY" : "BRIEF_EMAIL_TO"} not set in .env.local (capture already ran).`
+      `Email unavailable — ${!apiKey ? "RESEND_API_KEY" : "BRIEF_EMAIL_TO"} not set in .env.local.`
     );
     process.exit(1);
   }

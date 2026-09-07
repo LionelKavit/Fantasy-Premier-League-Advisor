@@ -11,7 +11,10 @@ OUT = Path(__file__).parent / "out"
 
 def main():
     name = sys.argv[1] if len(sys.argv) > 1 else "dataset.csv"
-    src = OUT / name
+    # A bare filename resolves inside out/ (archive datasets); a path is used as given so
+    # the live-eval harness can derive research/squad-eval/live-dataset.parquet in place.
+    given = Path(name)
+    src = given if given.parent != Path(".") or given.is_absolute() else OUT / name
     dst = src.with_suffix(".parquet")
     df = pd.read_csv(src, low_memory=False)
     df.to_parquet(dst, index=False)
