@@ -19,6 +19,13 @@ import {
 // Market signals are stored on ScoredPlayer for the synthesis/optimizer nodes but do not
 // contribute to the base composite score — the spec's weight mappings use only statistical,
 // fixture, trend, and LLM signals.
+// Offline counterfactuals (composite-refit-gate) may inject candidate weights + squash;
+// production callers omit it and get the shipped lib/scoring-weights.json values.
+export interface CompositeOverride {
+  weights: Record<Position, Record<string, number>>;
+  squash: { center: number; scale: number };
+}
+
 export function computeCompositeScore(
   stats: StatisticalSignals,
   trend: TrendSignals | null,
@@ -26,7 +33,8 @@ export function computeCompositeScore(
   market: MarketSignals,
   llm: LlmContextSignals,
   position: Position,
-  totalMinutes: number
+  totalMinutes: number,
+  override?: CompositeOverride
 ): CompositeScore {
   // Cold-start (new-season-readiness): below minMinutes the per-90 deterministic signals
   // are noise, but FPL's `ep_next` projection is real from preseason — so keep ranking on
@@ -55,7 +63,8 @@ export function computeCompositeScore(
   // it as a weighted category so the loop below includes it. `epNextSignal` already
   // falls back to a neutral 0.5 when `ep_next` is null.
   signalMap.epNext = market.epNextSignal;
-  const weights = SCORING_WEIGHTS[position];
+  const weights = (override?.weights ?? SCORING_WEIGHTS)[position];
+  const squash = override?.squash ?? COMPOSITE_SQUASH;
 
   const breakdown: Record<string, number> = {};
   let baseScore = 0;
@@ -87,7 +96,7 @@ export function computeCompositeScore(
   // ranking of the signed-weighted raw score — no clamp-ties — while mapping to (0,1)
   // for the "/10" display and downstream [0,1] consumers.
   const raw = baseScore + trendAdjustment + llmAdjustment - suspensionPenalty;
-  const total = 1 / (1 + Math.exp(-(raw - COMPOSITE_SQUASH.center) / COMPOSITE_SQUASH.scale));
+  const total = 1 / (1 + Math.exp(-(raw - squash.center) / squash.scale));
 
   return {
     total,

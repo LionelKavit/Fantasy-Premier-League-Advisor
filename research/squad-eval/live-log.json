@@ -38,7 +38,7 @@
     "llm": "unavailable — no pre-deadline capture — the public API exposes no picks before the GW1 deadline",
     "transfer": "unavailable — no pre-deadline capture — the public API exposes no picks before the GW1 deadline",
     "realized": {
-      "syncedAt": "2026-09-06T22:10:59.004Z",
+      "syncedAt": "2026-09-07T04:25:42.109Z",
       "chip": null,
       "xi": [
         {
@@ -449,7 +449,7 @@
       "narrativeSummary": "Fernandes is the clear captain call — highest captain score (5.11), penalty taker status raises his ceiling, and at 48.1% EO he sits right in the template sweet spot. At rank 2,201,654 with a balanced strategy and 37 gameweeks ahead, there's no urgency to chase a differential risk this early; captaining Fernandes means you move with half the field if he hauls and don't bleed rank if he doesn't. João Pedro (68.5% EO) is the natural vice-captain fallback — heavily owned enough that missing his points would hurt more than captaining Fernandes. Hold the Triple Captain chip; no upcoming week clears the bar meaningfully enough to burn it now."
     },
     "realized": {
-      "syncedAt": "2026-09-06T22:10:59.004Z",
+      "syncedAt": "2026-09-07T04:25:42.109Z",
       "chip": null,
       "xi": [
         {
@@ -871,7 +871,7 @@
   {
     "gw": 4,
     "teamId": 2558300,
-    "capturedAt": "2026-09-06T21:02:03.827Z",
+    "capturedAt": "2026-09-06T22:38:36.664Z",
     "deadline": "2026-09-12T12:30:00Z",
     "postDeadline": false,
     "captureMode": "pre-deadline",
@@ -929,7 +929,7 @@
       },
       "epNext": 9,
       "compositeTotal": 0.9937105852430762,
-      "effectiveOwnership": 0.478,
+      "effectiveOwnership": 0.47700000000000004,
       "rotationRisk": 0,
       "injurySeverity": 0
     },
@@ -966,7 +966,7 @@
         },
         "epNext": 9,
         "compositeTotal": 0.9937105852430762,
-        "effectiveOwnership": 0.478,
+        "effectiveOwnership": 0.47700000000000004,
         "rotationRisk": 0,
         "injurySeverity": 0
       },
@@ -984,7 +984,7 @@
         },
         "epNext": 9.3,
         "compositeTotal": 0.9974400290920546,
-        "effectiveOwnership": 0.11900000000000001,
+        "effectiveOwnership": 0.122,
         "rotationRisk": 0.09999999999999998,
         "injurySeverity": 0
       },
@@ -1020,7 +1020,7 @@
         },
         "epNext": 6,
         "compositeTotal": 0.9667058383248093,
-        "effectiveOwnership": 0.14800000000000002,
+        "effectiveOwnership": 0.147,
         "rotationRisk": 0,
         "injurySeverity": 0
       },
@@ -1128,7 +1128,7 @@
         },
         "epNext": 4,
         "compositeTotal": 0.9592250131051154,
-        "effectiveOwnership": 0.038,
+        "effectiveOwnership": 0.037000000000000005,
         "rotationRisk": 0.95,
         "injurySeverity": 0
       }
@@ -1140,7 +1140,7 @@
     "llm": {
       "used": true,
       "confidence": "high",
-      "narrativeSummary": "Haaland is the clear captain call — highest captain score (9.24), 71.2% EO, penalties, and an FDR 2 home fixture is the template at its most compelling. At rank 833,991 with a rising trend and 35 gameweeks left, you protect that upward momentum by moving with the field: if he hauls, you gain on everyone who doesn't own him; if he blanks, the damage is shared. B.Fernandes is a solid vice-captain at 47.8% EO and on penalties too, giving you genuine fallback cover. No TC this week — the baseline is too strong to waste the chip."
+      "narrativeSummary": "Haaland is the clear captain call for GW3. At 71.2% effective ownership he's the most template pick in the game — captaining him protects your rising rank by moving with the majority, and if he hauls off a home FDR 2 fixture with penalties, you're gaining ground rather than gifting it. B.Fernandes is a solid VC fallback at 47.7% EO with his own pen duties and strong form (9.0), but with 35 GWs left and rank trending upward, this is a protect-not-chase week — back the highest-ceiling template asset and don't manufacture variance you don't need. Triple Captain chip should stay in the pocket; GW3's baseline already peaks above the upcoming horizon."
     },
     "transfer": {
       "freeTransfersAssumed": 1,
@@ -1187,19 +1187,21 @@
       },
       "hitVerdict": {
         "recommended": false,
-        "reasoning": "No hit options were flagged as viable by the engine, and with 35 gameweeks remaining and a risk-averse profile, paying 4 points to accelerate any move is unjustifiable. The gains available via free transfers are modest (sub-1.5 pts over 5 GWs for the top option) — nowhere near the threshold where absorbing a hit makes mathematical sense at this stage of the season.",
+        "reasoning": "No hit options were surfaced as viable, and with 35 gameweeks remaining and a risk-averse profile, spending 4 points now to accelerate a marginal improvement would require a breakeven that simply isn't justified this early in the season. The free move achieves meaningful goalkeeper improvement at zero cost.",
         "breakEvenGw": null
       },
       "dataNotice": null,
       "alerts": [],
       "confidence": "high",
-      "narrativeSummary": "The Scherpen-to-Tzolakis swap is the cleanest use of this free transfer: it compounds across all five projected gameweeks with a 1.29pt cumulative gain at essentially zero price cost, whereas the Kinsky-to-Tzolakis route — the bigger 5-GW gain at 2.35pts — is best saved for next week when the rolled transfer gives you two free moves and more optionality. The goalkeeper position is a low-EO, low-ownership area, so neither move materially shifts your rank exposure; this is pure expected-points optimisation with no meaningful template risk. The key trade-off being accepted is taking the smaller Scherpen gain now to preserve the larger Kinsky upgrade as a banked option, rather than burning both moves this week on goalkeepers when outfield upgrades (Cash, McGinn) may become urgent."
+      "narrativeSummary": "Scherpen is the weaker of two underperforming keepers in this squad, and Tzolakis delivers the same GW1 gain as Donnarumma or Trafford at a fraction of the price — freeing up £0.1m in bank. The real story here is that Kinsky is the bigger drag over a five-game horizon (2.35 cumulative gain vs 1.29 if you fix Kinsky instead), so if a free transfer rolls naturally into GW4, targeting Kinsky→Tzolakis or Kinsky→Raya becomes the sharper play. Goalkeepers are low-EO positions by nature so there's no rank protection lost by moving away from a template keeper — this is clean value with no differential risk attached."
     },
     "pool": {
       "file": "pool/gw04.csv",
       "rows": 55,
       "squadRows": 15,
-      "candidateRows": 40
+      "candidateRows": 40,
+      "universeFile": "pool/gw04.universe.csv",
+      "universeRows": 654
     }
   }
 ]

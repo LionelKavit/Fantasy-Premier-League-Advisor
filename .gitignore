@@ -62,3 +62,7 @@ research/squad-eval/cache/
 
 # Demo video — too large to commit; upload via GitHub's web UI for an inline player
 docs/images/*.mov
+
+# live-eval tick state (per-step progress + failure counters) and the data-branch worktree
+scripts/.live-eval-state.json
+.worktrees/

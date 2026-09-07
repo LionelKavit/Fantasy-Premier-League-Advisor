@@ -20,6 +20,7 @@ export interface CaptureWritePlan {
   postDeadline: boolean;
   writeRecord: boolean; // false ⇒ keep the existing clean record untouched
   poolFile: string; // `gwNN.csv` (clean) or `gwNN.post-deadline.csv` (audit only)
+  universeFile: string; // `gwNN.universe.csv` (clean) or `gwNN.universe.post-deadline.csv` (audit only)
   note: string | null; // human-readable reason when something was withheld
 }
 
@@ -35,12 +36,14 @@ export function planCaptureWrite(args: {
   const { gw, deadline, now, existing } = args;
   const base = `gw${String(gw).padStart(2, "0")}`;
   const postDeadline = now.getTime() >= new Date(deadline).getTime();
-  if (!postDeadline) return { postDeadline, writeRecord: true, poolFile: `${base}.csv`, note: null };
+  if (!postDeadline)
+    return { postDeadline, writeRecord: true, poolFile: `${base}.csv`, universeFile: `${base}.universe.csv`, note: null };
   const haveClean = !!existing && isPreDeadlineRecord(existing);
   return {
     postDeadline,
     writeRecord: !haveClean,
     poolFile: `${base}.post-deadline.csv`,
+    universeFile: `${base}.universe.post-deadline.csv`,
     note: haveClean
       ? `POST-DEADLINE capture (${now.toISOString()} ≥ ${deadline}) — pre-deadline record from ${existing!.capturedAt} preserved; pool rows written to ${base}.post-deadline.csv (audit only, never ingested)`
       : `POST-DEADLINE capture (${now.toISOString()} ≥ ${deadline}) — no clean record existed, so the flagged record is kept for audit; it is excluded from scoring and its pool rows go to ${base}.post-deadline.csv (never ingested)`,
@@ -150,6 +153,10 @@ export interface LiveCaptureRecord {
   transfer?: TransferCaptureRecord | string; // string = `unavailable — <reason>`
   // Scored-pool dump (squad + candidate pool, one CSV row each, backtest schema) written
   // alongside the capture — see pool/ and score-live's live-dataset.csv. Absent on older records.
-  pool?: { file: string; rows: number; squadRows: number; candidateRows: number };
+  pool?: {
+    file: string; rows: number; squadRows: number; candidateRows: number;
+    // live-dataset-universe: the full bootstrap scored at lite tier (absent on older records)
+    universeFile?: string; universeRows?: number;
+  };
   realized?: RealizedGw;
 }

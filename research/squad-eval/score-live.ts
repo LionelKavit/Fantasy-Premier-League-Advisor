@@ -12,7 +12,9 @@
  *      transfer-replay.ts, and write live-transfer-report.md with its floor side-by-side.
  *
  * Run any time after a captured GW finishes:
- *   npx tsx research/squad-eval/score-live.ts [teamId]   (default: manager 2558300)
+ *   npx tsx research/squad-eval/score-live.ts [teamId] [--gw 4,5]   (default: manager 2558300)
+ * `--gw` restricts the realized sync + captain/transfer scoring to those gameweeks (the
+ * datasets are always rebuilt in full); the default scores everything, idempotently.
  */
 import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -33,7 +35,8 @@ const LOG = join(import.meta.dirname, "live-log.json");
 const REPORT = join(import.meta.dirname, "live-report.md");
 const TRANSFER_REPORT = join(import.meta.dirname, "live-transfer-report.md");
 const POOL_DIR = join(import.meta.dirname, "pool");
-const DATASET = join(import.meta.dirname, "live-dataset.csv");
+const DATASET = join(import.meta.dirname, "live-dataset.csv"); // universe (lite) — the fit's input
+const POOL_DATASET = join(import.meta.dirname, "live-pool-dataset.csv"); // squad + candidates (full tier)
 const SEASON_GWS = 38;
 
 // Deterministic-floor headlines (2025-26 replays) for the side-by-sides.
@@ -62,7 +65,11 @@ async function main() {
     console.error(`No live-log.json yet — run capture.ts before a deadline first.`);
     process.exit(1);
   }
-  const teamId = Number(process.argv[2]) || DEFAULT_TEAM_ID;
+  const argv = process.argv.slice(2);
+  const gwFlag = argv.indexOf("--gw");
+  const onlyGws = gwFlag >= 0 ? new Set((argv[gwFlag + 1] ?? "").split(",").map(Number).filter((n) => n > 0)) : null;
+  const teamId = Number(argv.find((a, i) => /^\d+$/.test(a) && i !== gwFlag + 1)) || DEFAULT_TEAM_ID;
+  const wanted = (gw: number) => onlyGws === null || onlyGws.has(gw);
   const now = new Date().toISOString();
   const log: LiveCaptureRecord[] = JSON.parse(readFileSync(LOG, "utf8"));
   const records = log.filter((r) => r.teamId === teamId);
@@ -102,6 +109,7 @@ async function main() {
   ]);
   const syncNotes: string[] = [];
   for (let gw = 1; gw <= lastFinished; gw++) {
+    if (!wanted(gw)) continue;
     const picks = await fetchPicks(teamId, gw).catch(() => null);
     if (!picks) {
       syncNotes.push(`GW ${gw}: locked picks unavailable — picks endpoint failed (entry may not have existed yet)`);
@@ -187,6 +195,7 @@ async function main() {
   const skipped: string[] = [];
   const drift: string[] = [];
   for (const rec of records) {
+    if (!wanted(rec.gw)) continue;
     if (!isPreDeadline(rec)) {
       skipped.push(`GW ${rec.gw}: picks-only backfill (no pre-deadline capture) — excluded`);
       continue;
@@ -308,6 +317,7 @@ async function main() {
   const tRows: TransferRow[] = [];
   const tSkipped: string[] = [];
   for (const rec of records) {
+    if (!wanted(rec.gw)) continue;
     if (!isPreDeadline(rec)) {
       tSkipped.push(`GW ${rec.gw}: picks-only backfill (no pre-deadline capture) — excluded`);
       continue;
@@ -406,21 +416,23 @@ async function main() {
   writeFileSync(TRANSFER_REPORT, tReport);
   console.log(tReport);
 
-  // ── 4. Live dataset: every scored-pool row (pool/gwNN.csv) + realized labels ──
-  // `label_gws` counts FINISHED gameweeks in the next-3 window (3 = complete label, the
-  // backtest's eligibility bar). Unlike the archive, a blank GW still counts as a finished
-  // GW with 0 points here — the live event feed lists every element regardless.
-  if (existsSync(POOL_DIR)) {
-    // Only clean dumps are ingested: `gwNN.csv`. Post-deadline captures land in
-    // `gwNN.post-deadline.csv` (audit only) and any row flagged `post_deadline=1` is
-    // dropped even if it somehow sits in a clean file (pool-dump-deadline-guard).
+  // ── 4. Live datasets: labelled rows from the pool dumps (live-dataset-universe) ──
+  //   live-dataset.csv      ← gwNN.universe.csv  (lite tier, one row per bootstrap player — the fit's input)
+  //   live-pool-dataset.csv ← gwNN.csv           (full tier, squad + candidate pool — decision-layer analysis)
+  // Only clean dumps are ingested: post-deadline sidecars are ignored and any row flagged
+  // `post_deadline=1` is dropped (pool-dump-deadline-guard). `label_gws` counts FINISHED
+  // gameweeks in the next-3 window (3 = complete, the fit's eligibility bar); unlike the
+  // archive, a blank GW still counts as finished with 0 points — the live feed lists every
+  // element regardless. No (element, gw) may appear twice in an output — that is a bug.
+  const buildLabelled = async (label: string, fileRe: RegExp, sidecarRe: RegExp, out: string): Promise<string[]> => {
     const entries = readdirSync(POOL_DIR);
-    const files = entries.filter((f) => /^gw\d+\.csv$/.test(f)).sort();
-    const sidecars = entries.filter((f) => /^gw\d+\.post-deadline\.csv$/.test(f)).sort();
+    const files = entries.filter((f) => fileRe.test(f)).sort();
+    const sidecars = entries.filter((f) => sidecarRe.test(f)).sort();
     const all: Record<string, string>[] = [];
     let columns: string[] = [];
     let complete = 0;
     let contaminated = 0;
+    const seen = new Set<string>();
     for (const f of files) {
       const poolRows = readCsv(join(POOL_DIR, f));
       if (!poolRows.length) continue;
@@ -430,6 +442,9 @@ async function main() {
           contaminated++;
           continue;
         }
+        const key = `${r.element}:${r.gw}`;
+        if (seen.has(key)) throw new Error(`${label}: duplicate (element, gw) ${key} in ${f} — one row per player per gameweek is the contract`);
+        seen.add(key);
         const gw = Number(r.gw);
         const el = Number(r.element);
         const p1 = await pointsFor(gw);
@@ -448,15 +463,30 @@ async function main() {
         all.push(r);
       }
     }
-    writeCsv(DATASET, columns, all);
+    writeCsv(out, columns, all);
     console.log(
-      `\nlive-dataset.csv: ${all.length} scored rows across ${files.length} gameweek pool file(s); ` +
-        `${complete} with a complete next-3 label${all.length ? "" : " — run capture.ts before a deadline to start accruing"}.` +
+      `${label}: ${all.length} rows across ${files.length} file(s); ${complete} with a complete next-3 label.` +
         (contaminated ? ` Dropped ${contaminated} post-deadline row(s).` : "") +
-        (sidecars.length ? ` Ignored ${sidecars.length} post-deadline sidecar file(s): ${sidecars.join(", ")}.` : "")
+        (sidecars.length ? ` Ignored ${sidecars.length} post-deadline sidecar file(s): ${sidecars.join(", ")}.` : "") +
+        (all.length ? "" : " (no dumps yet — run capture.ts before a deadline)")
     );
+    return files;
+  };
+  if (existsSync(POOL_DIR)) {
+    console.log("");
+    const universeFiles = await buildLabelled(
+      "live-dataset.csv (universe, lite)", /^gw\d+\.universe\.csv$/, /^gw\d+\.universe\.post-deadline\.csv$/, DATASET
+    );
+    const poolFiles = await buildLabelled(
+      "live-pool-dataset.csv (pool, full)", /^gw\d+\.csv$/, /^gw\d+\.post-deadline\.csv$/, POOL_DATASET
+    );
+    for (const f of poolFiles) {
+      const gw = f.slice(2, 4);
+      if (!universeFiles.includes(`gw${gw}.universe.csv`))
+        console.log(`GW${Number(gw)}: universe unavailable — captured before live-dataset-universe`);
+    }
   } else {
-    console.log(`\nlive-dataset.csv: unavailable — no pool/ dumps yet (captures before 2026-09-04 predate the scored-pool dump).`);
+    console.log(`\nlive-dataset.csv / live-pool-dataset.csv: unavailable — no pool/ dumps yet (captures before 2026-09-04 predate the scored-pool dump).`);
   }
 }
 

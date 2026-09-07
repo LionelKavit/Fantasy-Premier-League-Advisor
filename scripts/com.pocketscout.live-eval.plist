@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Pocket Scout live-eval LaunchAgent (live-eval-automation) — hourly tick. The script
+  gates itself: captures only inside `deadline − 5h`, scores only when FPL marks a
+  gameweek finished + data_checked, rebuilds the datasets, hands off to the refit gate,
+  rewrites research/squad-eval/live-status.md, syncs artefacts to the `live-eval-data`
+  branch, and emails (Resend) on a missed window or two consecutive step failures.
+  launchd coalesces missed ticks on wake, so a sleeping Mac fires once when it wakes.
+
+  Install (from the MAIN checkout — the tick runs whatever branch is checked out):
+    cp scripts/com.pocketscout.live-eval.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.pocketscout.live-eval.plist
+  Uninstall:
+    launchctl unload ~/Library/LaunchAgents/com.pocketscout.live-eval.plist
+    rm ~/Library/LaunchAgents/com.pocketscout.live-eval.plist
+  Logs:
+    ~/Library/Logs/pocketscout-live-eval.log
+  Manual tick / testing:
+    npx tsx scripts/live-eval-tick.ts                 (real tick)
+    LIVE_EVAL_DRY_RUN=1 LIVE_EVAL_FORCE=1 npx tsx scripts/live-eval-tick.ts   (decisions only)
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.pocketscout.live-eval</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>cd "$HOME/Desktop/fpl-advisor" &amp;&amp; npx tsx scripts/live-eval-tick.ts >> "$HOME/Library/Logs/pocketscout-live-eval.log" 2>&amp;1</string>
+  </array>
+  <key>StartInterval</key>
+  <integer>3600</integer>
+  <key>RunAtLoad</key>
+  <true/>
+</dict>
+</plist>

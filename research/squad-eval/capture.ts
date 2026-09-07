@@ -29,6 +29,7 @@ import {
 } from "../../lib/fpl-api";
 import { runSquadAnalysisPipeline } from "../../lib/pipeline";
 import { buildSignalMap } from "../../lib/pipeline/composite-scorer";
+import { scorePlayerLite } from "../../lib/pipeline/lite-scoring";
 import { runCaptainWithContext } from "../../lib/captain";
 import { runOptimizerWithContext } from "../../lib/optimizer";
 import { detectGameweekFlags } from "../../lib/gameweek";
@@ -267,6 +268,26 @@ async function main() {
   const poolFile = plan.poolFile;
   writeCsv(join(POOL_DIR, poolFile), POOL_COLUMNS, [...squadRows, ...candidateRows]);
 
+  // ── Universe dump (live-dataset-universe): every bootstrap player at LITE tier ──
+  // The composite fit consumes only the deterministic signal-map columns + ep_next + ppg
+  // (never trend/LLM), so the lite scorer — pure compute, no LLM cost — is the faithful
+  // continuation of the backtest dataset (neutral trend + LLM). Normalised exactly as the
+  // runtime does: epNext / max epNext over ALL bootstrap players (floor 1). Every player
+  // is kept (unavailable, zero-minute); `availability`/`low_minute` flag them — the fit
+  // filters, the dataset stays honest about the pool the model saw.
+  const maxEpNext = boot.players.reduce((max, p) => Math.max(max, p.epNext ?? 0), 1);
+  const squadIds = new Set(analysis.picks.map((p) => p.element));
+  const universeRows = boot.players.map((p) =>
+    poolRow(
+      scorePlayerLite(p, { fixtures, teams: boot.teams, currentGw: analysis.currentGw, maxEpNext }),
+      squadIds.has(p.id),
+      target.id,
+      capturedAt,
+      plan.postDeadline
+    )
+  );
+  writeCsv(join(POOL_DIR, plan.universeFile), POOL_COLUMNS, universeRows);
+
   const record: LiveCaptureRecord = {
     gw: target.id,
     teamId,
@@ -292,6 +313,8 @@ async function main() {
       rows: squadRows.length + candidateRows.length,
       squadRows: squadRows.length,
       candidateRows: candidateRows.length,
+      universeFile: `pool/${plan.universeFile}`,
+      universeRows: universeRows.length,
     },
     // A previous score-live sync may already have written realized data for this GW
     // (only possible if the GW finished — in which case we never get here).
@@ -326,7 +349,8 @@ async function main() {
       ` (score ${record.appCaptain?.captainScore.toFixed(2) ?? "—"}, ep_next ${record.appCaptain?.epNext ?? "—"})` +
       `; your armband in that squad: ${record.actualCaptainId ?? "unavailable"}\n` +
       `  transfer → ${transferLine}\n` +
-      `  pool     → ${record.pool!.rows} scored rows (${record.pool!.squadRows} squad + ${record.pool!.candidateRows} candidates) → ${record.pool!.file}` +
+      `  pool     → ${record.pool!.rows} scored rows (${record.pool!.squadRows} squad + ${record.pool!.candidateRows} candidates) → ${record.pool!.file}\n` +
+      `  universe → ${record.pool!.universeRows} lite-tier rows (every bootstrap player) → ${record.pool!.universeFile}` +
       (record.postDeadline
         ? `\n  ⚠ POST-DEADLINE — ${plan.writeRecord ? "record flagged, excluded from scoring" : "record NOT written (clean one preserved)"}; pool rows are audit-only`
         : "")
