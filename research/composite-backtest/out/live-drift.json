@@ -1,0 +1,54 @@
+{
+  "window_gws": [],
+  "window_rows": 0,
+  "metrics": {
+    "overall": {},
+    "by_position": {}
+  },
+  "saturation": {
+    "gw": 4,
+    "all": 0.0245,
+    "eligible": 0.1013,
+    "n_all": 654,
+    "n_eligible": 79
+  },
+  "candidate_present": false,
+  "gate": {
+    "at": "2026-09-07T19:52:20.014Z",
+    "holdout_gws": [],
+    "labelled_gws": [],
+    "streak": 0,
+    "pass": false,
+    "criteria": {
+      "c1_sample_floors": {
+        "ok": false,
+        "detail": "GK: insufficient 0/0; DEF: insufficient 0/0; MID: insufficient 0/0; FWD: insufficient 0/0"
+      },
+      "c2_margin": {
+        "ok": false,
+        "detail": "unavailable \u2014 no held-out comparison"
+      },
+      "c3_consecutive": {
+        "ok": false,
+        "detail": "core criteria failed \u2014 streak reset"
+      },
+      "c4_no_sign_flips": {
+        "ok": false,
+        "detail": "no candidate"
+      },
+      "c5_ep_floor": {
+        "ok": false,
+        "detail": "unavailable"
+      }
+    },
+    "constants": {
+      "MIN_TRAIN": 200,
+      "MIN_HOLDOUT": 100,
+      "MARGIN": 0.02,
+      "CONSECUTIVE": 2,
+      "MATERIAL_WEIGHT": 1,
+      "EP_FLOOR": 0.9
+    }
+  },
+  "transfer_calibration": "unavailable \u2014 no scored transfer gameweek yet"
+}

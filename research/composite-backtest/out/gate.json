@@ -1,0 +1,37 @@
+{
+  "at": "2026-09-07T19:52:20.014Z",
+  "holdout_gws": [],
+  "labelled_gws": [],
+  "streak": 0,
+  "pass": false,
+  "criteria": {
+    "c1_sample_floors": {
+      "ok": false,
+      "detail": "GK: insufficient 0/0; DEF: insufficient 0/0; MID: insufficient 0/0; FWD: insufficient 0/0"
+    },
+    "c2_margin": {
+      "ok": false,
+      "detail": "unavailable — no held-out comparison"
+    },
+    "c3_consecutive": {
+      "ok": false,
+      "detail": "core criteria failed — streak reset"
+    },
+    "c4_no_sign_flips": {
+      "ok": false,
+      "detail": "no candidate"
+    },
+    "c5_ep_floor": {
+      "ok": false,
+      "detail": "unavailable"
+    }
+  },
+  "constants": {
+    "MIN_TRAIN": 200,
+    "MIN_HOLDOUT": 100,
+    "MARGIN": 0.02,
+    "CONSECUTIVE": 2,
+    "MATERIAL_WEIGHT": 1,
+    "EP_FLOOR": 0.9
+  }
+}

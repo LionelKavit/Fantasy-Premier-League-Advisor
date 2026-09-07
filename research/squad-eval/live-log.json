@@ -1,0 +1,1353 @@
+[
+  {
+    "gw": 1,
+    "teamId": 2558300,
+    "capturedAt": "2026-09-04T19:13:56.574Z",
+    "deadline": "2026-08-21T17:30:00Z",
+    "postDeadline": false,
+    "captureMode": "retrospective",
+    "pipelineGw": 1,
+    "squadAsOfGw": 1,
+    "xi": [
+      496,
+      32,
+      8,
+      418,
+      532,
+      87,
+      426,
+      367,
+      45,
+      124,
+      165
+    ],
+    "benchIds": [
+      564,
+      431,
+      25,
+      411
+    ],
+    "actualCaptainId": 165,
+    "appCaptain": null,
+    "appVice": null,
+    "rankedCandidates": [],
+    "baselines": {
+      "ppgId": null,
+      "ownId": null
+    },
+    "llm": "unavailable — no pre-deadline capture — the public API exposes no picks before the GW1 deadline",
+    "transfer": "unavailable — no pre-deadline capture — the public API exposes no picks before the GW1 deadline",
+    "realized": {
+      "syncedAt": "2026-09-07T19:52:03.617Z",
+      "chip": null,
+      "xi": [
+        {
+          "id": 496,
+          "webName": "Kinsky",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": true,
+          "points": 2
+        },
+        {
+          "id": 32,
+          "webName": "Cash",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": -1
+        },
+        {
+          "id": 8,
+          "webName": "Calafiori",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 9
+        },
+        {
+          "id": 418,
+          "webName": "Maguire",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 532,
+          "webName": "Ballard",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        },
+        {
+          "id": 87,
+          "webName": "Ajer",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 8
+        },
+        {
+          "id": 426,
+          "webName": "B.Fernandes",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 367,
+          "webName": "Gakpo",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 12
+        },
+        {
+          "id": 45,
+          "webName": "McGinn",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 124,
+          "webName": "Groß",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 165,
+          "webName": "João Pedro",
+          "multiplier": 2,
+          "isCaptain": true,
+          "isVice": false,
+          "points": 11
+        }
+      ],
+      "bench": [
+        {
+          "id": 564,
+          "webName": "Scherpen",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 431,
+          "webName": "Amad",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        },
+        {
+          "id": 25,
+          "webName": "Gyökeres",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        },
+        {
+          "id": 411,
+          "webName": "Haaland",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        }
+      ],
+      "captainId": 165,
+      "viceId": 496,
+      "gwPoints": 58,
+      "pointsOnBench": 4,
+      "gwRank": 2201657,
+      "overallRank": 2201654,
+      "transfers": [],
+      "transfersCost": 0,
+      "bank": 0,
+      "squadValue": 100
+    }
+  },
+  {
+    "gw": 2,
+    "teamId": 2558300,
+    "capturedAt": "2026-08-28T17:25:14.531Z",
+    "deadline": "2026-08-28T17:30:00Z",
+    "postDeadline": false,
+    "pipelineGw": 1,
+    "xi": [
+      496,
+      32,
+      8,
+      418,
+      532,
+      87,
+      426,
+      367,
+      45,
+      124,
+      165
+    ],
+    "benchIds": [
+      564,
+      431,
+      25,
+      411
+    ],
+    "actualCaptainId": 165,
+    "appCaptain": {
+      "id": 426,
+      "webName": "B.Fernandes",
+      "captainScore": 5.10986,
+      "breakdown": {
+        "baseProjection": 3.59,
+        "ceilingBoost": 1.2125,
+        "fixtureMultiplier": 1.12,
+        "minutesCertainty": 0.95,
+        "dgwMultiplier": 1,
+        "formSignal": 2
+      },
+      "epNext": 4,
+      "compositeTotal": 0.9975214861080927,
+      "effectiveOwnership": 0.48100000000000004,
+      "rotationRisk": 0.09999999999999998,
+      "injurySeverity": 0
+    },
+    "appVice": {
+      "id": 165,
+      "webName": "João Pedro",
+      "captainScore": 3.811875,
+      "breakdown": {
+        "baseProjection": 3.55,
+        "ceilingBoost": 0.4625,
+        "fixtureMultiplier": 1,
+        "minutesCertainty": 0.95,
+        "dgwMultiplier": 1,
+        "formSignal": 11
+      },
+      "epNext": 2.4,
+      "compositeTotal": 0.9153139800613734,
+      "effectiveOwnership": 0.685,
+      "rotationRisk": 0.09999999999999998,
+      "injurySeverity": 0
+    },
+    "rankedCandidates": [
+      {
+        "id": 426,
+        "webName": "B.Fernandes",
+        "captainScore": 5.10986,
+        "breakdown": {
+          "baseProjection": 3.59,
+          "ceilingBoost": 1.2125,
+          "fixtureMultiplier": 1.12,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 2
+        },
+        "epNext": 4,
+        "compositeTotal": 0.9975214861080927,
+        "effectiveOwnership": 0.48100000000000004,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 165,
+        "webName": "João Pedro",
+        "captainScore": 3.811875,
+        "breakdown": {
+          "baseProjection": 3.55,
+          "ceilingBoost": 0.4625,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 11
+        },
+        "epNext": 2.4,
+        "compositeTotal": 0.9153139800613734,
+        "effectiveOwnership": 0.685,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 124,
+        "webName": "Groß",
+        "captainScore": 3.6802500000000005,
+        "breakdown": {
+          "baseProjection": 2.4050000000000002,
+          "ceilingBoost": 1.1,
+          "fixtureMultiplier": 1.05,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 2
+        },
+        "epNext": 2,
+        "compositeTotal": 0.9231281159866759,
+        "effectiveOwnership": 0.128,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 367,
+        "webName": "Gakpo",
+        "captainScore": 3.503125,
+        "breakdown": {
+          "baseProjection": 3.225,
+          "ceilingBoost": 0.4625,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 12
+        },
+        "epNext": 2.5,
+        "compositeTotal": 0.9710409293104725,
+        "effectiveOwnership": 0.066,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 418,
+        "webName": "Maguire",
+        "captainScore": 3.25318,
+        "breakdown": {
+          "baseProjection": 2.8200000000000003,
+          "ceilingBoost": 0.2375,
+          "fixtureMultiplier": 1.12,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 1
+        },
+        "epNext": 2.2,
+        "compositeTotal": 0.9059693973922304,
+        "effectiveOwnership": 0.17,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 8,
+        "webName": "Calafiori",
+        "captainScore": 2.9190768750000005,
+        "breakdown": {
+          "baseProjection": 2.5700000000000003,
+          "ceilingBoost": 0.05625,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 9
+        },
+        "epNext": 2.6,
+        "compositeTotal": 0.9354033006838085,
+        "effectiveOwnership": 0.418,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 87,
+        "webName": "Ajer",
+        "captainScore": 2.779875,
+        "breakdown": {
+          "baseProjection": 2.21,
+          "ceilingBoost": 0.4375,
+          "fixtureMultiplier": 1.05,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 8
+        },
+        "epNext": 1.7,
+        "compositeTotal": 0.8165047030866341,
+        "effectiveOwnership": 0.040999999999999995,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 532,
+        "webName": "Ballard",
+        "captainScore": 2.3688000000000007,
+        "breakdown": {
+          "baseProjection": 2.115,
+          "ceilingBoost": 0,
+          "fixtureMultiplier": 1.12,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 0
+        },
+        "epNext": 2.2,
+        "compositeTotal": 0.8900656468011163,
+        "effectiveOwnership": 0.05,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 45,
+        "webName": "McGinn",
+        "captainScore": 2.0224444444444445,
+        "breakdown": {
+          "baseProjection": 2.115,
+          "ceilingBoost": 0.01388888888888889,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 1
+        },
+        "epNext": 2,
+        "compositeTotal": 0.9225510163965471,
+        "effectiveOwnership": 0.027999999999999997,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 496,
+        "webName": "Kinsky",
+        "captainScore": 1.95,
+        "breakdown": {
+          "baseProjection": 1.95,
+          "ceilingBoost": 0,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 2
+        },
+        "epNext": 1.9,
+        "compositeTotal": 0.8559316173830335,
+        "effectiveOwnership": 0.226,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 32,
+        "webName": "Cash",
+        "captainScore": 1.7575,
+        "breakdown": {
+          "baseProjection": 1.85,
+          "ceilingBoost": 0,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": -1
+        },
+        "epNext": 1.7,
+        "compositeTotal": 0.8111842717383825,
+        "effectiveOwnership": 0.076,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      }
+    ],
+    "baselines": {
+      "ppgId": 367,
+      "ownId": 165
+    },
+    "llm": {
+      "used": true,
+      "confidence": "high",
+      "narrativeSummary": "Fernandes is the clear captain call — highest captain score (5.11), penalty taker status raises his ceiling, and at 48.1% EO he sits right in the template sweet spot. At rank 2,201,654 with a balanced strategy and 37 gameweeks ahead, there's no urgency to chase a differential risk this early; captaining Fernandes means you move with half the field if he hauls and don't bleed rank if he doesn't. João Pedro (68.5% EO) is the natural vice-captain fallback — heavily owned enough that missing his points would hurt more than captaining Fernandes. Hold the Triple Captain chip; no upcoming week clears the bar meaningfully enough to burn it now."
+    },
+    "realized": {
+      "syncedAt": "2026-09-07T19:52:03.617Z",
+      "chip": null,
+      "xi": [
+        {
+          "id": 496,
+          "webName": "Kinsky",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 8,
+          "webName": "Calafiori",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 11
+        },
+        {
+          "id": 418,
+          "webName": "Maguire",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 4
+        },
+        {
+          "id": 532,
+          "webName": "Ballard",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 8
+        },
+        {
+          "id": 426,
+          "webName": "B.Fernandes",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 23
+        },
+        {
+          "id": 367,
+          "webName": "Gakpo",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 5
+        },
+        {
+          "id": 565,
+          "webName": "M.Sangaré",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 4
+        },
+        {
+          "id": 124,
+          "webName": "Groß",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 13
+        },
+        {
+          "id": 45,
+          "webName": "McGinn",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 165,
+          "webName": "João Pedro",
+          "multiplier": 2,
+          "isCaptain": true,
+          "isVice": false,
+          "points": 9
+        },
+        {
+          "id": 411,
+          "webName": "Haaland",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": true,
+          "points": 13
+        }
+      ],
+      "bench": [
+        {
+          "id": 564,
+          "webName": "Scherpen",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 25,
+          "webName": "Gyökeres",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        },
+        {
+          "id": 32,
+          "webName": "Cash",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 87,
+          "webName": "Ajer",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 3
+        }
+      ],
+      "captainId": 165,
+      "viceId": 411,
+      "gwPoints": 101,
+      "pointsOnBench": 7,
+      "gwRank": 1562375,
+      "overallRank": 1185762,
+      "transfers": [
+        {
+          "outId": 431,
+          "outName": "Amad",
+          "inId": 565,
+          "inName": "M.Sangaré",
+          "time": "2026-08-28T15:34:30.353988Z"
+        }
+      ],
+      "transfersCost": 0,
+      "bank": 0.3,
+      "squadValue": 100
+    }
+  },
+  {
+    "gw": 3,
+    "teamId": 2558300,
+    "capturedAt": "2026-09-04T16:46:34.247Z",
+    "deadline": "2026-09-04T17:30:00Z",
+    "postDeadline": false,
+    "pipelineGw": 2,
+    "xi": [
+      496,
+      8,
+      418,
+      532,
+      426,
+      367,
+      565,
+      124,
+      45,
+      165,
+      411
+    ],
+    "benchIds": [
+      564,
+      25,
+      32,
+      87
+    ],
+    "actualCaptainId": 165,
+    "appCaptain": {
+      "id": 426,
+      "webName": "B.Fernandes",
+      "captainScore": 13.980037500000002,
+      "breakdown": {
+        "baseProjection": 10.43,
+        "ceilingBoost": 1.51875,
+        "fixtureMultiplier": 1.1700000000000002,
+        "minutesCertainty": 1,
+        "dgwMultiplier": 1,
+        "formSignal": 12.5
+      },
+      "epNext": 12.5,
+      "compositeTotal": 0.9973452871348301,
+      "effectiveOwnership": 0.484,
+      "rotationRisk": 0,
+      "injurySeverity": 0
+    },
+    "appVice": {
+      "id": 165,
+      "webName": "João Pedro",
+      "captainScore": 9.396343125000003,
+      "breakdown": {
+        "baseProjection": 7.9350000000000005,
+        "ceilingBoost": 0.51875,
+        "fixtureMultiplier": 1.1700000000000002,
+        "minutesCertainty": 0.95,
+        "dgwMultiplier": 1,
+        "formSignal": 10
+      },
+      "epNext": 10,
+      "compositeTotal": 0.9750111934285016,
+      "effectiveOwnership": 0.69,
+      "rotationRisk": 0.09999999999999998,
+      "injurySeverity": 0
+    },
+    "rankedCandidates": [
+      {
+        "id": 426,
+        "webName": "B.Fernandes",
+        "captainScore": 13.980037500000002,
+        "breakdown": {
+          "baseProjection": 10.43,
+          "ceilingBoost": 1.51875,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 12.5
+        },
+        "epNext": 12.5,
+        "compositeTotal": 0.9973452871348301,
+        "effectiveOwnership": 0.484,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 165,
+        "webName": "João Pedro",
+        "captainScore": 9.396343125000003,
+        "breakdown": {
+          "baseProjection": 7.9350000000000005,
+          "ceilingBoost": 0.51875,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 10
+        },
+        "epNext": 10,
+        "compositeTotal": 0.9750111934285016,
+        "effectiveOwnership": 0.69,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 411,
+        "webName": "Haaland",
+        "captainScore": 7.4064375,
+        "breakdown": {
+          "baseProjection": 6.165,
+          "ceilingBoost": 1.63125,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 7.5
+        },
+        "epNext": 7.5,
+        "compositeTotal": 0.9153139800613734,
+        "effectiveOwnership": 0.7240000000000001,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 367,
+        "webName": "Gakpo",
+        "captainScore": 6.635712890625,
+        "breakdown": {
+          "baseProjection": 6.35,
+          "ceilingBoost": 0.30234375,
+          "fixtureMultiplier": 1.05,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 8.5
+        },
+        "epNext": 8.5,
+        "compositeTotal": 0.978359263034286,
+        "effectiveOwnership": 0.08900000000000001,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 565,
+        "webName": "M.Sangaré",
+        "captainScore": 6.368181818181818,
+        "breakdown": {
+          "baseProjection": 6.15,
+          "ceilingBoost": 0.2181818181818182,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 9
+        },
+        "epNext": 9,
+        "compositeTotal": 0.9808998880075821,
+        "effectiveOwnership": 0.154,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 8,
+        "webName": "Calafiori",
+        "captainScore": 5.652220588235293,
+        "breakdown": {
+          "baseProjection": 6.675,
+          "ceilingBoost": 0.08602941176470588,
+          "fixtureMultiplier": 0.88,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 10
+        },
+        "epNext": 10,
+        "compositeTotal": 0.9711550808065426,
+        "effectiveOwnership": 0.445,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 124,
+        "webName": "Groß",
+        "captainScore": 5.5253000000000005,
+        "breakdown": {
+          "baseProjection": 5.085,
+          "ceilingBoost": 1.19375,
+          "fixtureMultiplier": 0.88,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 7.5
+        },
+        "epNext": 7.5,
+        "compositeTotal": 0.9601649907454651,
+        "effectiveOwnership": 0.16,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 532,
+        "webName": "Ballard",
+        "captainScore": 3.4498181250000006,
+        "breakdown": {
+          "baseProjection": 3.06,
+          "ceilingBoost": 0.04375,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 4
+        },
+        "epNext": 4,
+        "compositeTotal": 0.6906336917206033,
+        "effectiveOwnership": 0.039,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 418,
+        "webName": "Maguire",
+        "captainScore": 3.3067125,
+        "breakdown": {
+          "baseProjection": 2.67,
+          "ceilingBoost": 0.15625,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 2.5
+        },
+        "epNext": 2.5,
+        "compositeTotal": 0.5565660204640018,
+        "effectiveOwnership": 0.138,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 496,
+        "webName": "Kinsky",
+        "captainScore": 2.0475000000000003,
+        "breakdown": {
+          "baseProjection": 1.75,
+          "ceilingBoost": 0,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 1.5
+        },
+        "epNext": 1.5,
+        "compositeTotal": 0.3830988846076718,
+        "effectiveOwnership": 0.18899999999999997,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 45,
+        "webName": "McGinn",
+        "captainScore": 1.5393825,
+        "breakdown": {
+          "baseProjection": 1.67,
+          "ceilingBoost": 0.07236842105263158,
+          "fixtureMultiplier": 0.93,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 1
+        },
+        "epNext": 1,
+        "compositeTotal": 0.403232241778025,
+        "effectiveOwnership": 0.024,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      }
+    ],
+    "baselines": {
+      "ppgId": 426,
+      "ownId": 411
+    },
+    "llm": {
+      "used": true,
+      "confidence": "high",
+      "narrativeSummary": "Fernandes is the clear captain call at rank 1,185,762 with 36 gameweeks remaining — a balanced stance means protecting rank without over-hedging. He leads all candidates on captain score (13.98), carries a penalty threat, and faces an FDR 2 home fixture; crucially, his 48.4% EO sits well below Haaland (72.4%) and João Pedro (69.0%), meaning he's a template pick without being a full crowded bet — you move with enough of the field to protect rank but still gain ground if he hauls while the bigger-EO names blank. VC falls to João Pedro as given, covering Chelsea's favourable home game. No TC case this week — Fernandes' own baseline outstrips anything on the near horizon."
+    },
+    "realized": {
+      "syncedAt": "2026-09-07T19:52:03.617Z",
+      "chip": null,
+      "xi": [
+        {
+          "id": 564,
+          "webName": "Scherpen",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 8,
+          "webName": "Calafiori",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 532,
+          "webName": "Ballard",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 4
+        },
+        {
+          "id": 87,
+          "webName": "Ajer",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 32,
+          "webName": "Cash",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 6
+        },
+        {
+          "id": 426,
+          "webName": "B.Fernandes",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": true,
+          "points": 2
+        },
+        {
+          "id": 367,
+          "webName": "Gakpo",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 11
+        },
+        {
+          "id": 124,
+          "webName": "Groß",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 565,
+          "webName": "M.Sangaré",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        },
+        {
+          "id": 411,
+          "webName": "Haaland",
+          "multiplier": 2,
+          "isCaptain": true,
+          "isVice": false,
+          "points": 9
+        },
+        {
+          "id": 464,
+          "webName": "Wissa",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        }
+      ],
+      "bench": [
+        {
+          "id": 496,
+          "webName": "Kinsky",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 6
+        },
+        {
+          "id": 45,
+          "webName": "McGinn",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 3
+        },
+        {
+          "id": 165,
+          "webName": "João Pedro",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 418,
+          "webName": "Maguire",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        }
+      ],
+      "captainId": 411,
+      "viceId": 426,
+      "gwPoints": 49,
+      "pointsOnBench": 12,
+      "gwRank": 6245837,
+      "overallRank": 1516623,
+      "transfers": [
+        {
+          "outId": 25,
+          "outName": "Gyökeres",
+          "inId": 464,
+          "inName": "Wissa",
+          "time": "2026-09-04T17:24:57.896510Z"
+        }
+      ],
+      "transfersCost": 0,
+      "bank": 1.5,
+      "squadValue": 100.2
+    }
+  },
+  {
+    "gw": 4,
+    "teamId": 2558300,
+    "capturedAt": "2026-09-06T22:38:36.664Z",
+    "deadline": "2026-09-12T12:30:00Z",
+    "postDeadline": false,
+    "captureMode": "pre-deadline",
+    "pipelineGw": 3,
+    "squadAsOfGw": 3,
+    "xi": [
+      564,
+      8,
+      532,
+      87,
+      32,
+      426,
+      367,
+      124,
+      565,
+      411,
+      464
+    ],
+    "benchIds": [
+      496,
+      45,
+      165,
+      418
+    ],
+    "actualCaptainId": 411,
+    "appCaptain": {
+      "id": 411,
+      "webName": "Haaland",
+      "captainScore": 9.243048750000002,
+      "breakdown": {
+        "baseProjection": 6.895,
+        "ceilingBoost": 1.4208333333333334,
+        "fixtureMultiplier": 1.1700000000000002,
+        "minutesCertainty": 0.95,
+        "dgwMultiplier": 1,
+        "formSignal": 8
+      },
+      "epNext": 8,
+      "compositeTotal": 0.9722354550168364,
+      "effectiveOwnership": 0.7120000000000001,
+      "rotationRisk": 0.09999999999999998,
+      "injurySeverity": 0
+    },
+    "appVice": {
+      "id": 426,
+      "webName": "B.Fernandes",
+      "captainScore": 9.125833333333333,
+      "breakdown": {
+        "baseProjection": 7.78,
+        "ceilingBoost": 1.3458333333333332,
+        "fixtureMultiplier": 1,
+        "minutesCertainty": 1,
+        "dgwMultiplier": 1,
+        "formSignal": 9
+      },
+      "epNext": 9,
+      "compositeTotal": 0.9937105852430762,
+      "effectiveOwnership": 0.47700000000000004,
+      "rotationRisk": 0,
+      "injurySeverity": 0
+    },
+    "rankedCandidates": [
+      {
+        "id": 411,
+        "webName": "Haaland",
+        "captainScore": 9.243048750000002,
+        "breakdown": {
+          "baseProjection": 6.895,
+          "ceilingBoost": 1.4208333333333334,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 8
+        },
+        "epNext": 8,
+        "compositeTotal": 0.9722354550168364,
+        "effectiveOwnership": 0.7120000000000001,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 426,
+        "webName": "B.Fernandes",
+        "captainScore": 9.125833333333333,
+        "breakdown": {
+          "baseProjection": 7.78,
+          "ceilingBoost": 1.3458333333333332,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 9
+        },
+        "epNext": 9,
+        "compositeTotal": 0.9937105852430762,
+        "effectiveOwnership": 0.47700000000000004,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 367,
+        "webName": "Gakpo",
+        "captainScore": 7.249564,
+        "breakdown": {
+          "baseProjection": 6.62,
+          "ceilingBoost": 0.1935,
+          "fixtureMultiplier": 1.12,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 9.3
+        },
+        "epNext": 9.3,
+        "compositeTotal": 0.9974400290920546,
+        "effectiveOwnership": 0.122,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 124,
+        "webName": "Groß",
+        "captainScore": 6.656325000000002,
+        "breakdown": {
+          "baseProjection": 4.5600000000000005,
+          "ceilingBoost": 1.1291666666666667,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 5.3
+        },
+        "epNext": 5.3,
+        "compositeTotal": 0.8943053985080864,
+        "effectiveOwnership": 0.16,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 565,
+        "webName": "M.Sangaré",
+        "captainScore": 5.687871428571429,
+        "breakdown": {
+          "baseProjection": 4.6899999999999995,
+          "ceilingBoost": 0.17142857142857143,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 6
+        },
+        "epNext": 6,
+        "compositeTotal": 0.9667058383248093,
+        "effectiveOwnership": 0.147,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 8,
+        "webName": "Calafiori",
+        "captainScore": 5.037690794491526,
+        "breakdown": {
+          "baseProjection": 5.640000000000001,
+          "ceilingBoost": 0.06197033898305084,
+          "fixtureMultiplier": 0.93,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 7.3
+        },
+        "epNext": 7.3,
+        "compositeTotal": 0.9717065296119856,
+        "effectiveOwnership": 0.467,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 464,
+        "webName": "Wissa",
+        "captainScore": 4.6609137931034486,
+        "breakdown": {
+          "baseProjection": 4.12,
+          "ceilingBoost": 0.31896551724137934,
+          "fixtureMultiplier": 1.05,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 4.3
+        },
+        "epNext": 4.3,
+        "compositeTotal": 0.8170753257441155,
+        "effectiveOwnership": 0.16399999999999998,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 87,
+        "webName": "Ajer",
+        "captainScore": 4.023825,
+        "breakdown": {
+          "baseProjection": 3.285,
+          "ceilingBoost": 0.15416666666666667,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 4.3
+        },
+        "epNext": 4.3,
+        "compositeTotal": 0.968209499399453,
+        "effectiveOwnership": 0.051,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 32,
+        "webName": "Cash",
+        "captainScore": 2.4965424701195214,
+        "breakdown": {
+          "baseProjection": 2.3149999999999995,
+          "ceilingBoost": 0.03137450199203187,
+          "fixtureMultiplier": 1.12,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 2.3
+        },
+        "epNext": 2.3,
+        "compositeTotal": 0.635012989160082,
+        "effectiveOwnership": 0.069,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 564,
+        "webName": "Scherpen",
+        "captainScore": 1.86,
+        "breakdown": {
+          "baseProjection": 2,
+          "ceilingBoost": 0,
+          "fixtureMultiplier": 0.93,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 2
+        },
+        "epNext": 2,
+        "compositeTotal": 0.7073086633201402,
+        "effectiveOwnership": 0.006,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 532,
+        "webName": "Ballard",
+        "captainScore": 1.6769375000000002,
+        "breakdown": {
+          "baseProjection": 3.165,
+          "ceilingBoost": 0.029166666666666667,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 0.525,
+          "dgwMultiplier": 1,
+          "formSignal": 4
+        },
+        "epNext": 4,
+        "compositeTotal": 0.9592250131051154,
+        "effectiveOwnership": 0.037000000000000005,
+        "rotationRisk": 0.95,
+        "injurySeverity": 0
+      }
+    ],
+    "baselines": {
+      "ppgId": 367,
+      "ownId": 411
+    },
+    "llm": {
+      "used": true,
+      "confidence": "high",
+      "narrativeSummary": "Haaland is the clear captain call for GW3. At 71.2% effective ownership he's the most template pick in the game — captaining him protects your rising rank by moving with the majority, and if he hauls off a home FDR 2 fixture with penalties, you're gaining ground rather than gifting it. B.Fernandes is a solid VC fallback at 47.7% EO with his own pen duties and strong form (9.0), but with 35 GWs left and rank trending upward, this is a protect-not-chase week — back the highest-ceiling template asset and don't manufacture variance you don't need. Triple Captain chip should stay in the pocket; GW3's baseline already peaks above the upcoming horizon."
+    },
+    "transfer": {
+      "freeTransfersAssumed": 1,
+      "bank": 1.5,
+      "primary": {
+        "type": "FREE",
+        "moves": [
+          {
+            "outId": 564,
+            "outName": "Scherpen",
+            "inId": 572,
+            "inName": "Tzolakis",
+            "priceDelta": 0.09999999999999964,
+            "epOut": 2,
+            "epIn": 8.7,
+            "epDelta": 6.699999999999999,
+            "gw1Gain": 0.2741602034152082,
+            "gw5Gain": 0.2741602034152082
+          }
+        ],
+        "netPointsCost": 0,
+        "netGain": 0.2741602034152082,
+        "breakEvenGw": null
+      },
+      "secondary": {
+        "type": "FREE",
+        "moves": [
+          {
+            "outId": 564,
+            "outName": "Scherpen",
+            "inId": 572,
+            "inName": "Tzolakis",
+            "priceDelta": 0.09999999999999964,
+            "epOut": 2,
+            "epIn": 8.7,
+            "epDelta": 6.699999999999999,
+            "gw1Gain": 0.2741602034152082,
+            "gw5Gain": 0.2741602034152082
+          }
+        ],
+        "netPointsCost": 0,
+        "netGain": 0.2741602034152082,
+        "breakEvenGw": null
+      },
+      "hitVerdict": {
+        "recommended": false,
+        "reasoning": "No hit options were surfaced as viable, and with 35 gameweeks remaining and a risk-averse profile, spending 4 points now to accelerate a marginal improvement would require a breakeven that simply isn't justified this early in the season. The free move achieves meaningful goalkeeper improvement at zero cost.",
+        "breakEvenGw": null
+      },
+      "dataNotice": null,
+      "alerts": [],
+      "confidence": "high",
+      "narrativeSummary": "Scherpen is the weaker of two underperforming keepers in this squad, and Tzolakis delivers the same GW1 gain as Donnarumma or Trafford at a fraction of the price — freeing up £0.1m in bank. The real story here is that Kinsky is the bigger drag over a five-game horizon (2.35 cumulative gain vs 1.29 if you fix Kinsky instead), so if a free transfer rolls naturally into GW4, targeting Kinsky→Tzolakis or Kinsky→Raya becomes the sharper play. Goalkeepers are low-EO positions by nature so there's no rank protection lost by moving away from a template keeper — this is clean value with no differential risk attached."
+    },
+    "pool": {
+      "file": "pool/gw04.csv",
+      "rows": 55,
+      "squadRows": 15,
+      "candidateRows": 40,
+      "universeFile": "pool/gw04.universe.csv",
+      "universeRows": 654
+    }
+  }
+]

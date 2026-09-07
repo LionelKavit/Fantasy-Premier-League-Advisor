@@ -1,0 +1,48 @@
+{
+  "dataset_rows": 654,
+  "eligible_rows": 0,
+  "labelled_gws": [],
+  "train_gws": [],
+  "holdout_gws": [],
+  "positions": {
+    "GK": {
+      "status": "insufficient",
+      "n_train": 0,
+      "n_heldout": 0,
+      "floors": {
+        "train": 200,
+        "heldout": 100
+      }
+    },
+    "DEF": {
+      "status": "insufficient",
+      "n_train": 0,
+      "n_heldout": 0,
+      "floors": {
+        "train": 200,
+        "heldout": 100
+      }
+    },
+    "MID": {
+      "status": "insufficient",
+      "n_train": 0,
+      "n_heldout": 0,
+      "floors": {
+        "train": 200,
+        "heldout": 100
+      }
+    },
+    "FWD": {
+      "status": "insufficient",
+      "n_train": 0,
+      "n_heldout": 0,
+      "floors": {
+        "train": 200,
+        "heldout": 100
+      }
+    }
+  },
+  "complete": false,
+  "heldout_comparison": {},
+  "candidate": null
+}
