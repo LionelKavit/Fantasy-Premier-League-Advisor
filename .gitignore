@@ -66,3 +66,6 @@ docs/images/*.mov
 # live-eval tick state (per-step progress + failure counters) and the data-branch worktree
 scripts/.live-eval-state.json
 .worktrees/
+
+# rewritten by every live-eval tick; the data branch keeps the history (synced by the tick)
+research/squad-eval/live-status.md

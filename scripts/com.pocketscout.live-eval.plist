@@ -34,5 +34,13 @@
   <integer>3600</integer>
   <key>RunAtLoad</key>
   <true/>
+  <!-- launchd's login shell does not run ~/.zshrc, so the conda Python (pandas / scikit-learn /
+       pyarrow for the dataset + refit steps) is not on PATH there. Point the tick at it
+       explicitly; adjust if your scientific Python lives elsewhere. -->
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>LIVE_EVAL_PYTHON</key>
+    <string>/opt/anaconda3/bin/python3</string>
+  </dict>
 </dict>
 </plist>
