@@ -1,6 +1,6 @@
 # Live refit (composite-refit-gate)
 
-Rows 654 · eligible 0 · labelled GWs — · train — · holdout —
+Rows 656 · eligible 0 · labelled GWs — · train — · holdout —
 
 | position | status | n_train | n_heldout | alpha | heldout ρ |
 |---|---|---|---|---|---|

@@ -38,7 +38,7 @@
     "llm": "unavailable — no pre-deadline capture — the public API exposes no picks before the GW1 deadline",
     "transfer": "unavailable — no pre-deadline capture — the public API exposes no picks before the GW1 deadline",
     "realized": {
-      "syncedAt": "2026-09-07T19:52:03.617Z",
+      "syncedAt": "2026-09-15T16:42:37.098Z",
       "chip": null,
       "xi": [
         {
@@ -449,7 +449,7 @@
       "narrativeSummary": "Fernandes is the clear captain call — highest captain score (5.11), penalty taker status raises his ceiling, and at 48.1% EO he sits right in the template sweet spot. At rank 2,201,654 with a balanced strategy and 37 gameweeks ahead, there's no urgency to chase a differential risk this early; captaining Fernandes means you move with half the field if he hauls and don't bleed rank if he doesn't. João Pedro (68.5% EO) is the natural vice-captain fallback — heavily owned enough that missing his points would hurt more than captaining Fernandes. Hold the Triple Captain chip; no upcoming week clears the bar meaningfully enough to burn it now."
     },
     "realized": {
-      "syncedAt": "2026-09-07T19:52:03.617Z",
+      "syncedAt": "2026-09-15T16:42:37.098Z",
       "chip": null,
       "xi": [
         {
@@ -868,7 +868,7 @@
       "narrativeSummary": "Fernandes is the clear captain call at rank 1,185,762 with 36 gameweeks remaining — a balanced stance means protecting rank without over-hedging. He leads all candidates on captain score (13.98), carries a penalty threat, and faces an FDR 2 home fixture; crucially, his 48.4% EO sits well below Haaland (72.4%) and João Pedro (69.0%), meaning he's a template pick without being a full crowded bet — you move with enough of the field to protect rank but still gain ground if he hauls while the bigger-EO names blank. VC falls to João Pedro as given, covering Chelsea's favourable home game. No TC case this week — Fernandes' own baseline outstrips anything on the near horizon."
     },
     "realized": {
-      "syncedAt": "2026-09-07T19:52:03.617Z",
+      "syncedAt": "2026-09-15T16:42:37.098Z",
       "chip": null,
       "xi": [
         {
@@ -1348,6 +1348,152 @@
       "candidateRows": 40,
       "universeFile": "pool/gw04.universe.csv",
       "universeRows": 656
+    },
+    "realized": {
+      "syncedAt": "2026-09-15T16:42:37.098Z",
+      "chip": null,
+      "xi": [
+        {
+          "id": 564,
+          "webName": "Scherpen",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 418,
+          "webName": "Maguire",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 8,
+          "webName": "Calafiori",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 6
+        },
+        {
+          "id": 87,
+          "webName": "Ajer",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 426,
+          "webName": "B.Fernandes",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 367,
+          "webName": "Gakpo",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 15,
+          "webName": "Ødegaard",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": true,
+          "points": 3
+        },
+        {
+          "id": 124,
+          "webName": "Groß",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 17
+        },
+        {
+          "id": 165,
+          "webName": "João Pedro",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 12
+        },
+        {
+          "id": 464,
+          "webName": "Wissa",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 411,
+          "webName": "Haaland",
+          "multiplier": 2,
+          "isCaptain": true,
+          "isVice": false,
+          "points": 9
+        }
+      ],
+      "bench": [
+        {
+          "id": 496,
+          "webName": "Kinsky",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 7
+        },
+        {
+          "id": 565,
+          "webName": "M.Sangaré",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 4
+        },
+        {
+          "id": 32,
+          "webName": "Cash",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        },
+        {
+          "id": 532,
+          "webName": "Ballard",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        }
+      ],
+      "captainId": 411,
+      "viceId": 15,
+      "gwPoints": 64,
+      "pointsOnBench": 11,
+      "gwRank": 6835136,
+      "overallRank": 2625039,
+      "transfers": [
+        {
+          "outId": 45,
+          "outName": "McGinn",
+          "inId": 15,
+          "inName": "Ødegaard",
+          "time": "2026-09-12T09:26:34.874825Z"
+        }
+      ],
+      "transfersCost": 0,
+      "bank": 0.2,
+      "squadValue": 100.4
     }
   }
 ]

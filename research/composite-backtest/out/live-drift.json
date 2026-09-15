@@ -7,14 +7,14 @@
   },
   "saturation": {
     "gw": 4,
-    "all": 0.0245,
-    "eligible": 0.1013,
-    "n_all": 654,
+    "all": 0.029,
+    "eligible": 0.1139,
+    "n_all": 656,
     "n_eligible": 79
   },
   "candidate_present": false,
   "gate": {
-    "at": "2026-09-07T19:52:20.014Z",
+    "at": "2026-09-15T16:42:44.855Z",
     "holdout_gws": [],
     "labelled_gws": [],
     "streak": 0,
@@ -50,5 +50,5 @@
       "EP_FLOOR": 0.9
     }
   },
-  "transfer_calibration": "unavailable \u2014 no scored transfer gameweek yet"
+  "transfer_calibration": "Calibration (n=1): mean projected \u0394ep 6.70 vs mean realized next-1 (in \u2212 out, net of hit) 1.00."
 }
