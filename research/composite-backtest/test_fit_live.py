@@ -17,8 +17,24 @@ def synthetic(gws, n_per_pos=60, seed=0, strong=True):
                 y = 10 * sm["sm_form"] + rng.normal(0, 0.5) if strong else rng.normal(5, 2)
                 rows.append({"season": "2026-27", "gw": gw, "position": pos, "element": 10_000 * gw + 100 * ["GK", "DEF", "MID", "FWD"].index(pos) + i,
                              "next3_points": y, "composite": rng.uniform(0, 1), "xP": y + rng.normal(0, 4), "ppg": rng.uniform(0, 8),
-                             "trend_adj": 0.0, "low_minute": 0, "label_gws": 3, "has_fixture": 1, "has_xg": 1, **sm})
+                             "trend_adj": 0.0, "low_minute": 0, "label_gws": 3, "has_fixture": 1, "has_xg": 1,
+                             "fixture_gw": gw, **sm})  # aligned by construction (target-gameweek-alignment)
     return pd.DataFrame(rows)
+
+
+def test_misaligned_rows_excluded():
+    df = synthetic([4, 5, 6], n_per_pos=3)
+    n = len(df)
+    # legacy rows (no column) → all excluded
+    legacy = df.drop(columns=["fixture_gw"])
+    assert len(eligible(legacy)) == 0
+    from fit_live import misaligned_count, MISALIGNED_REASON
+    assert misaligned_count(legacy) == n and "target-gameweek-alignment" in MISALIGNED_REASON
+    # mixed: GW4 rows mislabelled as computed from GW3 → only GW5/GW6 survive
+    mixed = df.copy()
+    mixed.loc[mixed.gw == 4, "fixture_gw"] = 3
+    e = eligible(mixed)
+    assert sorted(e.gw.unique()) == [5, 6] and misaligned_count(mixed) == (df.gw == 4).sum()
 
 
 def test_split_gws():

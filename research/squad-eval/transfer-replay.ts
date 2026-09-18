@@ -66,7 +66,7 @@ function decide(gw: number): TransferRow | null {
   const analysis: SquadAnalysisResult = {
     rankedSquad: ranked, weakSpots, picks: squad,
     chipsRemaining: { wildcard: 0, freeHit: 0, benchBoost: 0, tripleCaptain: 0 },
-    bank, currentGw: gw, deadline: null, generatedAt: "",
+    bank, currentGw: gw, deadline: null, squadGw: gw - 1, inPlayGw: null, generatedAt: "",
   };
   const valid = buildValidTransfers(analysis, bank, teamCounts);
   const { bestSingle } = evaluateSingleTransfer(valid, PROFILE_STUB, 1, analysis, bank, teamCounts);

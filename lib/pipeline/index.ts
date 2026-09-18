@@ -30,12 +30,17 @@ export async function runSquadAnalysisPipeline(
 
   const managerProfile = await buildManagerProfile(teamId, bootstrap);
 
-  const currentGw = bootstrap.currentGameweek?.id ?? 1;
-  const deadline = bootstrap.currentGameweek?.deadline_time ?? null;
+  // Target = the gameweek being prepared (scoring origin); squadGw = the last locked
+  // gameweek (the only picks that are public). See lib/gameweek.ts.
+  const currentGw = bootstrap.targetGameweek?.id ?? 1;
+  const deadline = bootstrap.targetGameweek?.deadline_time ?? null;
+  const squadGw = bootstrap.currentGameweek?.id ?? null;
+  const inPlayGw = bootstrap.inPlayGameweek?.id ?? null;
   const { players, teams } = bootstrap;
 
-  // Step 2: Get current squad picks
-  const picksResponse = await fetchPicks(teamId, currentGw);
+  // Step 2: Get the last LOCKED squad picks (pre-season: no locked GW yet — fall back to
+  // the target and let the picks endpoint 404 as it always has).
+  const picksResponse = await fetchPicks(teamId, squadGw ?? currentGw);
   const squadPlayerIds = picksResponse.picks.map((p) => p.element);
 
   const playerMap = new Map(players.map((p) => [p.id, p]));
@@ -162,6 +167,8 @@ export async function runSquadAnalysisPipeline(
     bank,
     currentGw,
     deadline,
+    squadGw,
+    inPlayGw,
     generatedAt: new Date().toISOString(),
     scoredCandidatePool,
   };

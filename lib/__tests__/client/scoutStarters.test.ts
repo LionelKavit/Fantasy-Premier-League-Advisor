@@ -9,6 +9,7 @@ function plan(over: Partial<GameweekPlan>): GameweekPlan {
     teamId: 1,
     currentGw: 20,
     deadline: null,
+    inPlayGw: null,
     transfers: null,
     captaincy: null,
     squad: [],

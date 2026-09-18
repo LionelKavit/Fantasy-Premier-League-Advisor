@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { fetchBootstrap, fetchFixtures } from "@/lib/fpl-api";
 import {
-  detectCurrentGameweek,
+  detectTargetGameweek,
   detectGameweekFlags,
   computeFdrRun,
 } from "@/lib/gameweek";
@@ -14,7 +14,9 @@ export async function GET() {
       fetchFixtures(),
     ]);
 
-    const currentGw = detectCurrentGameweek(bootstrap.gameweeks);
+    // FDR runs and BGW/DGW flags describe the gameweek being PREPARED, not the last
+    // locked one (target-gameweek-alignment).
+    const currentGw = detectTargetGameweek(bootstrap.gameweeks);
     if (!currentGw) {
       return NextResponse.json(
         { error: "Could not determine current gameweek", status: 500 } satisfies ApiErrorResponse,

@@ -7,6 +7,10 @@ import type {
   GameweekFlags,
 } from "./types";
 
+// FPL's `is_current` gameweek: the last one whose picks are LOCKED (in play, or the
+// most recently finished one until the next deadline passes). Use it for the picks
+// fetch and for nothing that means "the gameweek being prepared" — see
+// detectTargetGameweek (target-gameweek-alignment).
 export function detectCurrentGameweek(events: Gameweek[]): Gameweek | null {
   const current = events.find((e) => e.is_current);
   if (current) return current;
@@ -18,6 +22,28 @@ export function detectCurrentGameweek(events: Gameweek[]): Gameweek | null {
   if (finished.length > 0) return finished[finished.length - 1];
 
   return null;
+}
+
+// The gameweek being PREPARED: the first unfinished one whose deadline is still in the
+// future. This is what every scorer, planner, chip window, prompt and label should use —
+// it is the round the historical backtest and the research replays pass as the target,
+// so the shipped weights are aligned to it. FPL keeps `is_current` on the just-played
+// gameweek for the whole preparation week, which is why that flag is the wrong origin.
+// Falls back to detectCurrentGameweek when no future deadline exists (season over, or
+// the API mid-rollover) so end-of-season behaviour holds.
+export function detectTargetGameweek(events: Gameweek[], now: number = Date.now()): Gameweek | null {
+  const target = [...events]
+    .filter((e) => !e.finished && e.deadline_time != null && Date.parse(e.deadline_time) > now)
+    .sort((a, b) => a.id - b.id)[0];
+  return target ?? detectCurrentGameweek(events);
+}
+
+// The gameweek IN PLAY: deadline passed, matches not all finished. Null outside that
+// window (i.e. for the whole preparation week). Display-only.
+export function detectInPlayGameweek(events: Gameweek[], now: number = Date.now()): Gameweek | null {
+  const current = events.find((e) => e.is_current);
+  if (!current || current.finished) return null;
+  return Date.parse(current.deadline_time) <= now ? current : null;
 }
 
 export function computeTeamFixtureCounts(

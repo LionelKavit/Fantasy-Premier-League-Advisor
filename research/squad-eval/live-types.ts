@@ -139,8 +139,12 @@ export interface LiveCaptureRecord {
   // with no capture (e.g. GW1, where the public API exposes no picks pre-deadline); it
   // carries NO app recommendation and is never scored.
   captureMode?: "pre-deadline" | "retrospective";
-  pipelineGw: number; // analysis.currentGw as the app computed it (transparency)
-  squadAsOfGw?: number; // the locked picks the pipeline read (= pipelineGw; see capture.ts header)
+  // analysis.currentGw as the app computed it. Since target-gameweek-alignment (2026-09-18)
+  // this is the TARGET gameweek (= `gw` for a clean capture). Records before that date carry
+  // the LOCKED gameweek here (= gw − 1): their fixture signals were computed one gameweek
+  // behind, which is why their pool rows have no `fixture_gw` column and the fit excludes them.
+  pipelineGw: number;
+  squadAsOfGw?: number; // the locked picks the pipeline read (target − 1 in a normal week)
   xi: number[];
   benchIds: number[];
   actualCaptainId: number | null; // the manager's captain in that locked squad

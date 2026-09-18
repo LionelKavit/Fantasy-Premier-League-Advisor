@@ -44,11 +44,14 @@ export async function buildAnalysisContext(
 export async function buildLiteBaseContext(teamId: number): Promise<AnalysisContext> {
   const [bootstrap, fixtures] = await Promise.all([fetchBootstrap(), fetchFixtures()]);
   const managerProfile = await buildManagerProfile(teamId, bootstrap);
-  const currentGw = bootstrap.currentGameweek?.id ?? 1;
-  const deadline = bootstrap.currentGameweek?.deadline_time ?? null;
+  // Target = gameweek being prepared (scoring origin); picks come from the last locked GW.
+  const currentGw = bootstrap.targetGameweek?.id ?? 1;
+  const deadline = bootstrap.targetGameweek?.deadline_time ?? null;
+  const squadGw = bootstrap.currentGameweek?.id ?? null;
+  const inPlayGw = bootstrap.inPlayGameweek?.id ?? null;
   const { players, teams } = bootstrap;
 
-  const picksResponse = await fetchPicks(teamId, currentGw);
+  const picksResponse = await fetchPicks(teamId, squadGw ?? currentGw);
   const playerMap = new Map(players.map((p) => [p.id, p]));
   const squadPlayers = picksResponse.picks
     .map((pick) => playerMap.get(pick.element))
@@ -70,6 +73,8 @@ export async function buildLiteBaseContext(teamId: number): Promise<AnalysisCont
     bank: picksResponse.entry_history.bank,
     currentGw,
     deadline,
+    squadGw,
+    inPlayGw,
     generatedAt: new Date().toISOString(),
   };
 
@@ -83,8 +88,10 @@ export async function buildLiteBaseContext(teamId: number): Promise<AnalysisCont
 // but the squad comes from buildDemoSquad and the manager profile is stubbed.
 export async function buildDemoContext(): Promise<AnalysisContext> {
   const [bootstrap, fixtures] = await Promise.all([fetchBootstrap(), fetchFixtures()]);
-  const currentGw = bootstrap.currentGameweek?.id ?? 1;
-  const deadline = bootstrap.currentGameweek?.deadline_time ?? null;
+  const currentGw = bootstrap.targetGameweek?.id ?? 1;
+  const deadline = bootstrap.targetGameweek?.deadline_time ?? null;
+  const squadGw = bootstrap.currentGameweek?.id ?? null;
+  const inPlayGw = bootstrap.inPlayGameweek?.id ?? null;
   const { players, teams } = bootstrap;
 
   const season = deriveDemoSeason(bootstrap.gameweeks);
@@ -110,6 +117,8 @@ export async function buildDemoContext(): Promise<AnalysisContext> {
     bank: picks.entry_history.bank,
     currentGw,
     deadline,
+    squadGw,
+    inPlayGw,
     generatedAt: new Date().toISOString(),
   };
 

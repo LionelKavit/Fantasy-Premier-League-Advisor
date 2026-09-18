@@ -30,6 +30,19 @@ describe("computeCaptainHorizon", () => {
     expect(dgw.bestScore).toBeGreaterThan(single.bestScore);
   });
 
+  it("never applies the ep_next blend — every entry is a future week the projection does not describe", () => {
+    // target-gameweek-alignment: currentGw is the target (scored separately with ep);
+    // the horizon is currentGw+1.., so ep_next must not move any horizon score.
+    const fixtures = [21, 22, 23].map((event) => makeFixture({ event, team_h: 1, team_a: 2, team_h_difficulty: 3 }));
+    const build = (epNext: number) => {
+      const squad = Array.from({ length: 11 }, (_, i) => makeScoredPlayer({ player: { id: i + 1, teamId: 1, position: "MID", epNext } }));
+      const picks = squad.map((sp, i) => makePick({ element: sp.player.id, position: i + 1 }));
+      return computeCaptainHorizon(squad, picks, fixtures, teams, 20, 3).map((e) => e.bestScore);
+    };
+    expect(build(0)).toEqual(build(20));
+    expect(computeCaptainHorizon([], [], fixtures, teams, 20, 3)).toEqual([]);
+  });
+
   it("stops at the end of the season", () => {
     const { squad, picks } = xi();
     const fixtures = [makeFixture({ event: 38, team_h: 1, team_a: 2, team_h_difficulty: 3 })];

@@ -59,8 +59,9 @@ export interface PlanInsights {
 
 export interface GameweekPlan {
   teamId: number;
-  currentGw: number;
-  deadline: string | null; // ISO deadline of the current gameweek (when picks lock)
+  currentGw: number; // the TARGET gameweek being prepared (target-gameweek-alignment)
+  deadline: string | null; // ISO deadline of the target gameweek (when its picks lock)
+  inPlayGw: number | null; // gameweek in play (deadline passed, unfinished), else null
   transfers: OptimizerResult | null;
   captaincy: CaptainResult | null;
   squad: SquadPlayerView[];

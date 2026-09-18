@@ -33,6 +33,7 @@ function fakePlan(over: Partial<GameweekPlan> = {}): GameweekPlan {
     teamId: 1,
     currentGw: 20,
     deadline: "2026-02-14T11:30:00Z",
+    inPlayGw: null,
     transfers: null,
     captaincy: null,
     squad: [],

@@ -77,6 +77,9 @@ function buildUniverse(): { bootstrap: BootstrapData; fixtures: Fixture[]; squad
     teams,
     gameweeks: [makeGameweek({ id: CURRENT_GW })],
     currentGameweek: makeGameweek({ id: CURRENT_GW, deadline_time: CURRENT_DEADLINE }),
+    // The flow test prepares CURRENT_GW on the squad locked for it (target = locked here).
+    targetGameweek: makeGameweek({ id: CURRENT_GW, deadline_time: CURRENT_DEADLINE }),
+    inPlayGameweek: null,
     chips: [],
   };
   return {
@@ -267,9 +270,10 @@ describe("gameweek deadline threads onto the plan (gameweek-deadline-surface)", 
     expect(plan.deadline).toBe(CURRENT_DEADLINE);
   });
 
-  it("is null when the bootstrap has no current gameweek (off-season / cold start)", async () => {
+  it("is null when the bootstrap has no target gameweek (off-season / cold start)", async () => {
     _clearContextCache();
-    vi.mocked(fetchBootstrap).mockResolvedValue({ ...universe.bootstrap, currentGameweek: null });
+    // The deadline is the TARGET's (target-gameweek-alignment); with no target there is none.
+    vi.mocked(fetchBootstrap).mockResolvedValue({ ...universe.bootstrap, currentGameweek: null, targetGameweek: null });
     const base = await runGameweekPlanBase(1, { freeTransfers: 1 });
     expect(base.deadline).toBeNull();
   });

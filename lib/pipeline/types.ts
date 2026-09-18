@@ -119,8 +119,16 @@ export interface SquadAnalysisResult {
   picks: Pick[];
   chipsRemaining: ChipsRemaining;
   bank: number;
+  // The TARGET gameweek — the one being prepared (target-gameweek-alignment). Every
+  // fixture/statistical signal, horizon, chip window, prompt and label keys off this;
+  // it is the same "round N" the backtest and replays pass, so the weights align.
   currentGw: number;
-  deadline: string | null; // ISO deadline of the current gameweek (when picks lock)
+  deadline: string | null; // ISO deadline of the TARGET gameweek (when its picks lock)
+  // The last LOCKED gameweek (FPL `is_current`) — the picks the analysis was built on;
+  // the manager's in-progress changes for the target are never public. Null pre-season.
+  squadGw: number | null;
+  // The gameweek in play (deadline passed, not finished), else null. Display-only.
+  inPlayGw: number | null;
   generatedAt: string;
   // The transfer candidate pool (top-N per position by PPG, non-squad) scored the same
   // way as the squad. Exposed for the offline live-eval dataset (research/squad-eval)

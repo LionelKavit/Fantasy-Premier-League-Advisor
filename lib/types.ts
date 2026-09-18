@@ -406,7 +406,14 @@ export interface BootstrapData {
   players: Player[];
   teams: Team[];
   gameweeks: Gameweek[];
+  // Three gameweeks, each named for what it is (target-gameweek-alignment):
+  //  - currentGameweek: FPL `is_current` — the last LOCKED gameweek (picks public).
+  //  - targetGameweek:  the gameweek being PREPARED (first unfinished, future deadline).
+  //                     Every scorer/planner/label uses this.
+  //  - inPlayGameweek:  deadline passed, not finished — the live window; else null.
   currentGameweek: Gameweek | null;
+  targetGameweek: Gameweek | null;
+  inPlayGameweek: Gameweek | null;
   chips: BootstrapChip[];
 }
 

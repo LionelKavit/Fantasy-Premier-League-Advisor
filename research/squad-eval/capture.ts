@@ -78,6 +78,10 @@ export const POOL_COLUMNS = [
   "captured_at", "in_squad", "ep_this", "price", "selected_by_pct", "availability", "chance_next",
   "llm_rotationRisk", "llm_injurySeverity", "llm_adj", "trend_class", "fidelity",
   "post_deadline", // 1 ⇒ contaminated (captured after picks locked) — the dataset builder drops it
+  // The gameweek the fixture signals were computed FROM (target-gameweek-alignment). Equal
+  // to `gw` for every row written after the fix; rows from before it lack the column — their
+  // fixture columns describe the previous (played) gameweek and the fit excludes them.
+  "fixture_gw",
 ];
 const round4 = (n: number) => Math.round(n * 1e4) / 1e4;
 
@@ -86,7 +90,8 @@ function poolRow(
   inSquad: boolean,
   gw: number,
   capturedAt: string,
-  postDeadline: boolean
+  postDeadline: boolean,
+  fixtureGw: number
 ): Record<string, unknown> {
   const p = sp.player;
   const s = sp.statisticalSignals;
@@ -114,6 +119,7 @@ function poolRow(
     llm_adj: round4(sp.score.llmAdjustment), trend_class: sp.score.trendClassification ?? "",
     fidelity: sp.fidelity, // which scoring tier produced the row (all "full" from the pipeline)
     post_deadline: postDeadline ? 1 : 0,
+    fixture_gw: fixtureGw,
   };
   for (const k of SM_KEYS) row[`sm_${k}`] = round4(sm[k] ?? 0);
   for (const k of TIER2_COLUMNS) row[k] = ""; // unavailable — Tier-2 features come from the historical archive only
@@ -260,9 +266,9 @@ async function main() {
 
   // ── Scored-pool dump (every row the pipeline scored, point-in-time) ────────────
   const capturedAt = writeAt.toISOString();
-  const squadRows = analysis.rankedSquad.map((sp) => poolRow(sp, true, target.id, capturedAt, plan.postDeadline));
+  const squadRows = analysis.rankedSquad.map((sp) => poolRow(sp, true, target.id, capturedAt, plan.postDeadline, analysis.currentGw));
   const candidateRows = (analysis.scoredCandidatePool ?? []).map((sp) =>
-    poolRow(sp, false, target.id, capturedAt, plan.postDeadline)
+    poolRow(sp, false, target.id, capturedAt, plan.postDeadline, analysis.currentGw)
   );
   mkdirSync(POOL_DIR, { recursive: true });
   const poolFile = plan.poolFile;
@@ -283,7 +289,8 @@ async function main() {
       squadIds.has(p.id),
       target.id,
       capturedAt,
-      plan.postDeadline
+      plan.postDeadline,
+      analysis.currentGw
     )
   );
   writeCsv(join(POOL_DIR, plan.universeFile), POOL_COLUMNS, universeRows);
@@ -295,8 +302,8 @@ async function main() {
     deadline: target.deadline_time,
     postDeadline: plan.postDeadline,
     captureMode: "pre-deadline",
-    pipelineGw: analysis.currentGw,
-    squadAsOfGw: analysis.currentGw,
+    pipelineGw: analysis.currentGw, // the target (= gw for a clean capture) since target-gameweek-alignment
+    squadAsOfGw: analysis.squadGw ?? analysis.currentGw,
     xi: xiIds,
     benchIds: analysis.picks.filter((p) => p.position > 11).map((p) => p.element),
     actualCaptainId: analysis.picks.find((p) => p.is_captain)?.element ?? null,
@@ -344,7 +351,7 @@ async function main() {
           `, composite ${signed(transfer.primary.netGain, 3)}, ${transfer.freeTransfersAssumed} FT assumed)`
         : `hold (${transfer.primary.type}; ${transfer.freeTransfersAssumed} FT assumed${transfer.dataNotice ? `; ${transfer.dataNotice}` : ""})`;
   console.log(
-    `Captured GW ${target.id} (squad as locked for GW ${analysis.currentGw}):\n` +
+    `Captured GW ${target.id} (squad as locked for GW ${analysis.squadGw ?? analysis.currentGw}):\n` +
       `  captain  → ${record.appCaptain?.webName ?? "unavailable"}` +
       ` (score ${record.appCaptain?.captainScore.toFixed(2) ?? "—"}, ep_next ${record.appCaptain?.epNext ?? "—"})` +
       `; your armband in that squad: ${record.actualCaptainId ?? "unavailable"}\n` +

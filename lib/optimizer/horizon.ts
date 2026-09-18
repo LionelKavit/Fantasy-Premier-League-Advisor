@@ -18,13 +18,15 @@ export function computeHorizon(
   const entries: HorizonEntry[] = [];
 
   for (const vt of top5) {
-    const horizonLength = Math.min(5, maxGw - currentGw);
+    // `currentGw` is the TARGET gameweek (target-gameweek-alignment): the horizon is the
+    // target and the four after it, so the first entry is the gameweek being prepared.
+    const horizonLength = Math.min(5, maxGw - currentGw + 1);
     if (horizonLength <= 0) continue;
 
     const gwScores: HorizonGwScore[] = [];
     const perGwGains: number[] = [];
 
-    for (let offset = 1; offset <= horizonLength; offset++) {
+    for (let offset = 0; offset < horizonLength; offset++) {
       const gw = currentGw + offset;
 
       const candidateScore = rescoreForGw(

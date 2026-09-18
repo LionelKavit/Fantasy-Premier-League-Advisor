@@ -41,9 +41,11 @@ describe("computeHorizon", () => {
   });
 
   it("pads cumulativeGain to length 5 near the end of the season", () => {
-    const entries = computeHorizon([buyNowTransfer()], runFixtures([37, 38]), teams, 36);
+    // currentGw is the TARGET (target-gameweek-alignment): preparing GW37 ⇒ GW37, GW38.
+    const entries = computeHorizon([buyNowTransfer()], runFixtures([37, 38]), teams, 37);
     const e = entries[0];
     expect(e.gwScores).toHaveLength(2); // only GW37, GW38 remain
+    expect(e.gwScores.map((g) => g.gw)).toEqual([37, 38]);
     expect(e.cumulativeGain).toHaveLength(5);
     // padded tail repeats the last real value
     expect(e.cumulativeGain[4]).toBe(e.cumulativeGain[1]);
