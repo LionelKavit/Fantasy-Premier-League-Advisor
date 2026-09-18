@@ -128,8 +128,13 @@ ${JSON.stringify(restructureOptions.map(ro => ({
 ${JSON.stringify(horizon.map(h => ({
   candidate: h.candidate.player.webName,
   replacing: h.weakPlayer.player.webName,
+  // timing: BUY_NOW | WAIT (candidate's fixtures improve later, or blanks now) |
+  // SHORT_TERM (fixture edge now, fades — plan to flip). fixtureEdge is per-GW in FDR
+  // steps, positive = candidate has the easier week.
   timing: h.timing,
-  fixtureSwing: h.fixtureSwing,
+  nearEdge: h.nearEdge.toFixed(2),
+  farEdge: h.farEdge.toFixed(2),
+  fixtureEdge: h.fixtureEdge.map(e => e.toFixed(1)),
   cumulativeGain: h.cumulativeGain.map(g => g.toFixed(3)),
 })), null, 2)}
 

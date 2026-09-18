@@ -83,10 +83,16 @@ export interface HorizonGwScore {
 export interface HorizonEntry {
   candidate: ScoredPlayer;
   weakPlayer: ScoredPlayer;
-  gwScores: HorizonGwScore[];
-  cumulativeGain: number[];
-  fixtureSwing: boolean;
-  timing: "BUY_NOW" | "WAIT" | "BUY_NOW_SELL_LATER";
+  gwScores: HorizonGwScore[]; // per-GW composite rescoring (fixture term only varies)
+  cumulativeGain: number[]; // running composite gain, padded to 5 — the LEVEL gate (must end > 0)
+  // Per-GW fixture edge in difficulty steps: effective(weak FDR) − effective(candidate FDR);
+  // positive = the candidate has the easier week. Blanks/doubles per HORIZON_TIMING.
+  fixtureEdge: number[];
+  nearEdge: number; // mean edge over the first HORIZON_TIMING.nearGws gameweeks
+  farEdge: number; // mean edge over the remaining gameweeks (= nearEdge when none)
+  // WAIT: near trails far by > threshold, or the candidate blanks in the target GW.
+  // SHORT_TERM: near leads far by > threshold (edge now, fades). BUY_NOW: otherwise.
+  timing: "BUY_NOW" | "WAIT" | "SHORT_TERM";
 }
 
 export type ChipName = "wildcard" | "freeHit" | "benchBoost" | "tripleCaptain";
