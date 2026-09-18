@@ -35,8 +35,8 @@
       "ppgId": null,
       "ownId": null
     },
-    "llm": "unavailable — no pre-deadline capture — the public API exposes no picks before the GW1 deadline",
-    "transfer": "unavailable — no pre-deadline capture — the public API exposes no picks before the GW1 deadline",
+    "llm": "unavailable \u2014 no pre-deadline capture \u2014 the public API exposes no picks before the GW1 deadline",
+    "transfer": "unavailable \u2014 no pre-deadline capture \u2014 the public API exposes no picks before the GW1 deadline",
     "realized": {
       "syncedAt": "2026-09-15T16:42:37.098Z",
       "chip": null,
@@ -115,7 +115,7 @@
         },
         {
           "id": 124,
-          "webName": "Groß",
+          "webName": "Gro\u00df",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -123,7 +123,7 @@
         },
         {
           "id": 165,
-          "webName": "João Pedro",
+          "webName": "Jo\u00e3o Pedro",
           "multiplier": 2,
           "isCaptain": true,
           "isVice": false,
@@ -149,7 +149,7 @@
         },
         {
           "id": 25,
-          "webName": "Gyökeres",
+          "webName": "Gy\u00f6keres",
           "multiplier": 0,
           "isCaptain": false,
           "isVice": false,
@@ -223,7 +223,7 @@
     },
     "appVice": {
       "id": 165,
-      "webName": "João Pedro",
+      "webName": "Jo\u00e3o Pedro",
       "captainScore": 3.811875,
       "breakdown": {
         "baseProjection": 3.55,
@@ -260,7 +260,7 @@
       },
       {
         "id": 165,
-        "webName": "João Pedro",
+        "webName": "Jo\u00e3o Pedro",
         "captainScore": 3.811875,
         "breakdown": {
           "baseProjection": 3.55,
@@ -278,7 +278,7 @@
       },
       {
         "id": 124,
-        "webName": "Groß",
+        "webName": "Gro\u00df",
         "captainScore": 3.6802500000000005,
         "breakdown": {
           "baseProjection": 2.4050000000000002,
@@ -446,7 +446,7 @@
     "llm": {
       "used": true,
       "confidence": "high",
-      "narrativeSummary": "Fernandes is the clear captain call — highest captain score (5.11), penalty taker status raises his ceiling, and at 48.1% EO he sits right in the template sweet spot. At rank 2,201,654 with a balanced strategy and 37 gameweeks ahead, there's no urgency to chase a differential risk this early; captaining Fernandes means you move with half the field if he hauls and don't bleed rank if he doesn't. João Pedro (68.5% EO) is the natural vice-captain fallback — heavily owned enough that missing his points would hurt more than captaining Fernandes. Hold the Triple Captain chip; no upcoming week clears the bar meaningfully enough to burn it now."
+      "narrativeSummary": "Fernandes is the clear captain call \u2014 highest captain score (5.11), penalty taker status raises his ceiling, and at 48.1% EO he sits right in the template sweet spot. At rank 2,201,654 with a balanced strategy and 37 gameweeks ahead, there's no urgency to chase a differential risk this early; captaining Fernandes means you move with half the field if he hauls and don't bleed rank if he doesn't. Jo\u00e3o Pedro (68.5% EO) is the natural vice-captain fallback \u2014 heavily owned enough that missing his points would hurt more than captaining Fernandes. Hold the Triple Captain chip; no upcoming week clears the bar meaningfully enough to burn it now."
     },
     "realized": {
       "syncedAt": "2026-09-15T16:42:37.098Z",
@@ -502,7 +502,7 @@
         },
         {
           "id": 565,
-          "webName": "M.Sangaré",
+          "webName": "M.Sangar\u00e9",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -510,7 +510,7 @@
         },
         {
           "id": 124,
-          "webName": "Groß",
+          "webName": "Gro\u00df",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -526,7 +526,7 @@
         },
         {
           "id": 165,
-          "webName": "João Pedro",
+          "webName": "Jo\u00e3o Pedro",
           "multiplier": 2,
           "isCaptain": true,
           "isVice": false,
@@ -552,7 +552,7 @@
         },
         {
           "id": 25,
-          "webName": "Gyökeres",
+          "webName": "Gy\u00f6keres",
           "multiplier": 0,
           "isCaptain": false,
           "isVice": false,
@@ -586,7 +586,7 @@
           "outId": 431,
           "outName": "Amad",
           "inId": 565,
-          "inName": "M.Sangaré",
+          "inName": "M.Sangar\u00e9",
           "time": "2026-08-28T15:34:30.353988Z"
         }
       ],
@@ -642,7 +642,7 @@
     },
     "appVice": {
       "id": 165,
-      "webName": "João Pedro",
+      "webName": "Jo\u00e3o Pedro",
       "captainScore": 9.396343125000003,
       "breakdown": {
         "baseProjection": 7.9350000000000005,
@@ -679,7 +679,7 @@
       },
       {
         "id": 165,
-        "webName": "João Pedro",
+        "webName": "Jo\u00e3o Pedro",
         "captainScore": 9.396343125000003,
         "breakdown": {
           "baseProjection": 7.9350000000000005,
@@ -733,7 +733,7 @@
       },
       {
         "id": 565,
-        "webName": "M.Sangaré",
+        "webName": "M.Sangar\u00e9",
         "captainScore": 6.368181818181818,
         "breakdown": {
           "baseProjection": 6.15,
@@ -769,7 +769,7 @@
       },
       {
         "id": 124,
-        "webName": "Groß",
+        "webName": "Gro\u00df",
         "captainScore": 5.5253000000000005,
         "breakdown": {
           "baseProjection": 5.085,
@@ -865,7 +865,7 @@
     "llm": {
       "used": true,
       "confidence": "high",
-      "narrativeSummary": "Fernandes is the clear captain call at rank 1,185,762 with 36 gameweeks remaining — a balanced stance means protecting rank without over-hedging. He leads all candidates on captain score (13.98), carries a penalty threat, and faces an FDR 2 home fixture; crucially, his 48.4% EO sits well below Haaland (72.4%) and João Pedro (69.0%), meaning he's a template pick without being a full crowded bet — you move with enough of the field to protect rank but still gain ground if he hauls while the bigger-EO names blank. VC falls to João Pedro as given, covering Chelsea's favourable home game. No TC case this week — Fernandes' own baseline outstrips anything on the near horizon."
+      "narrativeSummary": "Fernandes is the clear captain call at rank 1,185,762 with 36 gameweeks remaining \u2014 a balanced stance means protecting rank without over-hedging. He leads all candidates on captain score (13.98), carries a penalty threat, and faces an FDR 2 home fixture; crucially, his 48.4% EO sits well below Haaland (72.4%) and Jo\u00e3o Pedro (69.0%), meaning he's a template pick without being a full crowded bet \u2014 you move with enough of the field to protect rank but still gain ground if he hauls while the bigger-EO names blank. VC falls to Jo\u00e3o Pedro as given, covering Chelsea's favourable home game. No TC case this week \u2014 Fernandes' own baseline outstrips anything on the near horizon."
     },
     "realized": {
       "syncedAt": "2026-09-15T16:42:37.098Z",
@@ -929,7 +929,7 @@
         },
         {
           "id": 124,
-          "webName": "Groß",
+          "webName": "Gro\u00df",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -937,7 +937,7 @@
         },
         {
           "id": 565,
-          "webName": "M.Sangaré",
+          "webName": "M.Sangar\u00e9",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -979,7 +979,7 @@
         },
         {
           "id": 165,
-          "webName": "João Pedro",
+          "webName": "Jo\u00e3o Pedro",
           "multiplier": 0,
           "isCaptain": false,
           "isVice": false,
@@ -1003,7 +1003,7 @@
       "transfers": [
         {
           "outId": 25,
-          "outName": "Gyökeres",
+          "outName": "Gy\u00f6keres",
           "inId": 464,
           "inName": "Wissa",
           "time": "2026-09-04T17:24:57.896510Z"
@@ -1118,7 +1118,7 @@
       },
       {
         "id": 124,
-        "webName": "Groß",
+        "webName": "Gro\u00df",
         "captainScore": 6.748950000000001,
         "breakdown": {
           "baseProjection": 4.5600000000000005,
@@ -1136,7 +1136,7 @@
       },
       {
         "id": 565,
-        "webName": "M.Sangaré",
+        "webName": "M.Sangar\u00e9",
         "captainScore": 5.738014285714286,
         "breakdown": {
           "baseProjection": 4.6899999999999995,
@@ -1286,7 +1286,7 @@
     "llm": {
       "used": true,
       "confidence": "high",
-      "narrativeSummary": "Haaland is the clear captain call. At 71.2% effective ownership he is the template — skipping him is a rank gamble that a rising manager at 1.5m doesn't need to take. He pairs the highest captain score (9.53) with a home FDR 2 fixture and penalty duties, giving him the ceiling to haul and the floor to limit damage if the game is tight. B.Fernandes is a solid vice at 42.8% EO with his own penalties and strong form, providing meaningful upside as the fallback."
+      "narrativeSummary": "Haaland is the clear captain call. At 71.2% effective ownership he is the template \u2014 skipping him is a rank gamble that a rising manager at 1.5m doesn't need to take. He pairs the highest captain score (9.53) with a home FDR 2 fixture and penalty duties, giving him the ceiling to haul and the floor to limit damage if the game is tight. B.Fernandes is a solid vice at 42.8% EO with his own penalties and strong form, providing meaningful upside as the fallback."
     },
     "transfer": {
       "freeTransfersAssumed": 1,
@@ -1333,13 +1333,13 @@
       },
       "hitVerdict": {
         "recommended": false,
-        "reasoning": "No hit options are flagged by the model, and the manager's risk-averse profile with 35 GWs remaining makes taking a 4-point penalty this early deeply unattractive. The best available free move (Scherpen → Tzolakis) delivers a positive gain without cost. Paying hits to accelerate a rank improvement of this magnitude — sub-1.5 points over 5 GWs — would take many gameweeks just to neutralise the deduction, not worth it at rank 1.5M with time on your side.",
+        "reasoning": "No hit options are flagged by the model, and the manager's risk-averse profile with 35 GWs remaining makes taking a 4-point penalty this early deeply unattractive. The best available free move (Scherpen \u2192 Tzolakis) delivers a positive gain without cost. Paying hits to accelerate a rank improvement of this magnitude \u2014 sub-1.5 points over 5 GWs \u2014 would take many gameweeks just to neutralise the deduction, not worth it at rank 1.5M with time on your side.",
         "breakEvenGw": null
       },
       "dataNotice": null,
       "alerts": [],
       "confidence": "high",
-      "narrativeSummary": "Scherpen is the weaker bench keeper here, and Tzolakis edges out Donnarumma and Trafford not just on GW3 gain but in compounding cumulative value — 1.13 pts over five weeks versus 0.88-0.89 for the alternatives, and at a fraction of the cost (£0.1m delta vs £0.5-1.0m). The real decision to track next week is whether to flip Kinsky to Tzolakis too: that move projects a 2.22-point gain over five GWs, the single highest-value horizon transfer on the board, and banking this week's free transfer creates the flexibility to do it without a hit. Given 35 GWs remaining and a rising rank, there's no urgency to overload transfers now — patience here is the edge, not aggression."
+      "narrativeSummary": "Scherpen is the weaker bench keeper here, and Tzolakis edges out Donnarumma and Trafford not just on GW3 gain but in compounding cumulative value \u2014 1.13 pts over five weeks versus 0.88-0.89 for the alternatives, and at a fraction of the cost (\u00a30.1m delta vs \u00a30.5-1.0m). The real decision to track next week is whether to flip Kinsky to Tzolakis too: that move projects a 2.22-point gain over five GWs, the single highest-value horizon transfer on the board, and banking this week's free transfer creates the flexibility to do it without a hit. Given 35 GWs remaining and a rising rank, there's no urgency to overload transfers now \u2014 patience here is the edge, not aggression."
     },
     "pool": {
       "file": "pool/gw04.csv",
@@ -1403,7 +1403,7 @@
         },
         {
           "id": 15,
-          "webName": "Ødegaard",
+          "webName": "\u00d8degaard",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": true,
@@ -1411,7 +1411,7 @@
         },
         {
           "id": 124,
-          "webName": "Groß",
+          "webName": "Gro\u00df",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -1419,7 +1419,7 @@
         },
         {
           "id": 165,
-          "webName": "João Pedro",
+          "webName": "Jo\u00e3o Pedro",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -1453,7 +1453,7 @@
         },
         {
           "id": 565,
-          "webName": "M.Sangaré",
+          "webName": "M.Sangar\u00e9",
           "multiplier": 0,
           "isCaptain": false,
           "isVice": false,
@@ -1487,13 +1487,685 @@
           "outId": 45,
           "outName": "McGinn",
           "inId": 15,
-          "inName": "Ødegaard",
+          "inName": "\u00d8degaard",
           "time": "2026-09-12T09:26:34.874825Z"
         }
       ],
       "transfersCost": 0,
       "bank": 0.2,
       "squadValue": 100.4
+    }
+  },
+  {
+    "gw": 5,
+    "teamId": 2558300,
+    "capturedAt": "2026-09-18T06:40:49.123Z",
+    "deadline": "2026-09-18T17:30:00Z",
+    "postDeadline": false,
+    "captureMode": "pre-deadline",
+    "pipelineGw": 4,
+    "squadAsOfGw": 4,
+    "xi": [
+      564,
+      418,
+      8,
+      87,
+      426,
+      367,
+      15,
+      124,
+      165,
+      464,
+      411
+    ],
+    "benchIds": [
+      496,
+      565,
+      32,
+      532
+    ],
+    "actualCaptainId": 411,
+    "appCaptain": {
+      "id": 124,
+      "webName": "Gro\u00df",
+      "captainScore": 8.498000000000001,
+      "breakdown": {
+        "baseProjection": 6.375,
+        "ceilingBoost": 1.2125,
+        "fixtureMultiplier": 1.12,
+        "minutesCertainty": 1,
+        "dgwMultiplier": 1,
+        "formSignal": 8.2
+      },
+      "epNext": 8.2,
+      "compositeTotal": 0.9696242013771247,
+      "effectiveOwnership": 0.201,
+      "rotationRisk": 0,
+      "injurySeverity": 0
+    },
+    "appVice": {
+      "id": 426,
+      "webName": "B.Fernandes",
+      "captainScore": 7.226100000000001,
+      "breakdown": {
+        "baseProjection": 6.445,
+        "ceilingBoost": 1.325,
+        "fixtureMultiplier": 0.93,
+        "minutesCertainty": 1,
+        "dgwMultiplier": 1,
+        "formSignal": 7.2
+      },
+      "epNext": 7.2,
+      "compositeTotal": 0.9821959694406985,
+      "effectiveOwnership": 0.408,
+      "rotationRisk": 0,
+      "injurySeverity": 0
+    },
+    "rankedCandidates": [
+      {
+        "id": 124,
+        "webName": "Gro\u00df",
+        "captainScore": 8.498000000000001,
+        "breakdown": {
+          "baseProjection": 6.375,
+          "ceilingBoost": 1.2125,
+          "fixtureMultiplier": 1.12,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 8.2
+        },
+        "epNext": 8.2,
+        "compositeTotal": 0.9696242013771247,
+        "effectiveOwnership": 0.201,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 426,
+        "webName": "B.Fernandes",
+        "captainScore": 7.226100000000001,
+        "breakdown": {
+          "baseProjection": 6.445,
+          "ceilingBoost": 1.325,
+          "fixtureMultiplier": 0.93,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 7.2
+        },
+        "epNext": 7.2,
+        "compositeTotal": 0.9821959694406985,
+        "effectiveOwnership": 0.408,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 411,
+        "webName": "Haaland",
+        "captainScore": 7.1754925,
+        "breakdown": {
+          "baseProjection": 6.955,
+          "ceilingBoost": 1.628125,
+          "fixtureMultiplier": 0.88,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 8.2
+        },
+        "epNext": 8.2,
+        "compositeTotal": 0.9702034519229663,
+        "effectiveOwnership": 0.7290000000000001,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 15,
+        "webName": "\u00d8degaard",
+        "captainScore": 5.67227868852459,
+        "breakdown": {
+          "baseProjection": 5.720000000000001,
+          "ceilingBoost": 0.25081967213114753,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 6.8
+        },
+        "epNext": 6.8,
+        "compositeTotal": 0.9621590866712366,
+        "effectiveOwnership": 0.19699999999999998,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 367,
+        "webName": "Gakpo",
+        "captainScore": 5.629313320312501,
+        "breakdown": {
+          "baseProjection": 5.535,
+          "ceilingBoost": 0.253125,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 0.8312499999999999,
+          "dgwMultiplier": 1,
+          "formSignal": 7.2
+        },
+        "epNext": 7.2,
+        "compositeTotal": 0.9762701585832391,
+        "effectiveOwnership": 0.125,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 8,
+        "webName": "Calafiori",
+        "captainScore": 5.1383052147239265,
+        "breakdown": {
+          "baseProjection": 5.25,
+          "ceilingBoost": 0.15874233128834356,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 0.95,
+          "dgwMultiplier": 1,
+          "formSignal": 7
+        },
+        "epNext": 7,
+        "compositeTotal": 0.9970025828740232,
+        "effectiveOwnership": 0.502,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 165,
+        "webName": "Jo\u00e3o Pedro",
+        "captainScore": 4.659442734375,
+        "breakdown": {
+          "baseProjection": 5.205,
+          "ceilingBoost": 0.384375,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 0.7124999999999999,
+          "dgwMultiplier": 1,
+          "formSignal": 8.2
+        },
+        "epNext": 6.1,
+        "compositeTotal": 0.7743473374384755,
+        "effectiveOwnership": 0.722,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 87,
+        "webName": "Ajer",
+        "captainScore": 2.995625,
+        "breakdown": {
+          "baseProjection": 2.855,
+          "ceilingBoost": 0.140625,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 3.5
+        },
+        "epNext": 3.5,
+        "compositeTotal": 0.9476585243022622,
+        "effectiveOwnership": 0.040999999999999995,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 418,
+        "webName": "Maguire",
+        "captainScore": 2.2633875,
+        "breakdown": {
+          "baseProjection": 2.315,
+          "ceilingBoost": 0.11875,
+          "fixtureMultiplier": 0.93,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 2
+        },
+        "epNext": 2,
+        "compositeTotal": 0.9063215216783308,
+        "effectiveOwnership": 0.09699999999999999,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 464,
+        "webName": "Wissa",
+        "captainScore": 2.0845865384615383,
+        "breakdown": {
+          "baseProjection": 3.695,
+          "ceilingBoost": 0.27564102564102566,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 0.525,
+          "dgwMultiplier": 1,
+          "formSignal": 3.8
+        },
+        "epNext": 3.8,
+        "compositeTotal": 0.6708464469537633,
+        "effectiveOwnership": 0.185,
+        "rotationRisk": 0.95,
+        "injurySeverity": 0
+      },
+      {
+        "id": 564,
+        "webName": "Scherpen",
+        "captainScore": 1.9,
+        "breakdown": {
+          "baseProjection": 1.9,
+          "ceilingBoost": 0,
+          "fixtureMultiplier": 1,
+          "minutesCertainty": 1,
+          "dgwMultiplier": 1,
+          "formSignal": 1.8
+        },
+        "epNext": 1.8,
+        "compositeTotal": 0.6927850005269296,
+        "effectiveOwnership": 0.006,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      }
+    ],
+    "baselines": {
+      "ppgId": 411,
+      "ownId": 411
+    },
+    "llm": {
+      "used": true,
+      "confidence": "medium",
+      "narrativeSummary": "Gro\u00df leads the captain score (8.50) and sits at just 20.1% EO \u2014 low enough to gain meaningful ground on the field if he delivers, without being a reckless differential punt. He's on penalties, in strong form, and this is exactly the balanced play this manager's falling rank needs: not the full crowd-follow of Haaland (72.9% EO locks in your deficit), but not a genuine differential risk either. B.Fernandes at 40.8% EO is the vice-captain safety net \u2014 penalty taker, strong form, and a captain horizon that shows he's worth targeting in GW6 and GW8 too. Hold the Triple Captain chip; GW5 Haaland (9.54) doesn't clear the bar meaningfully enough yet \u2014 wait for a standout double gameweek."
+    },
+    "transfer": {
+      "freeTransfersAssumed": 1,
+      "bank": 0.2,
+      "primary": {
+        "type": "FREE",
+        "moves": [
+          {
+            "outId": 32,
+            "outName": "Cash",
+            "inId": 330,
+            "inName": "Bogle",
+            "priceDelta": 0.1999999999999993,
+            "epOut": 1.8,
+            "epIn": 9.2,
+            "epDelta": 7.3999999999999995,
+            "gw1Gain": 0.47947410757749,
+            "gw5Gain": 0.47947410757749
+          }
+        ],
+        "netPointsCost": 0,
+        "netGain": 0.47947410757749,
+        "breakEvenGw": null
+      },
+      "secondary": {
+        "type": "FREE",
+        "moves": [
+          {
+            "outId": 32,
+            "outName": "Cash",
+            "inId": 330,
+            "inName": "Bogle",
+            "priceDelta": 0.1999999999999993,
+            "epOut": 1.8,
+            "epIn": 9.2,
+            "epDelta": 7.3999999999999995,
+            "gw1Gain": 0.47947410757749,
+            "gw5Gain": 0.47947410757749
+          }
+        ],
+        "netPointsCost": 0,
+        "netGain": 0.47947410757749,
+        "breakEvenGw": null
+      },
+      "hitVerdict": {
+        "recommended": false,
+        "reasoning": "No hit options are flagged as viable, and the data shows no scenario where paying 4 points unlocks a gain that justifies the cost. With 34 GWs remaining and a balanced risk profile, burning a hit in GW4 is premature \u2014 free transfers compounding over time are more valuable than forcing a move now.",
+        "breakEvenGw": null
+      },
+      "dataNotice": null,
+      "alerts": [],
+      "confidence": "high",
+      "narrativeSummary": "Bogle over Cash is the clearest marginal gain in the squad \u2014 a +2.26 cumulative edge over five weeks dwarfs every other option available with this free transfer, and it comes without any budget sacrifice (\u00a30.2m banked). The Wissa-to-Emersonn swap is the logical follow-up next week: the underlying numbers show Emersonn sustaining ~1.38 points of cumulative advantage over five GWs, making this a two-move sequence rather than a one-off fix. The key trade-off accepted on Emersonn is ownership risk \u2014 if he's a low-EO differential and blanks, you cede ground \u2014 but at rank 2.6m with a falling trend and 34 GWs left, a balanced approach means taking selective upside like this rather than locking in pure template. Jo\u00e3o Pedro moves are uniformly negative or marginal across all horizons, so he holds for now."
+    },
+    "pool": {
+      "file": "pool/gw05.csv",
+      "rows": 55,
+      "squadRows": 15,
+      "candidateRows": 40,
+      "universeFile": "pool/gw05.universe.csv",
+      "universeRows": 659
+    }
+  },
+  {
+    "gw": 6,
+    "teamId": 2558300,
+    "capturedAt": "2026-09-18T19:36:29.434Z",
+    "deadline": "2026-10-10T10:00:00Z",
+    "postDeadline": false,
+    "captureMode": "pre-deadline",
+    "pipelineGw": 6,
+    "squadAsOfGw": 5,
+    "xi": [
+      496,
+      8,
+      330,
+      32,
+      426,
+      367,
+      565,
+      15,
+      411,
+      464,
+      165
+    ],
+    "benchIds": [
+      564,
+      124,
+      532,
+      87
+    ],
+    "actualCaptainId": 411,
+    "appCaptain": {
+      "id": 426,
+      "webName": "B.Fernandes",
+      "captainScore": 5.876937499999999,
+      "breakdown": {
+        "baseProjection": 5.744999999999999,
+        "ceilingBoost": 1.325,
+        "fixtureMultiplier": 1.05,
+        "minutesCertainty": 0.7916666666666665,
+        "dgwMultiplier": 1,
+        "formSignal": 5.8
+      },
+      "epNext": 5.8,
+      "compositeTotal": 0.9741213878928595,
+      "effectiveOwnership": 0.4,
+      "rotationRisk": 0.09999999999999998,
+      "injurySeverity": 0
+    },
+    "appVice": {
+      "id": 411,
+      "webName": "Haaland",
+      "captainScore": 5.422243749999998,
+      "breakdown": {
+        "baseProjection": 6.154999999999999,
+        "ceilingBoost": 1.628125,
+        "fixtureMultiplier": 0.88,
+        "minutesCertainty": 0.7916666666666665,
+        "dgwMultiplier": 1,
+        "formSignal": 6.6
+      },
+      "epNext": 6.6,
+      "compositeTotal": 0.9584096690472468,
+      "effectiveOwnership": 0.732,
+      "rotationRisk": 0.09999999999999998,
+      "injurySeverity": 0
+    },
+    "rankedCandidates": [
+      {
+        "id": 426,
+        "webName": "B.Fernandes",
+        "captainScore": 5.876937499999999,
+        "breakdown": {
+          "baseProjection": 5.744999999999999,
+          "ceilingBoost": 1.325,
+          "fixtureMultiplier": 1.05,
+          "minutesCertainty": 0.7916666666666665,
+          "dgwMultiplier": 1,
+          "formSignal": 5.8
+        },
+        "epNext": 5.8,
+        "compositeTotal": 0.9741213878928595,
+        "effectiveOwnership": 0.4,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 411,
+        "webName": "Haaland",
+        "captainScore": 5.422243749999998,
+        "breakdown": {
+          "baseProjection": 6.154999999999999,
+          "ceilingBoost": 1.628125,
+          "fixtureMultiplier": 0.88,
+          "minutesCertainty": 0.7916666666666665,
+          "dgwMultiplier": 1,
+          "formSignal": 6.6
+        },
+        "epNext": 6.6,
+        "compositeTotal": 0.9584096690472468,
+        "effectiveOwnership": 0.732,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 15,
+        "webName": "\u00d8degaard",
+        "captainScore": 4.882096721311476,
+        "breakdown": {
+          "baseProjection": 5.0200000000000005,
+          "ceilingBoost": 0.25081967213114753,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 0.7916666666666665,
+          "dgwMultiplier": 1,
+          "formSignal": 5.4
+        },
+        "epNext": 5.4,
+        "compositeTotal": 0.9420997975973943,
+        "effectiveOwnership": 0.2,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 8,
+        "webName": "Calafiori",
+        "captainScore": 4.361472584355828,
+        "breakdown": {
+          "baseProjection": 4.55,
+          "ceilingBoost": 0.15874233128834356,
+          "fixtureMultiplier": 1.1700000000000002,
+          "minutesCertainty": 0.7916666666666665,
+          "dgwMultiplier": 1,
+          "formSignal": 5.6
+        },
+        "epNext": 5.6,
+        "compositeTotal": 0.9934291579856412,
+        "effectiveOwnership": 0.507,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 330,
+        "webName": "Bogle",
+        "captainScore": 3.7943232998885166,
+        "breakdown": {
+          "baseProjection": 5.9,
+          "ceilingBoost": 0.4063545150501672,
+          "fixtureMultiplier": 0.76,
+          "minutesCertainty": 0.7916666666666665,
+          "dgwMultiplier": 1,
+          "formSignal": 7.4
+        },
+        "epNext": 7.4,
+        "compositeTotal": 0.9974219683158011,
+        "effectiveOwnership": 0.057999999999999996,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 367,
+        "webName": "Gakpo",
+        "captainScore": 3.3715188281249993,
+        "breakdown": {
+          "baseProjection": 4.835,
+          "ceilingBoost": 0.253125,
+          "fixtureMultiplier": 0.93,
+          "minutesCertainty": 0.7124999999999999,
+          "dgwMultiplier": 1,
+          "formSignal": 5.8
+        },
+        "epNext": 5.8,
+        "compositeTotal": 0.9617788181501146,
+        "effectiveOwnership": 0.128,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 165,
+        "webName": "Jo\u00e3o Pedro",
+        "captainScore": 3.1105634765625005,
+        "breakdown": {
+          "baseProjection": 4.605,
+          "ceilingBoost": 0.384375,
+          "fixtureMultiplier": 1.05,
+          "minutesCertainty": 0.59375,
+          "dgwMultiplier": 1,
+          "formSignal": 6.6
+        },
+        "epNext": 4.9,
+        "compositeTotal": 0.704342441397732,
+        "effectiveOwnership": 0.688,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      },
+      {
+        "id": 565,
+        "webName": "M.Sangar\u00e9",
+        "captainScore": 2.8966666666666665,
+        "breakdown": {
+          "baseProjection": 3.8000000000000003,
+          "ceilingBoost": 0.15,
+          "fixtureMultiplier": 0.88,
+          "minutesCertainty": 0.8333333333333333,
+          "dgwMultiplier": 1,
+          "formSignal": 4.4
+        },
+        "epNext": 4.4,
+        "compositeTotal": 0.8787311565350457,
+        "effectiveOwnership": 0.11199999999999999,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 496,
+        "webName": "Kinsky",
+        "captainScore": 1.9066666666666667,
+        "breakdown": {
+          "baseProjection": 2.6,
+          "ceilingBoost": 0,
+          "fixtureMultiplier": 0.88,
+          "minutesCertainty": 0.8333333333333333,
+          "dgwMultiplier": 1,
+          "formSignal": 3.2
+        },
+        "epNext": 3.2,
+        "compositeTotal": 0.46753489464459463,
+        "effectiveOwnership": 0.183,
+        "rotationRisk": 0,
+        "injurySeverity": 0
+      },
+      {
+        "id": 464,
+        "webName": "Wissa",
+        "captainScore": 1.7496141025641028,
+        "breakdown": {
+          "baseProjection": 3.295,
+          "ceilingBoost": 0.27564102564102566,
+          "fixtureMultiplier": 1.12,
+          "minutesCertainty": 0.4375,
+          "dgwMultiplier": 1,
+          "formSignal": 3
+        },
+        "epNext": 3,
+        "compositeTotal": 0.5888311890180064,
+        "effectiveOwnership": 0.193,
+        "rotationRisk": 0.95,
+        "injurySeverity": 0
+      },
+      {
+        "id": 32,
+        "webName": "Cash",
+        "captainScore": 1.438844073705179,
+        "breakdown": {
+          "baseProjection": 1.8649999999999998,
+          "ceilingBoost": 0.05826693227091634,
+          "fixtureMultiplier": 1.05,
+          "minutesCertainty": 0.7124999999999999,
+          "dgwMultiplier": 1,
+          "formSignal": 1.4
+        },
+        "epNext": 1.4,
+        "compositeTotal": 0.51906286483476,
+        "effectiveOwnership": 0.051,
+        "rotationRisk": 0.09999999999999998,
+        "injurySeverity": 0
+      }
+    ],
+    "baselines": {
+      "ppgId": 330,
+      "ownId": 411
+    },
+    "llm": {
+      "used": true,
+      "confidence": "medium",
+      "narrativeSummary": "Fernandes tops the captain score at 5.88 and carries penalty duties, giving him the ceiling to haul. At 40% EO he's not the template pick (Haaland at 73.2% is), which suits a falling rank needing variance \u2014 you get meaningful upside without going fully differential. The risk is Man Utd's inconsistency, but that's the trade-off you're accepting at rank 2.6M on a downward trend. Haaland is the sensible vice \u2014 if Fernandes blanks, you want the 73.2% template player doubling up as your safety net."
+    },
+    "transfer": {
+      "freeTransfersAssumed": 1,
+      "bank": 0.5,
+      "primary": {
+        "type": "FREE",
+        "moves": [
+          {
+            "outId": 32,
+            "outName": "Cash",
+            "inId": 115,
+            "inName": "De Cuyper",
+            "priceDelta": 0.5,
+            "epOut": 1.4,
+            "epIn": 6.4,
+            "epDelta": 5,
+            "gw1Gain": 0.4576817917986502,
+            "gw5Gain": 0.4576817917986502
+          }
+        ],
+        "netPointsCost": 0,
+        "netGain": 0.4576817917986502,
+        "breakEvenGw": null
+      },
+      "secondary": {
+        "type": "FREE",
+        "moves": [
+          {
+            "outId": 32,
+            "outName": "Cash",
+            "inId": 115,
+            "inName": "De Cuyper",
+            "priceDelta": 0.5,
+            "epOut": 1.4,
+            "epIn": 6.4,
+            "epDelta": 5,
+            "gw1Gain": 0.4576817917986502,
+            "gw5Gain": 0.4576817917986502
+          }
+        ],
+        "netPointsCost": 0,
+        "netGain": 0.4576817917986502,
+        "breakEvenGw": null
+      },
+      "hitVerdict": {
+        "recommended": false,
+        "reasoning": "No hit options were flagged as viable, and the available free move (Cash \u2192 De Cuyper) already delivers a clean 0.46 xP gain with no cost. At rank 2,625,039 on a falling trend with 33 GWs left, the correct play is to recover steadily \u2014 burning 4 points to accelerate marginal gains like Emersonn would need to consistently outperform across multiple weeks just to break even, which isn't justified at this stage.",
+        "breakEvenGw": null
+      },
+      "dataNotice": null,
+      "alerts": [],
+      "confidence": "high",
+      "narrativeSummary": "Cash \u2192 De Cuyper is the cleanest free transfer on the board: it leads all single moves in both immediate and 5-GW cumulative gain (+2.15 over five weeks), and De Cuyper's underlying attacking output from a left-back role gives it legs beyond this gameweek alone. The Kinsky \u2192 Kelleher upgrade is the strongest horizon move (+2.28 cumulative) and makes sense as next week's free transfer \u2014 Kelleher's Liverpool clean-sheet profile is a genuine step up in expected points, not just a fixture punt. The Jo\u00e3o Pedro \u2192 Emersonn savings option frees \u00a32.3m but yields only +1.14 over five weeks versus the \u00a30.5m-cost moves, so the arithmetic doesn't support it unless you need the budget for a future premium. With rank falling and 33 GWs remaining, this is a steady-hand week \u2014 make the obvious upgrade, bank the compounding gain, and prepare the Kelleher move for GW7."
+    },
+    "pool": {
+      "file": "pool/gw06.csv",
+      "rows": 55,
+      "squadRows": 15,
+      "candidateRows": 40,
+      "universeFile": "pool/gw06.universe.csv",
+      "universeRows": 659
     }
   }
 ]
