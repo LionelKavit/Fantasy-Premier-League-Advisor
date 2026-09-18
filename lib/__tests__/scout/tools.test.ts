@@ -52,9 +52,23 @@ describe("runScoutTool dispatch", () => {
     expect(r.signals).toBeDefined();
   });
 
-  it("score_player returns a structured error for an unknown name", async () => {
+  it("score_player returns a structured notFound (no error string) for an unknown name", async () => {
     const r = await run("score_player", { player: "Nobody" });
-    expect(r.error).toMatch(/no player found/i);
+    expect(r.notFound).toBe(true);
+    expect(r.query).toBe("Nobody");
+    expect(Array.isArray(r.suggestions)).toBe(true);
+    expect(r.error).toBeUndefined();
+  });
+
+  it("score_player tags squad membership and search excludes owned players by default", async () => {
+    const owned = await run("score_player", { player: "P1" });
+    expect(["xi", "bench"]).toContain(owned.owned);
+    const external = await run("score_player", { player: "Affordable" });
+    expect(external.owned).toBeNull();
+    const search = await run("search_players", { position: "MID", limit: 15 });
+    expect((search.results as { owned: unknown }[]).every((p) => p.owned === null)).toBe(true);
+    const withOwned = await run("search_players", { position: "MID", limit: 15, excludeOwned: false });
+    expect((withOwned.results as { owned: unknown }[]).some((p) => p.owned !== null)).toBe(true);
   });
 
   it("search_players filters by position and ranks results", async () => {
@@ -87,9 +101,19 @@ describe("runScoutTool dispatch", () => {
     expect(r.legal).toBe(true);
   });
 
-  it("simulate_transfer errors when a name cannot be resolved", async () => {
+  it("simulate_transfer reports which side did not resolve, as notFound", async () => {
     const r = await run("simulate_transfer", { out: "Ghost", in: "Affordable" });
-    expect(r.error).toMatch(/outgoing player/i);
+    expect(r.notFound).toBe(true);
+    expect(r.side).toBe("out");
+    expect(r.query).toBe("Ghost");
+  });
+
+  it("compare_players keeps the resolved rows when one name misses", async () => {
+    const r = await run("compare_players", { players: ["Affordable", "Nobody"] });
+    const players = r.players as Record<string, unknown>[];
+    expect(players).toHaveLength(2);
+    expect(players[0].name).toBe("Affordable");
+    expect(players[1].notFound).toBe(true);
   });
 
   it("simulate_captain returns a captain score", async () => {

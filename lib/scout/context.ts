@@ -18,6 +18,9 @@ export interface ScoutContext {
   ctx: AnalysisContext;
   playersById: Map<number, Player>;
   scoredById: Map<number, ScoredPlayer>; // pre-scored squad + weak-spot targets
+  // Squad membership by element id (scout-squad-awareness): every player row the tools
+  // return is tagged from this, and transfer-target search excludes it by default.
+  ownedById: Map<number, "xi" | "bench">;
   maxEpNext: number;
   // Lazy enrichment caches (populated on demand by `scorePlayerEnriched`).
   enrichedById: Map<number, ScoredPlayer>;
@@ -46,10 +49,14 @@ export function buildScoutContext(ctx: AnalysisContext): ScoutContext {
 
   const maxEpNext = ctx.players.reduce((max, p) => Math.max(max, p.epNext ?? 0), 1);
 
+  const ownedById = new Map<number, "xi" | "bench">();
+  for (const pick of ctx.analysis.picks) ownedById.set(pick.element, pick.position <= 11 ? "xi" : "bench");
+
   return {
     ctx,
     playersById,
     scoredById,
+    ownedById,
     maxEpNext,
     enrichedById: new Map(),
     summaryById: new Map(),
@@ -195,7 +202,34 @@ export async function scorePlayerEnriched(
   return scored;
 }
 
-/** Resolve a player by numeric id or case-insensitive web-name match. */
+// ── Name folding (player-name-resolution) ────────────────────────────────────
+// Unicode NFD strips accents (João → joao, Sangaré → sangare) but NOT the letters that
+// are distinct code points rather than base + mark — Ø, ß, æ, œ, ð, þ, ł, đ — so those
+// get an explicit table. Eight letters cover every current Premier League name; keep the
+// table auditable rather than pulling a transliteration dependency.
+const FOLD_TABLE: Record<string, string> = {
+  ø: "o", æ: "ae", ß: "ss", œ: "oe", ð: "d", þ: "th", ł: "l", đ: "d",
+};
+
+/** Accent-, case- and punctuation-insensitive form of a name, for matching only. */
+export function foldName(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[øæßœðþłđ]/g, (ch) => FOLD_TABLE[ch] ?? ch)
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+const byPoints = (a: Player, b: Player) => b.totalPoints - a.totalPoints;
+
+/**
+ * Resolve a player by numeric id, or by name — accent/case-insensitive across the web
+ * name AND the full name ("odegaard", "martin odegaard", "gross", "joao pedro" all
+ * resolve). Precedence: exact web name → exact full name → prefix on either → substring
+ * on either; ties go to the higher season total so `saka` is Saka, not a substring elsewhere.
+ */
 export function resolvePlayer(query: string | number, sc: ScoutContext): Player | null {
   if (typeof query === "number") return sc.playersById.get(query) ?? null;
 
@@ -205,19 +239,47 @@ export function resolvePlayer(query: string | number, sc: ScoutContext): Player 
     return sc.playersById.get(asId)!;
   }
 
-  const lower = trimmed.toLowerCase();
+  const q = foldName(trimmed);
+  if (!q) return null;
   const players = sc.ctx.players;
-  const exact = players.find((p) => p.webName.toLowerCase() === lower);
-  if (exact) return exact;
+  const web = (p: Player) => foldName(p.webName);
+  const full = (p: Player) => foldName(p.fullName);
 
-  const matches = players.filter((p) => p.webName.toLowerCase().includes(lower));
-  // Unambiguous prefix/substring match → resolve; otherwise prefer the
-  // higher-scoring (more relevant) player to avoid dead ends.
-  if (matches.length === 1) return matches[0];
-  if (matches.length > 1) {
-    return [...matches].sort((a, b) => b.totalPoints - a.totalPoints)[0];
-  }
-  return null;
+  const pick = (pred: (p: Player) => boolean): Player | null => {
+    const hits = players.filter(pred);
+    return hits.length ? [...hits].sort(byPoints)[0] : null;
+  };
+  return (
+    pick((p) => web(p) === q) ??
+    pick((p) => full(p) === q) ??
+    pick((p) => web(p).startsWith(q) || full(p).startsWith(q)) ??
+    pick((p) => web(p).includes(q) || full(p).includes(q))
+  );
+}
+
+/**
+ * Near-miss names for a query that did not resolve — folded prefix/substring matches on
+ * either name, highest season total first — so a not-found result can offer spellings
+ * instead of leaving the model to guess why the lookup failed.
+ */
+export function suggestPlayers(query: string, sc: ScoutContext, limit = 5): string[] {
+  const q = foldName(query);
+  if (!q) return [];
+  // Also try each token alone ("odegard martin" / "m odegaard"), then a 4-letter stem of
+  // each token so a plain typo ("odegard" → "odeg…") still surfaces the likely player.
+  const tokens = q.split(" ").filter((t) => t.length >= 3);
+  const stems = tokens.filter((t) => t.length >= 4).map((t) => t.slice(0, 4));
+  const wordsOf = (p: Player) => `${foldName(p.webName)} ${foldName(p.fullName)}`.split(" ");
+  const hit = (p: Player) => {
+    const w = foldName(p.webName);
+    const f = foldName(p.fullName);
+    return (
+      w.includes(q) || f.includes(q) ||
+      tokens.some((t) => w.includes(t) || f.includes(t)) ||
+      stems.some((s) => wordsOf(p).some((word) => word.startsWith(s)))
+    );
+  };
+  return [...sc.ctx.players.filter(hit)].sort(byPoints).slice(0, limit).map((p) => p.webName);
 }
 
 /** Test-only: clear the per-manager context cache. */

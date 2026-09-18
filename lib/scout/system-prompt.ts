@@ -119,6 +119,7 @@ Answer ONLY questions about this FPL team, players, transfers, captaincy, chips,
 
 ## Grounding
 Never invent prices, scores, projections, ownership or transfer legality — call the tools to get real numbers. Call get_plan first when the user asks for general advice. Use simulate_transfer / simulate_captain for any "should I…" or "what if…" question, and make clear these are hypotheticals, not executed moves.
+${GROUNDING_RULES}
 
 ## Current situation
 GW${a.currentGw}, £${a.bank.toFixed(1)}m in the bank, ${freeTransfers} free transfer(s) available.
@@ -128,6 +129,12 @@ ${FORMAT_GUIDE}
 ## What to say
 The manager can already see their squad, the recommended transfer, restructure options and captaincy on screen. Don't just restate those — answer the actual question and add the reasoning: why this option over the alternatives, the key trade-off or risk, and context the raw numbers don't show (recent form vs underlying, fixtures, ownership/template, timing). Reference specific players, gameweeks and numbers.${heldChipsBlock(a.chipsRemaining, a.currentGw)}${chipPlanBlock(chipPlan, a.currentGw)}${expertKnowledgeBlock()}${chipVerdictAuthorityClause(chipPlan)}`;
 }
+
+// Two grounding rules shared by the manager and demo chats (scout-grounding-fixes). Each
+// closes a failure seen in real use: a lookup miss explained away as an injury, and a
+// player the manager already owned offered as a transfer target.
+const GROUNDING_RULES = `A tool result with notFound: true means the NAME did not match the data — nothing more. Say the name didn't match, offer the suggestions it lists, and ask for the spelling. Never infer injury, absence, a transfer, or unavailability from a not-found result.
+Every player row carries owned: "xi", "bench" or null. A transfer target is NEVER a player already owned. If an owned player is the better answer, say it is a lineup call (start them / move the armband), not a transfer, and never count their price against a transfer budget.`;
 
 // Shared narrow-column formatting rules (identical for the manager and demo chats).
 const FORMAT_GUIDE = `## How to format your answer
@@ -178,7 +185,8 @@ You are operating here as the in-app chat assistant in DEMO mode — this OVERRI
 Answer questions about FPL — players, captaincy, fixtures, value, the rules, and general strategy, including this sample squad. Give GENERAL advice; never refer to "your team", "your squad", a manager's rank, or held chips (there are none). When the sample squad and its numbers come from a finished season (the off-season), make clear you're reasoning off last season's data rather than a live projection. If asked anything unrelated to FPL, politely decline in one sentence and steer back.
 
 ## Grounding
-Never invent prices, scores, projections or ownership — call the tools to get real numbers. Use score_player / compare_players / simulate_captain for "who's better / who to captain" questions. simulate_transfer is a HYPOTHETICAL teaching tool: explain the projected-points effect of a swap, but never tell the visitor they "should" make a transfer — there is no team to manage.${fplRulesBlock()}${expertKnowledgeBlock()}
+Never invent prices, scores, projections or ownership — call the tools to get real numbers. Use score_player / compare_players / simulate_captain for "who's better / who to captain" questions. simulate_transfer is a HYPOTHETICAL teaching tool: explain the projected-points effect of a swap, but never tell the visitor they "should" make a transfer — there is no team to manage.
+${GROUNDING_RULES}${fplRulesBlock()}${expertKnowledgeBlock()}
 
 ${DEMO_FORMAT_GUIDE}
 

@@ -2,7 +2,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import type { Player, Position } from "../types";
 import type { ScoredPlayer } from "../pipeline/types";
 import type { ScoutContext } from "./context";
-import { scorePlayer, scorePlayerEnriched, resolvePlayer } from "./context";
+import { scorePlayer, scorePlayerEnriched, resolvePlayer, suggestPlayers } from "./context";
 import { buildValidTransfers } from "../optimizer/setup";
 import { computeCaptainScore } from "../captain/scoring";
 import { simulateTransfer, simulateCaptain } from "../simulate";
@@ -24,7 +24,7 @@ export const SCOUT_TOOLS: Anthropic.Tool[] = [
   },
   {
     name: "score_player",
-    description: "Look up and score any Premier League player by name or id. Returns price, form, projected points, composite score and key signals.",
+    description: "Look up and score any Premier League player by name or id (accent-insensitive; web name or full name). Returns price, form, projected points, composite score, key signals and whether the manager owns them. A notFound result means the spelling did not match — it says nothing about injury or availability.",
     input_schema: {
       type: "object",
       properties: { player: { type: "string", description: "Player web name (e.g. 'Saka') or numeric id." } },
@@ -33,7 +33,7 @@ export const SCOUT_TOOLS: Anthropic.Tool[] = [
   },
   {
     name: "search_players",
-    description: "Find players matching filters, ranked by a metric. Use to discover transfer targets.",
+    description: "Find TRANSFER TARGETS matching filters, ranked by a metric. Excludes the manager's own players unless excludeOwned is false — for questions about a player they already own, use get_squad or score_player instead.",
     input_schema: {
       type: "object",
       properties: {
@@ -42,6 +42,7 @@ export const SCOUT_TOOLS: Anthropic.Tool[] = [
         team: { type: "string", description: "Team short name (e.g. 'ARS')." },
         sortBy: { type: "string", enum: ["score", "form", "ppg", "epNext", "price"], description: "Ranking metric (default: score)." },
         limit: { type: "number", description: "Max results (default 8, capped at 15)." },
+        excludeOwned: { type: "boolean", description: "Omit players already in the manager's squad (default true)." },
       },
     },
   },
@@ -78,7 +79,10 @@ export const SCOUT_TOOLS: Anthropic.Tool[] = [
 ];
 
 // ── Compact serializers ──────────────────────────────────────────────────────
-function fmtPlayer(sp: ScoredPlayer) {
+// Every player row carries `owned` (scout-squad-awareness): "xi" | "bench" for the
+// manager's players, null otherwise — so the model can never mistake an owned player
+// for a transfer target, whichever tool produced the row.
+function fmtPlayer(sp: ScoredPlayer, sc: ScoutContext) {
   const p = sp.player;
   return {
     id: p.id,
@@ -92,7 +96,15 @@ function fmtPlayer(sp: ScoredPlayer) {
     selectedByPercent: p.selectedByPercent,
     status: p.availability.status,
     compositeScore: Number(sp.score.total.toFixed(2)),
+    owned: sc.ownedById.get(p.id) ?? null,
   };
+}
+
+// A miss is a statement about the SPELLING, not the player (player-name-resolution):
+// structured, with near-miss suggestions, never an `error` string the model might read
+// as "this player is unavailable".
+function notFound(query: string, sc: ScoutContext) {
+  return { notFound: true as const, query, suggestions: suggestPlayers(query, sc) };
 }
 
 // ── Dispatch ──────────────────────────────────────────────────────────────────
@@ -185,7 +197,7 @@ function getSquad(sc: ScoutContext) {
         return {
           slot: pick.position,
           isStarting: pick.position <= 11,
-          ...(sp ? fmtPlayer(sp) : { id: pick.element, name: "Unknown" }),
+          ...(sp ? fmtPlayer(sp, sc) : { id: pick.element, name: "Unknown" }),
         };
       }),
   };
@@ -193,10 +205,10 @@ function getSquad(sc: ScoutContext) {
 
 async function scorePlayerTool(query: string, sc: ScoutContext) {
   const player = resolvePlayer(query, sc);
-  if (!player) return { error: `No player found matching "${query}".` };
+  if (!player) return notFound(query, sc);
   const sp = await scorePlayerEnriched(player, sc);
   return {
-    ...fmtPlayer(sp),
+    ...fmtPlayer(sp, sc),
     teamName: player.teamName,
     signals: {
       goalThreat: Number(sp.statisticalSignals.goalThreat.toFixed(2)),
@@ -215,12 +227,14 @@ function searchPlayers(input: ToolInput, sc: ScoutContext) {
   const team = typeof input.team === "string" ? input.team.toUpperCase() : null;
   const sortBy = typeof input.sortBy === "string" ? input.sortBy : "score";
   const limit = Math.min(typeof input.limit === "number" ? input.limit : 8, 15);
+  const excludeOwned = input.excludeOwned !== false; // default true: this finds transfer targets
 
   if (position && !POSITIONS.includes(position)) {
     return { error: `Invalid position "${input.position}". Use GK, DEF, MID or FWD.` };
   }
 
   let pool: Player[] = sc.ctx.players.filter((p) => p.minutes > 0 && p.availability.status !== "unavailable");
+  if (excludeOwned) pool = pool.filter((p) => !sc.ownedById.has(p.id));
   if (position) pool = pool.filter((p) => p.position === position);
   if (maxPrice !== null) pool = pool.filter((p) => p.price <= maxPrice);
   if (team) pool = pool.filter((p) => p.teamShortName.toUpperCase() === team);
@@ -242,7 +256,7 @@ function searchPlayers(input: ToolInput, sc: ScoutContext) {
   };
   scored.sort((a, b) => metric(b) - metric(a));
 
-  return { sortBy, results: scored.slice(0, limit).map(fmtPlayer) };
+  return { sortBy, excludeOwned, results: scored.slice(0, limit).map((sp) => fmtPlayer(sp, sc)) };
 }
 
 async function comparePlayers(raw: unknown, sc: ScoutContext) {
@@ -252,23 +266,26 @@ async function comparePlayers(raw: unknown, sc: ScoutContext) {
   const results = await Promise.all(
     raw.map(async (q) => {
       const player = resolvePlayer(String(q), sc);
-      if (!player) return { query: String(q), error: "not found" };
-      return fmtPlayer(await scorePlayerEnriched(player, sc));
+      if (!player) return notFound(String(q), sc);
+      return fmtPlayer(await scorePlayerEnriched(player, sc), sc);
     })
   );
   return { players: results };
 }
 
 async function simulateTransferTool(input: ToolInput, sc: ScoutContext) {
-  const outPlayer = resolvePlayer(String(input.out ?? ""), sc);
-  const inPlayer = resolvePlayer(String(input.in ?? ""), sc);
-  if (!outPlayer) return { error: `Could not find outgoing player "${input.out}".` };
-  if (!inPlayer) return { error: `Could not find incoming player "${input.in}".` };
+  const outQ = String(input.out ?? "");
+  const inQ = String(input.in ?? "");
+  const outPlayer = resolvePlayer(outQ, sc);
+  const inPlayer = resolvePlayer(inQ, sc);
+  if (!outPlayer) return { side: "out" as const, ...notFound(outQ, sc) };
+  if (!inPlayer) return { side: "in" as const, ...notFound(inQ, sc) };
   return simulateTransfer({ outId: outPlayer.id, inId: inPlayer.id }, sc);
 }
 
 async function simulateCaptainTool(input: ToolInput, sc: ScoutContext) {
-  const player = resolvePlayer(String(input.player ?? ""), sc);
-  if (!player) return { error: `Could not find player "${input.player}".` };
+  const q = String(input.player ?? "");
+  const player = resolvePlayer(q, sc);
+  if (!player) return notFound(q, sc);
   return simulateCaptain({ id: player.id }, sc);
 }
