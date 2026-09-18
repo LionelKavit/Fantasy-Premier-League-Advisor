@@ -154,6 +154,20 @@ export const CAPTAIN_CONFIG = {
   horizonLengthDefault: 5,
 };
 
+// Transfer-horizon timing (horizon-fixture-timing). Timing is read from the RAW
+// per-gameweek fixture edge between candidate and weak player (difficulty steps, from
+// computeFdrRun), not from the squashed composite — at the composites horizon
+// candidates sit on (0.9+) a full one-step FDR change moves the composite by ~0.01,
+// so the composite can never express "when". PRE-REGISTERED constants: change only
+// through a new OpenSpec change, never at runtime; the drift report can test the
+// threshold against realized points once labelled live rows exist.
+export const HORIZON_TIMING = {
+  nearGws: 2, // "now" = the target gameweek + the next; "later" = the rest of the window
+  thresholdSteps: 0.5, // near vs far edge gap (in FDR steps) that flips BUY_NOW to WAIT / SHORT_TERM
+  dgwBonusSteps: 2, // a double gameweek counts as its mean difficulty minus this
+  blankPenaltyFdr: 7, // a blank counts as this difficulty (two steps worse than the hardest fixture)
+} as const;
+
 // Season chip calendar (2025/26 — update each season; mirrors lib/knowledge/chips.md).
 // Two sets of chips: the first expires at the GW19 deadline, the second unlocks at
 // GW20 and expires at GW38. A held chip can only be played within its half.

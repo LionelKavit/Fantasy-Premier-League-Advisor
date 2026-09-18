@@ -21,8 +21,10 @@ export function computeCaptainHorizon(
     const gw = currentGw + offset;
     if (gw > MAX_GW) break;
 
-    // Only the immediate next gameweek may use FPL's ep fields.
-    const immediate = offset === 1;
+    // `currentGw` is the TARGET gameweek (target-gameweek-alignment), scored separately
+    // with FPL's ep fields as the baseline. Every horizon entry is a genuinely future
+    // week, which `ep_next` does not describe — so none of them may use the ep blend.
+    const immediate = false;
     const candidates = batchComputeCaptainScores(
       squad,
       picks,

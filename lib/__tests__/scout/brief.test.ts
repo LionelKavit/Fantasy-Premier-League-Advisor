@@ -60,6 +60,7 @@ function makePlan(over: Partial<GameweekPlan> = {}): GameweekPlan {
     teamId: 1,
     currentGw: 20,
     deadline: DEADLINE,
+    inPlayGw: null,
     transfers: makeTransfer("FREE", [{ out: "Mbeumo", in: "Saka" }]),
     captaincy: makeCaptaincy("Haaland", "Salah"),
     squad: [],

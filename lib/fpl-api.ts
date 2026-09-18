@@ -22,6 +22,7 @@ import {
   STATUS_MAP,
   POSITION_MAP,
 } from "./types";
+import { detectTargetGameweek, detectInPlayGameweek } from "./gameweek";
 
 const FPL_BASE = "https://fantasy.premierleague.com/api";
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
@@ -171,9 +172,12 @@ export async function fetchBootstrap(): Promise<BootstrapData> {
   const players = raw.elements.map((el) => normalizePlayer(el, teams));
   const gameweeks = raw.events;
   const currentGameweek = gameweeks.find((gw) => gw.is_current) ?? null;
+  const now = Date.now();
+  const targetGameweek = detectTargetGameweek(gameweeks, now);
+  const inPlayGameweek = detectInPlayGameweek(gameweeks, now);
   const chips = raw.chips ?? [];
 
-  const data: BootstrapData = { players, teams, gameweeks, currentGameweek, chips };
+  const data: BootstrapData = { players, teams, gameweeks, currentGameweek, targetGameweek, inPlayGameweek, chips };
   setCache("bootstrap", data);
   return data;
 }

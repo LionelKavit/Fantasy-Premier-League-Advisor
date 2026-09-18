@@ -35,12 +35,32 @@ POSITIONS = ["GK", "DEF", "MID", "FWD"]
 NUMERIC = ["low_minute", "label_gws", "has_fixture", "has_xg", "next3_points", "element", "gw", "composite", "xP"]
 
 
+MISALIGNED_REASON = "fixture_gw missing or ≠ gw (captured before target-gameweek-alignment)"
+
+
+def fixture_aligned(df: pd.DataFrame) -> pd.Series:
+    """Rows whose fixture signals were computed FROM the row's own gameweek.
+
+    target-gameweek-alignment (2026-09-18): before it, the runtime computed fixture
+    signals from the previous (already played) gameweek, so rows written before the
+    fix lack `fixture_gw` and their `sm_fixture`/`fdrScore` describe the wrong round.
+    Decision (Kavit, option a): such rows never enter the fit."""
+    if "fixture_gw" not in df.columns:
+        return pd.Series(False, index=df.index)
+    return pd.to_numeric(df["fixture_gw"], errors="coerce") == pd.to_numeric(df["gw"], errors="coerce")
+
+
+def misaligned_count(df: pd.DataFrame) -> int:
+    return int((~fixture_aligned(df)).sum())
+
+
 def eligible(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     for c in NUMERIC:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce")
-    return df[(df.low_minute == 0) & (df.label_gws == 3) & (df.has_fixture == 1) & (df.has_xg == 1)].copy()
+    base = (df.low_minute == 0) & (df.label_gws == 3) & (df.has_fixture == 1) & (df.has_xg == 1)
+    return df[base & fixture_aligned(df)].copy()
 
 
 def split_gws(labelled_gws, holdout_n: int = HOLDOUT_GWS):
@@ -117,6 +137,7 @@ def fit_live(df: pd.DataFrame) -> dict:
         candidate = {"SCORING_WEIGHTS": signed, "COMPOSITE_SQUASH": squash_from_train(tr_all, signed)}
     return {
         "dataset_rows": int(len(df)), "eligible_rows": int(len(elig)),
+        "excluded_misaligned_rows": misaligned_count(df), "excluded_reason": MISALIGNED_REASON,
         "labelled_gws": sorted(int(g) for g in elig.gw.unique()),
         "train_gws": train_gws, "holdout_gws": holdout_gws,
         "positions": positions, "complete": complete,
@@ -128,6 +149,7 @@ def write_md(r: dict) -> str:
     L = ["# Live refit (composite-refit-gate)", "",
          f"Rows {r['dataset_rows']} · eligible {r['eligible_rows']} · labelled GWs {r['labelled_gws'] or '—'} · "
          f"train {r['train_gws'] or '—'} · holdout {r['holdout_gws'] or '—'}", "",
+         f"Excluded {r.get('excluded_misaligned_rows', 0)} rows: {r.get('excluded_reason', '')}", "",
          "| position | status | n_train | n_heldout | alpha | heldout ρ |", "|---|---|---|---|---|---|"]
     for pos in POSITIONS:
         p = r["positions"].get(pos, {})

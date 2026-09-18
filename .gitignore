@@ -67,5 +67,16 @@ docs/images/*.mov
 scripts/.live-eval-state.json
 .worktrees/
 
-# rewritten by every live-eval tick; the data branch keeps the history (synced by the tick)
+# Live-eval artefacts rewritten by every tick (capture / score / dataset build). Their
+# history lives on the `live-eval-data` branch, which the tick syncs and pushes; tracking
+# them on code branches left the checkout permanently dirty and blocked checkout/pull.
+# (Explicit names, not `live-*`, so research/squad-eval/live-types.ts stays tracked.)
 research/squad-eval/live-status.md
+research/squad-eval/live-log.json
+research/squad-eval/live-report.md
+research/squad-eval/live-transfer-report.md
+research/squad-eval/live-dataset.csv
+research/squad-eval/live-dataset.parquet
+research/squad-eval/live-pool-dataset.csv
+research/squad-eval/live-pool-dataset.parquet
+research/squad-eval/pool/

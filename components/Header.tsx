@@ -77,7 +77,10 @@ export function Header({
 
         {/* Stats — centred row, value over label */}
         <dl className="flex items-start justify-center gap-8">
-          <Stat label="GW" value={String(plan.currentGw)} />
+          <Stat
+            label={plan.inPlayGw != null ? `GW · GW${plan.inPlayGw} in play` : "GW"}
+            value={String(plan.currentGw)}
+          />
           {!demo && (
             <Stat
               label="Overall rank"

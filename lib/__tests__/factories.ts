@@ -421,6 +421,9 @@ export function makeSquadAnalysisResult(
     bank: o.bank ?? 2.0,
     currentGw: o.currentGw ?? 20,
     deadline: o.deadline ?? "2026-01-01T00:00:00Z",
+    // Default: preparing `currentGw` on the squad locked for the gameweek before it.
+    squadGw: o.squadGw !== undefined ? o.squadGw : (o.currentGw ?? 20) - 1,
+    inPlayGw: o.inPlayGw ?? null,
     generatedAt: o.generatedAt ?? "2026-01-01T00:00:00.000Z",
   };
 }
