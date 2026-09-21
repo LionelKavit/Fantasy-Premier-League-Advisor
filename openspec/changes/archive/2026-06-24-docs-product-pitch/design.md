@@ -11,7 +11,7 @@ Pitch it the way a PM would to an FPL player, in this order:
    team and tells you the highest-leverage move this week — transfers, captain, chips — and **explains
    why**, like a pundit breaking down a game. It's **personalized** (your squad, your bank, the exact
    number of free transfers you're holding), **educated** (grounded in expert FPL principles and the live
-   rules), and **deterministic** (the maths is reproducible — same squad, same answer — not an LLM
+   rules), and **deterministic** (the math is reproducible — same squad, same answer — not an LLM
    guessing).
 3. **How it's different (the wedge).** Three things generic tools don't do:
    - **It knows your constraints.** Tell it you have 0–5 free transfers; it plans *within that budget* —
@@ -19,7 +19,7 @@ Pitch it the way a PM would to an FPL player, in this order:
      **banks** a transfer rather than burn it on a marginal move.
    - **It holds when holding is right.** Every move is judged in **expected points**; if nothing clears the
      bar it tells you to roll — the opposite of the churn most tools encourage.
-   - **It shows its work.** A deterministic 0–10 model does the maths; the Scout chat fetches *real* numbers
+   - **It shows its work.** A deterministic 0–10 model does the math; the Scout chat fetches *real* numbers
      via tools, so it never invents a stat or contradicts the panels.
 4. **The proof.** Eval-first: fit-from-data ranking (~0.33 → ~0.53), a replay that caught the optimizer
    over-recommending (→ the hold gate), and a measured **no-ship**. Link `EVALUATION.md`.

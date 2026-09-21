@@ -4,7 +4,7 @@
 
 Every gameweek, millions of FPL managers face the same dread: a transfer to make (or two, or five), a captain to pick, a chip you're terrified to waste — and a deadline counting down. So you crowd-source it: group chats, Reddit, ten browser tabs of conflicting "templates," none of which know *your* squad, *your* bank, or how many free transfers you're actually holding. You make the call on a hunch and find out on Saturday.
 
-**Pocket Scout is your personal scout.** Enter your FPL manager ID and it reads *your* team and tells you the highest-leverage move this week — transfers, captaincy, chips — and **explains why**, the way a post-match analyst breaks down a game. It's **personalized** (your squad, your bank, the exact free transfers you hold), **educated** (grounded in expert FPL principles and the live rules), and **deterministic** (a reproducible engine does the maths — same squad, same answer — not an LLM guessing).
+**Pocket Scout is your personal scout.** Enter your FPL manager ID and it reads *your* team and tells you the highest-leverage move this week — transfers, captaincy, chips — and **explains why**, the way a post-match analyst breaks down a game. It's **personalized** (your squad, your bank, the exact free transfers you hold), **educated** (grounded in expert FPL principles and the live rules), and **deterministic** (a reproducible engine does the math — same squad, same answer — not an LLM guessing).
 
 ![Pocket Scout — the pitch, the Scout's proactive brief, and the breakdown](docs/images/fpl-advisor-hero.png)
 
@@ -12,7 +12,7 @@ Every gameweek, millions of FPL managers face the same dread: a transfer to make
 
 - **It knows your constraints.** Tell it how many free transfers you have — anywhere from **0 to 5** — and it plans *within that budget*: up to that many **stacked transfers**, or a sell-to-fund-a-dream **restructure** when that out-projects straight swaps. It even **banks** a transfer rather than burn it on a marginal move.
 - **It holds when holding is right.** Every move is judged in **expected points**; if nothing clears the bar, it tells you to roll — the opposite of the churn most tools nudge you toward.
-- **It shows its work.** A deterministic 0–10 model does the maths; the **Ask The Scout** chat fetches *real* numbers via tool calls, so it never invents a stat or contradicts the panels.
+- **It shows its work.** A deterministic 0–10 model does the math; the **Ask The Scout** chat fetches *real* numbers via tool calls, so it never invents a stat or contradicts the panels.
 
 ## Watch the Pocket Scout in action
 
@@ -30,22 +30,22 @@ https://github.com/user-attachments/assets/93f5c5eb-443b-4edb-b4d6-2a8c6037cfe0
 
 ## What it does
 
-- **Glanceable verdict** — one always-visible scout verdict as a top banner: *"This week: Sánchez → Raya +1 more transfer · Captain Haaland · Play your Bench Boost"*, with an **Open FPL Transfers** deep link at the end.
-  
-- **Pitch & ratings** — every squad player scored 0–10 by a position-aware composite model (anchored on FPL's expected points, corrected by form, fixtures, value, and underlying stats).
+- **One clear answer at the top.** The first thing you see is this week's advice in a single line: who to sell and who to buy, who to captain, and whether to play a chip. A button beside it takes you straight to the FPL transfers page.
 
-- **Ask The Scout (the hero)** — the conversation is the primary surface: the Scout opens with a proactive, deadline-aware brief, then answers "what if?" via real tool calls (`simulate_transfer`, `score_player`, …), grounded in a committed plan **and the curated knowledge base**, so it never invents numbers.
+- **A rating for every player in your squad.** Each player on the pitch gets a score out of 10. It starts from FPL's own points prediction for the next match and adjusts it for recent form, upcoming fixtures, price, and how well the player is really performing underneath the headline numbers.
 
-- **Act on it** — close the last mile: click any pitch player or transfer name for a **detail dialog** (age, nationality, form, last-week minutes/points, expected next points) with a **View on Premier League** link; the verdict bar hands you off to the FPL transfers screen.
+- **Ask The Scout.** This is the heart of the app. The Scout greets you with a short brief for the coming deadline, then you can ask it anything in plain words: *"Should I swap Wissa for Emersonn?"*, *"Who should I captain?"*, *"Is it worth taking a hit?"* It looks up the real numbers before it answers, so it never makes things up, and what it says always matches the advice on screen.
 
-- **Breakdown** — a collapsible drawer with three tabs:
-  - *This Week* — clear sections in order: **Transfer · Captaincy · Chip · Restructure** — up to **N free transfers** ("Make 3 free transfers"), chosen by an expected-points allocation that weighs straight swaps against a **restructure** (sell-to-fund-a-dream) and **holds rather than churns**; EO-aware captaincy; and the chip call in its own section (so a Bench Boost never hides your free transfers). The Restructure section lists alternative dream-funding chains, each priced against the free transfers you have left.
-  - *Long Term* — a multi-gameweek horizon.
-  - *Chips* — an LLM-orchestrated chip plan (play now / hold / sequenced windows), grounded in chip principles and the deterministic candidate windows.
+- **Act on it.** Click any player, on the pitch or in a suggestion, for a quick card: age, nationality, recent form, last week's minutes and points, and expected points next week, with a link to their Premier League profile. When you are ready, the banner at the top hands you over to FPL to make the move.
 
-- **Explore without a team** — no FPL ID required: Pocket Scout builds a **season-aware sample "dream team"** (best XV by FPL's projected points in-season, last-season returns off-season) and you can **Ask The Scout** anything. The chat is the whole point in this mode — there's no personalized transfer plan, and the chat is grounded in the current FPL rules so it never answers from stale knowledge.
+- **The full breakdown**, in a drawer you open when you want the detail, in three tabs:
+  - **This Week** — the transfers to make, using as many free transfers as you have (and telling you to hold if no move is worth it), the captain and vice-captain, whether to play a chip, and bigger "sell one player to afford a better one" ideas.
+  - **Long Term** — which transfers are worth making now, which are better left for a few weeks, and which only pay off for a short spell, judged on each player's upcoming fixtures.
+  - **Chips** — a plan for the chips you still hold: play one now, keep it, or aim for a particular week later in the season.
 
-Everything is delivered in one consistent voice — **Pocket Scout** — and grounded in curated expert knowledge (chip timing, effective-ownership strategy, and the FPL rules).
+- **Try it without a team.** No FPL ID? Pocket Scout builds a sample squad from the best players in the game, and you can still ask the Scout anything about FPL. In this mode there is no personal transfer plan, just the chat, and it always answers from this season's rules.
+
+Everything comes in one voice, **Pocket Scout**, backed by expert FPL knowledge: when to play chips, how player ownership affects your rank, and the official rules.
 
 ## Architecture at a glance
 
@@ -75,11 +75,11 @@ The pitch paints **immediately** from a fast deterministic phase; the Scout then
 
 ## What makes it interesting (engineering)
 
-It's built **eval-first**: a point-in-time backtest harness over 10 seasons of FPL data drives the model, and decisions are made on evidence — including the honest negative ones.
+Before the app gives advice, that advice is tested against ten seasons of real FPL history to see whether it would actually have earned points. Decisions about the app are made on that evidence, including when the evidence says no.
 
-- The player-ranking model was **fit from data, not hand-tuned** — lifting within-position rank correlation from ~0.33 to ~0.53 (approaching FPL's own ~0.59).
-- A replay on real squads showed the transfer optimizer **over-recommended moves**; that finding drove a points-based "hold" gate that fixed it.
-- A proposed fixture-difficulty upgrade was **measured and rejected** — the data said it was worse.
+- The player rating was **tuned on data, not by hand**. On past seasons it ranks players much better than the original version, and comes close to FPL's own prediction.
+- Replaying past seasons showed the app was **recommending too many transfers**. That led to a simple rule: a transfer is only suggested when it is projected to earn clearly more points than keeping the player you have.
+- An idea for rating fixtures differently was **tested and dropped**, because the numbers showed it made the advice worse.
 
 → **The full story (backtests, replays, the no-ship): [docs/EVALUATION.md](docs/EVALUATION.md)**
 

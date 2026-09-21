@@ -14,7 +14,7 @@ should sell that story to an FPL player, then back it with the engineering.
 - **`docs-product-pitch`** — reframe and refresh the docs:
   1. **README as a product pitch.** Lead with the manager's pain point and the promise (a scout that knows
      *your* team, explains *why*, and never churns for the sake of it), then "how it's different"
-     (deterministic maths + grounded reasoning, not vibes), then the proof. Keep it skimmable for a player,
+     (deterministic math + grounded reasoning, not vibes), then the proof. Keep it skimmable for a player,
      not just an engineer.
   2. **Reflect the final state.** Update every doc to this branch: enter **how many free transfers you
      actually have (0–5)**; the Scout recommends **up to that many stacked moves**, or a **restructure**
