@@ -1,45 +1,47 @@
-# Captain live-eval — full pipeline, 2026-27 (PROVISIONAL, n=3)
+# Captain live-eval — full pipeline, 2026-27 (PROVISIONAL, n=4)
 
 Prospective scoring of the app's full captain pipeline (live `ep_next` + LLM context),
 captured pre-deadline each gameweek and scored on realized `total_points` against the XI
 you actually locked (fetched post-deadline; the capture itself only sees the previous
 GW's locked squad — see "Squad drift").
-**Provisional:** 3 of ~38 gameweeks scored — read directionally, not conclusively.
+**Provisional:** 4 of ~38 gameweeks scored — read directionally, not conclusively.
 
-### All scored gameweeks — 3 gameweeks
+### All scored gameweeks — 4 gameweeks
 
-**Captain hit-rate** (app pick = realized top scorer in XI): **1/3 = 33%**
-**Points-captured ratio** (app captain ÷ best-in-XI): **57%**
+**Captain hit-rate** (app pick = realized top scorer in XI): **2/4 = 50%**
+**Points-captured ratio** (app captain ÷ best-in-XI): **68%**
 
-**Head-to-head vs your actual captain:** 1W / 1T / 1L · net **+7** captain-pts (×2 ⇒ +14 squad pts over the season)
+**Head-to-head vs your actual captain:** 2W / 1T / 1L · net **+15** captain-pts (×2 ⇒ +30 squad pts over the season)
 
 | predictor | mean captain pts/GW |
 |---|---|
-| Perfect (top scorer in XI) | 17.00 |
-| **App captain pipeline** | **11.33** |
-| Your actual captain | 9.00 |
-| Baseline: highest season-to-date PPG | 2.67 |
-| Baseline: highest ownership | 9.00 |
-| Baseline: random-in-XI (expected) | 5.67 |
+| Perfect (top scorer in XI) | 16.25 |
+| **App captain pipeline** | **12.00** |
+| Your actual captain | 8.25 |
+| Baseline: highest season-to-date PPG | 3.50 |
+| Baseline: highest ownership | 8.25 |
+| Baseline: random-in-XI (expected) | 5.02 |
 
 ## Full pipeline vs deterministic floor
 
-| | 2025-26 replay floor (ep_next absent, neutral LLM, 36 GWs) | Live full pipeline (n=3, provisional) |
+| | 2025-26 replay floor (ep_next absent, neutral LLM, 36 GWs) | Live full pipeline (n=4, provisional) |
 |---|---|---|
-| Captain hit-rate | 10/36 = 28% | 1/3 |
-| Points-captured | 57% | 57% |
-| Head-to-head vs actual | 6W / 26T / 4L · net +9 captain-pts (+18 squad pts) | 1W / 1T / 1L |
-| Mean app captain pts/GW | 7.06 | 11.33 |
+| Captain hit-rate | 10/36 = 28% | 2/4 |
+| Points-captured | 57% | 68% |
+| Head-to-head vs actual | 6W / 26T / 4L · net +9 captain-pts (+18 squad pts) | 2W / 1T / 1L |
+| Mean app captain pts/GW | 7.06 | 12.00 |
 
 ## Not scored
 
 - GW 1: picks-only backfill (no pre-deadline capture) — excluded
+- GW 6: not finished yet — pending
 
 ## Squad drift (capture saw the previous locked squad)
 
 - GW 2: XI changed before lock (out: Cash, Ajer; in: M.Sangaré, Haaland)
 - GW 3: XI changed before lock (out: Kinsky, Maguire, McGinn, João Pedro; in: Scherpen, Ajer, Cash, Wissa); armband moved João Pedro → Haaland before lock
 - GW 4: XI changed before lock (out: Ballard, Cash, M.Sangaré; in: Maguire, Ødegaard, João Pedro)
+- GW 5: XI changed before lock (out: Scherpen, Maguire, Ajer, João Pedro; in: Kinsky, Cash, Bogle, M.Sangaré)
 
 ## Per-gameweek detail
 
@@ -48,6 +50,7 @@ GW's locked squad — see "Squad drift").
 | 2 |  | B.Fernandes | 23 | João Pedro | 9 | 23 |
 | 3 |  | B.Fernandes | 2 | Haaland | 9 | 11 |
 | 4 |  | Haaland | 9 | Haaland | 9 | 17 |
+| 5 |  | Groß | 14 | Haaland | 6 | 14 |
 
 ## Season log — squads as locked
 
@@ -82,3 +85,14 @@ GW's locked squad — see "Squad drift").
 - Transfers for this GW: McGinn→Ødegaard
 - App: captain Haaland (ep_next 8) · transfer FREE: Scherpen→Tzolakis
 - Capture: pre-deadline capture 2026-09-12T08:25:53.028Z (squad as locked for GW 3)
+
+### GW 5
+- 40 pts (bench 9) · GW rank 8,188,512 · overall 3,383,519 · chip none · bank £0.5m · value £100.7m
+- XI: Kinsky 2, Cash -1, Calafiori 1, Bogle 5, B.Fernandes 2, Gakpo 3, Ødegaard 2, M.Sangaré 0, Groß 14, Wissa (VC) 0, Haaland (C) 6
+- Bench: Scherpen 0, João Pedro 0, Ballard 2, Ajer 7
+- Transfers for this GW: Maguire→Bogle
+- App: captain Groß (ep_next 8.2) · transfer FREE: Cash→Bogle
+- Capture: pre-deadline capture 2026-09-18T06:40:49.123Z (squad as locked for GW 4)
+
+### GW 6
+- realized: pending (gameweek not finished)

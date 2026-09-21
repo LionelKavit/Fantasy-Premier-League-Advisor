@@ -1,6 +1,8 @@
 {
-  "dataset_rows": 656,
+  "dataset_rows": 1974,
   "eligible_rows": 0,
+  "excluded_misaligned_rows": 1974,
+  "excluded_reason": "fixture_gw missing or \u2260 gw (captured before target-gameweek-alignment)",
   "labelled_gws": [],
   "train_gws": [],
   "holdout_gws": [],

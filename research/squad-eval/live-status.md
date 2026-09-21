@@ -1,16 +1,16 @@
 # Live-eval status
 
-_Rewritten every tick by scripts/live-eval-tick.ts — 2026-09-18T18:53:47.284Z. Checkout: `main` @ 48d28c2._
+_Rewritten every tick by scripts/live-eval-tick.ts — 2026-09-21T18:39:35.190Z. Checkout: `main` @ 222afd0._
 
 | | |
 |---|---|
-| Next deadline | GW 6 · 2026-10-10T10:00:00Z · 519.1h left |
-| Last capture | GW 5 at 2026-09-18T06:40:49.123Z · captain Groß · transfer Cash→Bogle |
-| Last scored GW | 4 (2026-09-15T16:42:38.475Z) |
+| Next deadline | GW 6 · 2026-10-10T10:00:00Z · 447.3h left |
+| Last capture | GW 6 at 2026-09-18T19:36:29.434Z · captain B.Fernandes · transfer Cash→De Cuyper |
+| Last scored GW | 5 (2026-09-21T18:39:15.933Z) |
 | Awaiting data_checked | — |
-| live-dataset.csv (universe) | 656 rows, 0 complete-label |
-| live-pool-dataset.csv (pool) | 55 rows, 0 complete-label |
-| Last dataset build | 2026-09-15T16:42:41.797Z |
+| live-dataset.csv (universe) | 1974 rows, 0 complete-label |
+| live-pool-dataset.csv (pool) | 165 rows, 0 complete-label |
+| Last dataset build | 2026-09-21T18:39:25.673Z |
 | Refit gate | **Drift: no labelled gameweeks yet** |
 | Failures (consecutive) | none |
 | Last error | none |

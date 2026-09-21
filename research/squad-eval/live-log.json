@@ -35,10 +35,10 @@
       "ppgId": null,
       "ownId": null
     },
-    "llm": "unavailable \u2014 no pre-deadline capture \u2014 the public API exposes no picks before the GW1 deadline",
-    "transfer": "unavailable \u2014 no pre-deadline capture \u2014 the public API exposes no picks before the GW1 deadline",
+    "llm": "unavailable — no pre-deadline capture — the public API exposes no picks before the GW1 deadline",
+    "transfer": "unavailable — no pre-deadline capture — the public API exposes no picks before the GW1 deadline",
     "realized": {
-      "syncedAt": "2026-09-15T16:42:37.098Z",
+      "syncedAt": "2026-09-21T18:39:11.167Z",
       "chip": null,
       "xi": [
         {
@@ -115,7 +115,7 @@
         },
         {
           "id": 124,
-          "webName": "Gro\u00df",
+          "webName": "Groß",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -123,7 +123,7 @@
         },
         {
           "id": 165,
-          "webName": "Jo\u00e3o Pedro",
+          "webName": "João Pedro",
           "multiplier": 2,
           "isCaptain": true,
           "isVice": false,
@@ -149,7 +149,7 @@
         },
         {
           "id": 25,
-          "webName": "Gy\u00f6keres",
+          "webName": "Gyökeres",
           "multiplier": 0,
           "isCaptain": false,
           "isVice": false,
@@ -223,7 +223,7 @@
     },
     "appVice": {
       "id": 165,
-      "webName": "Jo\u00e3o Pedro",
+      "webName": "João Pedro",
       "captainScore": 3.811875,
       "breakdown": {
         "baseProjection": 3.55,
@@ -260,7 +260,7 @@
       },
       {
         "id": 165,
-        "webName": "Jo\u00e3o Pedro",
+        "webName": "João Pedro",
         "captainScore": 3.811875,
         "breakdown": {
           "baseProjection": 3.55,
@@ -278,7 +278,7 @@
       },
       {
         "id": 124,
-        "webName": "Gro\u00df",
+        "webName": "Groß",
         "captainScore": 3.6802500000000005,
         "breakdown": {
           "baseProjection": 2.4050000000000002,
@@ -446,10 +446,10 @@
     "llm": {
       "used": true,
       "confidence": "high",
-      "narrativeSummary": "Fernandes is the clear captain call \u2014 highest captain score (5.11), penalty taker status raises his ceiling, and at 48.1% EO he sits right in the template sweet spot. At rank 2,201,654 with a balanced strategy and 37 gameweeks ahead, there's no urgency to chase a differential risk this early; captaining Fernandes means you move with half the field if he hauls and don't bleed rank if he doesn't. Jo\u00e3o Pedro (68.5% EO) is the natural vice-captain fallback \u2014 heavily owned enough that missing his points would hurt more than captaining Fernandes. Hold the Triple Captain chip; no upcoming week clears the bar meaningfully enough to burn it now."
+      "narrativeSummary": "Fernandes is the clear captain call — highest captain score (5.11), penalty taker status raises his ceiling, and at 48.1% EO he sits right in the template sweet spot. At rank 2,201,654 with a balanced strategy and 37 gameweeks ahead, there's no urgency to chase a differential risk this early; captaining Fernandes means you move with half the field if he hauls and don't bleed rank if he doesn't. João Pedro (68.5% EO) is the natural vice-captain fallback — heavily owned enough that missing his points would hurt more than captaining Fernandes. Hold the Triple Captain chip; no upcoming week clears the bar meaningfully enough to burn it now."
     },
     "realized": {
-      "syncedAt": "2026-09-15T16:42:37.098Z",
+      "syncedAt": "2026-09-21T18:39:11.167Z",
       "chip": null,
       "xi": [
         {
@@ -502,7 +502,7 @@
         },
         {
           "id": 565,
-          "webName": "M.Sangar\u00e9",
+          "webName": "M.Sangaré",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -510,7 +510,7 @@
         },
         {
           "id": 124,
-          "webName": "Gro\u00df",
+          "webName": "Groß",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -526,7 +526,7 @@
         },
         {
           "id": 165,
-          "webName": "Jo\u00e3o Pedro",
+          "webName": "João Pedro",
           "multiplier": 2,
           "isCaptain": true,
           "isVice": false,
@@ -552,7 +552,7 @@
         },
         {
           "id": 25,
-          "webName": "Gy\u00f6keres",
+          "webName": "Gyökeres",
           "multiplier": 0,
           "isCaptain": false,
           "isVice": false,
@@ -586,7 +586,7 @@
           "outId": 431,
           "outName": "Amad",
           "inId": 565,
-          "inName": "M.Sangar\u00e9",
+          "inName": "M.Sangaré",
           "time": "2026-08-28T15:34:30.353988Z"
         }
       ],
@@ -642,7 +642,7 @@
     },
     "appVice": {
       "id": 165,
-      "webName": "Jo\u00e3o Pedro",
+      "webName": "João Pedro",
       "captainScore": 9.396343125000003,
       "breakdown": {
         "baseProjection": 7.9350000000000005,
@@ -679,7 +679,7 @@
       },
       {
         "id": 165,
-        "webName": "Jo\u00e3o Pedro",
+        "webName": "João Pedro",
         "captainScore": 9.396343125000003,
         "breakdown": {
           "baseProjection": 7.9350000000000005,
@@ -733,7 +733,7 @@
       },
       {
         "id": 565,
-        "webName": "M.Sangar\u00e9",
+        "webName": "M.Sangaré",
         "captainScore": 6.368181818181818,
         "breakdown": {
           "baseProjection": 6.15,
@@ -769,7 +769,7 @@
       },
       {
         "id": 124,
-        "webName": "Gro\u00df",
+        "webName": "Groß",
         "captainScore": 5.5253000000000005,
         "breakdown": {
           "baseProjection": 5.085,
@@ -865,10 +865,10 @@
     "llm": {
       "used": true,
       "confidence": "high",
-      "narrativeSummary": "Fernandes is the clear captain call at rank 1,185,762 with 36 gameweeks remaining \u2014 a balanced stance means protecting rank without over-hedging. He leads all candidates on captain score (13.98), carries a penalty threat, and faces an FDR 2 home fixture; crucially, his 48.4% EO sits well below Haaland (72.4%) and Jo\u00e3o Pedro (69.0%), meaning he's a template pick without being a full crowded bet \u2014 you move with enough of the field to protect rank but still gain ground if he hauls while the bigger-EO names blank. VC falls to Jo\u00e3o Pedro as given, covering Chelsea's favourable home game. No TC case this week \u2014 Fernandes' own baseline outstrips anything on the near horizon."
+      "narrativeSummary": "Fernandes is the clear captain call at rank 1,185,762 with 36 gameweeks remaining — a balanced stance means protecting rank without over-hedging. He leads all candidates on captain score (13.98), carries a penalty threat, and faces an FDR 2 home fixture; crucially, his 48.4% EO sits well below Haaland (72.4%) and João Pedro (69.0%), meaning he's a template pick without being a full crowded bet — you move with enough of the field to protect rank but still gain ground if he hauls while the bigger-EO names blank. VC falls to João Pedro as given, covering Chelsea's favourable home game. No TC case this week — Fernandes' own baseline outstrips anything on the near horizon."
     },
     "realized": {
-      "syncedAt": "2026-09-15T16:42:37.098Z",
+      "syncedAt": "2026-09-21T18:39:11.167Z",
       "chip": null,
       "xi": [
         {
@@ -929,7 +929,7 @@
         },
         {
           "id": 124,
-          "webName": "Gro\u00df",
+          "webName": "Groß",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -937,7 +937,7 @@
         },
         {
           "id": 565,
-          "webName": "M.Sangar\u00e9",
+          "webName": "M.Sangaré",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -979,7 +979,7 @@
         },
         {
           "id": 165,
-          "webName": "Jo\u00e3o Pedro",
+          "webName": "João Pedro",
           "multiplier": 0,
           "isCaptain": false,
           "isVice": false,
@@ -1003,7 +1003,7 @@
       "transfers": [
         {
           "outId": 25,
-          "outName": "Gy\u00f6keres",
+          "outName": "Gyökeres",
           "inId": 464,
           "inName": "Wissa",
           "time": "2026-09-04T17:24:57.896510Z"
@@ -1118,7 +1118,7 @@
       },
       {
         "id": 124,
-        "webName": "Gro\u00df",
+        "webName": "Groß",
         "captainScore": 6.748950000000001,
         "breakdown": {
           "baseProjection": 4.5600000000000005,
@@ -1136,7 +1136,7 @@
       },
       {
         "id": 565,
-        "webName": "M.Sangar\u00e9",
+        "webName": "M.Sangaré",
         "captainScore": 5.738014285714286,
         "breakdown": {
           "baseProjection": 4.6899999999999995,
@@ -1286,7 +1286,7 @@
     "llm": {
       "used": true,
       "confidence": "high",
-      "narrativeSummary": "Haaland is the clear captain call. At 71.2% effective ownership he is the template \u2014 skipping him is a rank gamble that a rising manager at 1.5m doesn't need to take. He pairs the highest captain score (9.53) with a home FDR 2 fixture and penalty duties, giving him the ceiling to haul and the floor to limit damage if the game is tight. B.Fernandes is a solid vice at 42.8% EO with his own penalties and strong form, providing meaningful upside as the fallback."
+      "narrativeSummary": "Haaland is the clear captain call. At 71.2% effective ownership he is the template — skipping him is a rank gamble that a rising manager at 1.5m doesn't need to take. He pairs the highest captain score (9.53) with a home FDR 2 fixture and penalty duties, giving him the ceiling to haul and the floor to limit damage if the game is tight. B.Fernandes is a solid vice at 42.8% EO with his own penalties and strong form, providing meaningful upside as the fallback."
     },
     "transfer": {
       "freeTransfersAssumed": 1,
@@ -1333,13 +1333,13 @@
       },
       "hitVerdict": {
         "recommended": false,
-        "reasoning": "No hit options are flagged by the model, and the manager's risk-averse profile with 35 GWs remaining makes taking a 4-point penalty this early deeply unattractive. The best available free move (Scherpen \u2192 Tzolakis) delivers a positive gain without cost. Paying hits to accelerate a rank improvement of this magnitude \u2014 sub-1.5 points over 5 GWs \u2014 would take many gameweeks just to neutralise the deduction, not worth it at rank 1.5M with time on your side.",
+        "reasoning": "No hit options are flagged by the model, and the manager's risk-averse profile with 35 GWs remaining makes taking a 4-point penalty this early deeply unattractive. The best available free move (Scherpen → Tzolakis) delivers a positive gain without cost. Paying hits to accelerate a rank improvement of this magnitude — sub-1.5 points over 5 GWs — would take many gameweeks just to neutralise the deduction, not worth it at rank 1.5M with time on your side.",
         "breakEvenGw": null
       },
       "dataNotice": null,
       "alerts": [],
       "confidence": "high",
-      "narrativeSummary": "Scherpen is the weaker bench keeper here, and Tzolakis edges out Donnarumma and Trafford not just on GW3 gain but in compounding cumulative value \u2014 1.13 pts over five weeks versus 0.88-0.89 for the alternatives, and at a fraction of the cost (\u00a30.1m delta vs \u00a30.5-1.0m). The real decision to track next week is whether to flip Kinsky to Tzolakis too: that move projects a 2.22-point gain over five GWs, the single highest-value horizon transfer on the board, and banking this week's free transfer creates the flexibility to do it without a hit. Given 35 GWs remaining and a rising rank, there's no urgency to overload transfers now \u2014 patience here is the edge, not aggression."
+      "narrativeSummary": "Scherpen is the weaker bench keeper here, and Tzolakis edges out Donnarumma and Trafford not just on GW3 gain but in compounding cumulative value — 1.13 pts over five weeks versus 0.88-0.89 for the alternatives, and at a fraction of the cost (£0.1m delta vs £0.5-1.0m). The real decision to track next week is whether to flip Kinsky to Tzolakis too: that move projects a 2.22-point gain over five GWs, the single highest-value horizon transfer on the board, and banking this week's free transfer creates the flexibility to do it without a hit. Given 35 GWs remaining and a rising rank, there's no urgency to overload transfers now — patience here is the edge, not aggression."
     },
     "pool": {
       "file": "pool/gw04.csv",
@@ -1350,7 +1350,7 @@
       "universeRows": 656
     },
     "realized": {
-      "syncedAt": "2026-09-15T16:42:37.098Z",
+      "syncedAt": "2026-09-21T18:39:11.167Z",
       "chip": null,
       "xi": [
         {
@@ -1403,7 +1403,7 @@
         },
         {
           "id": 15,
-          "webName": "\u00d8degaard",
+          "webName": "Ødegaard",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": true,
@@ -1411,7 +1411,7 @@
         },
         {
           "id": 124,
-          "webName": "Gro\u00df",
+          "webName": "Groß",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -1419,7 +1419,7 @@
         },
         {
           "id": 165,
-          "webName": "Jo\u00e3o Pedro",
+          "webName": "João Pedro",
           "multiplier": 1,
           "isCaptain": false,
           "isVice": false,
@@ -1453,7 +1453,7 @@
         },
         {
           "id": 565,
-          "webName": "M.Sangar\u00e9",
+          "webName": "M.Sangaré",
           "multiplier": 0,
           "isCaptain": false,
           "isVice": false,
@@ -1487,7 +1487,7 @@
           "outId": 45,
           "outName": "McGinn",
           "inId": 15,
-          "inName": "\u00d8degaard",
+          "inName": "Ødegaard",
           "time": "2026-09-12T09:26:34.874825Z"
         }
       ],
@@ -1527,7 +1527,7 @@
     "actualCaptainId": 411,
     "appCaptain": {
       "id": 124,
-      "webName": "Gro\u00df",
+      "webName": "Groß",
       "captainScore": 8.498000000000001,
       "breakdown": {
         "baseProjection": 6.375,
@@ -1564,7 +1564,7 @@
     "rankedCandidates": [
       {
         "id": 124,
-        "webName": "Gro\u00df",
+        "webName": "Groß",
         "captainScore": 8.498000000000001,
         "breakdown": {
           "baseProjection": 6.375,
@@ -1618,7 +1618,7 @@
       },
       {
         "id": 15,
-        "webName": "\u00d8degaard",
+        "webName": "Ødegaard",
         "captainScore": 5.67227868852459,
         "breakdown": {
           "baseProjection": 5.720000000000001,
@@ -1672,7 +1672,7 @@
       },
       {
         "id": 165,
-        "webName": "Jo\u00e3o Pedro",
+        "webName": "João Pedro",
         "captainScore": 4.659442734375,
         "breakdown": {
           "baseProjection": 5.205,
@@ -1768,7 +1768,7 @@
     "llm": {
       "used": true,
       "confidence": "medium",
-      "narrativeSummary": "Gro\u00df leads the captain score (8.50) and sits at just 20.1% EO \u2014 low enough to gain meaningful ground on the field if he delivers, without being a reckless differential punt. He's on penalties, in strong form, and this is exactly the balanced play this manager's falling rank needs: not the full crowd-follow of Haaland (72.9% EO locks in your deficit), but not a genuine differential risk either. B.Fernandes at 40.8% EO is the vice-captain safety net \u2014 penalty taker, strong form, and a captain horizon that shows he's worth targeting in GW6 and GW8 too. Hold the Triple Captain chip; GW5 Haaland (9.54) doesn't clear the bar meaningfully enough yet \u2014 wait for a standout double gameweek."
+      "narrativeSummary": "Groß leads the captain score (8.50) and sits at just 20.1% EO — low enough to gain meaningful ground on the field if he delivers, without being a reckless differential punt. He's on penalties, in strong form, and this is exactly the balanced play this manager's falling rank needs: not the full crowd-follow of Haaland (72.9% EO locks in your deficit), but not a genuine differential risk either. B.Fernandes at 40.8% EO is the vice-captain safety net — penalty taker, strong form, and a captain horizon that shows he's worth targeting in GW6 and GW8 too. Hold the Triple Captain chip; GW5 Haaland (9.54) doesn't clear the bar meaningfully enough yet — wait for a standout double gameweek."
     },
     "transfer": {
       "freeTransfersAssumed": 1,
@@ -1815,13 +1815,13 @@
       },
       "hitVerdict": {
         "recommended": false,
-        "reasoning": "No hit options are flagged as viable, and the data shows no scenario where paying 4 points unlocks a gain that justifies the cost. With 34 GWs remaining and a balanced risk profile, burning a hit in GW4 is premature \u2014 free transfers compounding over time are more valuable than forcing a move now.",
+        "reasoning": "No hit options are flagged as viable, and the data shows no scenario where paying 4 points unlocks a gain that justifies the cost. With 34 GWs remaining and a balanced risk profile, burning a hit in GW4 is premature — free transfers compounding over time are more valuable than forcing a move now.",
         "breakEvenGw": null
       },
       "dataNotice": null,
       "alerts": [],
       "confidence": "high",
-      "narrativeSummary": "Bogle over Cash is the clearest marginal gain in the squad \u2014 a +2.26 cumulative edge over five weeks dwarfs every other option available with this free transfer, and it comes without any budget sacrifice (\u00a30.2m banked). The Wissa-to-Emersonn swap is the logical follow-up next week: the underlying numbers show Emersonn sustaining ~1.38 points of cumulative advantage over five GWs, making this a two-move sequence rather than a one-off fix. The key trade-off accepted on Emersonn is ownership risk \u2014 if he's a low-EO differential and blanks, you cede ground \u2014 but at rank 2.6m with a falling trend and 34 GWs left, a balanced approach means taking selective upside like this rather than locking in pure template. Jo\u00e3o Pedro moves are uniformly negative or marginal across all horizons, so he holds for now."
+      "narrativeSummary": "Bogle over Cash is the clearest marginal gain in the squad — a +2.26 cumulative edge over five weeks dwarfs every other option available with this free transfer, and it comes without any budget sacrifice (£0.2m banked). The Wissa-to-Emersonn swap is the logical follow-up next week: the underlying numbers show Emersonn sustaining ~1.38 points of cumulative advantage over five GWs, making this a two-move sequence rather than a one-off fix. The key trade-off accepted on Emersonn is ownership risk — if he's a low-EO differential and blanks, you cede ground — but at rank 2.6m with a falling trend and 34 GWs left, a balanced approach means taking selective upside like this rather than locking in pure template. João Pedro moves are uniformly negative or marginal across all horizons, so he holds for now."
     },
     "pool": {
       "file": "pool/gw05.csv",
@@ -1830,6 +1830,152 @@
       "candidateRows": 40,
       "universeFile": "pool/gw05.universe.csv",
       "universeRows": 659
+    },
+    "realized": {
+      "syncedAt": "2026-09-21T18:39:11.167Z",
+      "chip": null,
+      "xi": [
+        {
+          "id": 496,
+          "webName": "Kinsky",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 32,
+          "webName": "Cash",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": -1
+        },
+        {
+          "id": 8,
+          "webName": "Calafiori",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 330,
+          "webName": "Bogle",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 5
+        },
+        {
+          "id": 426,
+          "webName": "B.Fernandes",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 367,
+          "webName": "Gakpo",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 3
+        },
+        {
+          "id": 15,
+          "webName": "Ødegaard",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 565,
+          "webName": "M.Sangaré",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        },
+        {
+          "id": 124,
+          "webName": "Groß",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 14
+        },
+        {
+          "id": 464,
+          "webName": "Wissa",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": true,
+          "points": 0
+        },
+        {
+          "id": 411,
+          "webName": "Haaland",
+          "multiplier": 2,
+          "isCaptain": true,
+          "isVice": false,
+          "points": 6
+        }
+      ],
+      "bench": [
+        {
+          "id": 564,
+          "webName": "Scherpen",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        },
+        {
+          "id": 165,
+          "webName": "João Pedro",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        },
+        {
+          "id": 532,
+          "webName": "Ballard",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 87,
+          "webName": "Ajer",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 7
+        }
+      ],
+      "captainId": 411,
+      "viceId": 464,
+      "gwPoints": 40,
+      "pointsOnBench": 9,
+      "gwRank": 8188512,
+      "overallRank": 3383519,
+      "transfers": [
+        {
+          "outId": 418,
+          "outName": "Maguire",
+          "inId": 330,
+          "inName": "Bogle",
+          "time": "2026-09-18T15:02:12.014302Z"
+        }
+      ],
+      "transfersCost": 0,
+      "bank": 0.5,
+      "squadValue": 100.7
     }
   },
   {
@@ -1936,7 +2082,7 @@
       },
       {
         "id": 15,
-        "webName": "\u00d8degaard",
+        "webName": "Ødegaard",
         "captainScore": 4.882096721311476,
         "breakdown": {
           "baseProjection": 5.0200000000000005,
@@ -2008,7 +2154,7 @@
       },
       {
         "id": 165,
-        "webName": "Jo\u00e3o Pedro",
+        "webName": "João Pedro",
         "captainScore": 3.1105634765625005,
         "breakdown": {
           "baseProjection": 4.605,
@@ -2026,7 +2172,7 @@
       },
       {
         "id": 565,
-        "webName": "M.Sangar\u00e9",
+        "webName": "M.Sangaré",
         "captainScore": 2.8966666666666665,
         "breakdown": {
           "baseProjection": 3.8000000000000003,
@@ -2104,7 +2250,7 @@
     "llm": {
       "used": true,
       "confidence": "medium",
-      "narrativeSummary": "Fernandes tops the captain score at 5.88 and carries penalty duties, giving him the ceiling to haul. At 40% EO he's not the template pick (Haaland at 73.2% is), which suits a falling rank needing variance \u2014 you get meaningful upside without going fully differential. The risk is Man Utd's inconsistency, but that's the trade-off you're accepting at rank 2.6M on a downward trend. Haaland is the sensible vice \u2014 if Fernandes blanks, you want the 73.2% template player doubling up as your safety net."
+      "narrativeSummary": "Fernandes tops the captain score at 5.88 and carries penalty duties, giving him the ceiling to haul. At 40% EO he's not the template pick (Haaland at 73.2% is), which suits a falling rank needing variance — you get meaningful upside without going fully differential. The risk is Man Utd's inconsistency, but that's the trade-off you're accepting at rank 2.6M on a downward trend. Haaland is the sensible vice — if Fernandes blanks, you want the 73.2% template player doubling up as your safety net."
     },
     "transfer": {
       "freeTransfersAssumed": 1,
@@ -2151,13 +2297,13 @@
       },
       "hitVerdict": {
         "recommended": false,
-        "reasoning": "No hit options were flagged as viable, and the available free move (Cash \u2192 De Cuyper) already delivers a clean 0.46 xP gain with no cost. At rank 2,625,039 on a falling trend with 33 GWs left, the correct play is to recover steadily \u2014 burning 4 points to accelerate marginal gains like Emersonn would need to consistently outperform across multiple weeks just to break even, which isn't justified at this stage.",
+        "reasoning": "No hit options were flagged as viable, and the available free move (Cash → De Cuyper) already delivers a clean 0.46 xP gain with no cost. At rank 2,625,039 on a falling trend with 33 GWs left, the correct play is to recover steadily — burning 4 points to accelerate marginal gains like Emersonn would need to consistently outperform across multiple weeks just to break even, which isn't justified at this stage.",
         "breakEvenGw": null
       },
       "dataNotice": null,
       "alerts": [],
       "confidence": "high",
-      "narrativeSummary": "Cash \u2192 De Cuyper is the cleanest free transfer on the board: it leads all single moves in both immediate and 5-GW cumulative gain (+2.15 over five weeks), and De Cuyper's underlying attacking output from a left-back role gives it legs beyond this gameweek alone. The Kinsky \u2192 Kelleher upgrade is the strongest horizon move (+2.28 cumulative) and makes sense as next week's free transfer \u2014 Kelleher's Liverpool clean-sheet profile is a genuine step up in expected points, not just a fixture punt. The Jo\u00e3o Pedro \u2192 Emersonn savings option frees \u00a32.3m but yields only +1.14 over five weeks versus the \u00a30.5m-cost moves, so the arithmetic doesn't support it unless you need the budget for a future premium. With rank falling and 33 GWs remaining, this is a steady-hand week \u2014 make the obvious upgrade, bank the compounding gain, and prepare the Kelleher move for GW7."
+      "narrativeSummary": "Cash → De Cuyper is the cleanest free transfer on the board: it leads all single moves in both immediate and 5-GW cumulative gain (+2.15 over five weeks), and De Cuyper's underlying attacking output from a left-back role gives it legs beyond this gameweek alone. The Kinsky → Kelleher upgrade is the strongest horizon move (+2.28 cumulative) and makes sense as next week's free transfer — Kelleher's Liverpool clean-sheet profile is a genuine step up in expected points, not just a fixture punt. The João Pedro → Emersonn savings option frees £2.3m but yields only +1.14 over five weeks versus the £0.5m-cost moves, so the arithmetic doesn't support it unless you need the budget for a future premium. With rank falling and 33 GWs remaining, this is a steady-hand week — make the obvious upgrade, bank the compounding gain, and prepare the Kelleher move for GW7."
     },
     "pool": {
       "file": "pool/gw06.csv",
