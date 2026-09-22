@@ -50,28 +50,59 @@ Everything comes in one voice, **Pocket Scout**, backed by expert FPL knowledge:
 ## Architecture at a glance
 
 ```mermaid
-flowchart LR
-  U([Manager ID]) --> BASE
-  D([No ID · Explore<br/>sample dream team]) --> BASE
-  subgraph Fast["Base phase — deterministic, instant"]
-    BASE[Squad analysis<br/>+ composite scoring] --> PITCH[Pitch + ratings]
+%%{init: {"flowchart": {"curve": "monotoneY", "nodeSpacing": 60, "rankSpacing": 80, "subGraphTitleMargin": {"top": 12, "bottom": 12}}}}%%
+flowchart TB
+  subgraph IN["Your input"]
+    YOU(["Your FPL manager ID"]):::you
+    DEMO(["No ID?<br/>Explore a sample squad"]):::you
   end
-  subgraph Slow["Insights phase — LLM, cached"]
-    OPT[Optimizer<br/>transfers / captain / horizon / chip windows] --> SYN[Grounded syntheses<br/>+ chip orchestrator + Pocket Scout persona]
+
+  FPL[("Official FPL data")]:::data
+  NEWS[("Injury and team news")]:::data
+
+  subgraph P1["Phase 1 — Rank Your Squad"]
+    RANK["Rates every player 0–10<br/>pure math"]:::math
   end
-  BASE --> OPT
-  FPL[(FPL API)] --> BASE
-  NEWS[(Team news)] -.-> OPT
-  KB[(Knowledge:<br/>chips · rank · rules)] -.-> SYN
-  KB -.-> CHAT
-  PITCH --> UI[Conversation-first UI<br/>verdict bar · pitch · chat · breakdown · player dialog]
-  SYN --> UI
-  CHAT[Ask The Scout<br/>proactive brief + tool-use loop] --> UI
+
+  subgraph P2["Phase 2 — Compute Transfer and Chip Strategy"]
+    PLAN["Transfers, captain, chips<br/>pure math"]:::math
+    AI["Explains the plan<br/>Claude AI"]:::ai
+    CACHE[("Saved for 10 minutes")]:::cache
+    PLAN --> AI --> CACHE
+  end
+
+  subgraph SCREEN["Your screen"]
+    OUT["Verdict · pitch · ratings<br/>breakdown"]:::screen
+    CHAT["Ask The Scout chat<br/>Claude AI · real numbers"]:::screen
+  end
+
+  YOU --> P1
+  DEMO --> P1
+  FPL --> P1
+  RANK --> P2
+  NEWS -.-> P2
+  RANK -->|instantly| OUT
+  CACHE -->|once ready| OUT
+  CACHE -.-> CHAT
+  KB[("FPL expert playbook")]:::data -.-> CHAT
+
+  classDef you    fill:#4f81bd33,stroke:#4f81bd,stroke-width:1.5px
+  classDef data   fill:#3a9c8f2e,stroke:#3a9c8f,stroke-width:1.5px
+  classDef cache  fill:#3a9c8f2e,stroke:#3a9c8f,stroke-width:1.5px,stroke-dasharray:4 3
+  classDef math   fill:#c9822b2e,stroke:#c9822b,stroke-width:1.5px
+  classDef ai     fill:#8b6cc42e,stroke:#8b6cc4,stroke-width:1.5px
+  classDef screen fill:#5aa05a2e,stroke:#5aa05a,stroke-width:1.5px
+  style IN fill:#4f81bd14,stroke:#4f81bd80
+  style P1 fill:#88888814,stroke:#88888880
+  style P2 fill:#88888814,stroke:#88888880
+  style SCREEN fill:#5aa05a14,stroke:#5aa05a80
 ```
 
-> In **demo mode** (no ID) the base phase paints a synthesized sample squad, the insights phase runs **captaincy only** (the optimizer is skipped — no transfers/horizon/chips), and the chat answers general FPL questions grounded in the rules.
+**Color key:** blue = your input · teal = data · amber = pure math · purple = Claude AI · green = your screen.
 
-The pitch paints **immediately** from a fast deterministic phase; the Scout then opens with a proactive brief and the LLM insights stream in. → **Full breakdown: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**
+> **No manager ID?** Phase 1 rates a sample squad instead, Phase 2 only picks a captain (no transfer, long-term or chip plan), and Ask The Scout answers general FPL questions grounded in this season's rules.
+
+Phase 1 is pure math, so the pitch paints **immediately**. Phase 2 does the heavier planning, then Claude writes the reasoning (the chip plan is grounded in the same expert playbook the Scout uses), and those insights stream in while you read; the Scout opens with a brief for the coming deadline. → **Full breakdown: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**
 
 ## What makes it interesting (engineering)
 
