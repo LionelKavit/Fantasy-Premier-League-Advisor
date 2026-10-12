@@ -1,10 +1,10 @@
 # Live-eval status
 
-_Rewritten every tick by scripts/live-eval-tick.ts — 2026-10-12T02:35:50.508Z. Checkout: `main` @ ee06577._
+_Rewritten every tick by scripts/live-eval-tick.ts — 2026-10-12T03:35:55.557Z. Checkout: `main` @ ee06577._
 
 | | |
 |---|---|
-| Next deadline | GW 7 · 2026-10-17T10:00:00Z · 127.4h left |
+| Next deadline | GW 7 · 2026-10-17T10:00:00Z · 126.4h left |
 | Last capture | GW 6 at 2026-10-10T05:02:33.305Z · captain Groß · transfer Gakpo→Schade |
 | Last scored GW | 5 (2026-09-21T18:39:15.933Z) |
 | Awaiting data_checked | — |
