@@ -1,8 +1,8 @@
 # Live refit (composite-refit-gate)
 
-Rows 1974 · eligible 0 · labelled GWs — · train — · holdout —
+Rows 1982 · eligible 0 · labelled GWs — · train — · holdout —
 
-Excluded 1974 rows: fixture_gw missing or ≠ gw (captured before target-gameweek-alignment)
+Excluded 1982 rows: fixture_gw missing or ≠ gw (captured before target-gameweek-alignment)
 
 | position | status | n_train | n_heldout | alpha | heldout ρ |
 |---|---|---|---|---|---|
