@@ -2492,7 +2492,7 @@
   {
     "gw": 7,
     "teamId": 2558300,
-    "capturedAt": "2026-10-17T08:45:51.499Z",
+    "capturedAt": "2026-10-17T09:47:59.723Z",
     "deadline": "2026-10-17T10:00:00Z",
     "postDeadline": false,
     "captureMode": "pre-deadline",
@@ -2532,7 +2532,7 @@
       },
       "epNext": 10,
       "compositeTotal": 0.9836099423302951,
-      "effectiveOwnership": 0.435,
+      "effectiveOwnership": 0.439,
       "rotationRisk": 0,
       "injurySeverity": 0
     },
@@ -2550,7 +2550,7 @@
       },
       "epNext": 6,
       "compositeTotal": 0.7861789845538187,
-      "effectiveOwnership": 0.763,
+      "effectiveOwnership": 0.764,
       "rotationRisk": 0.09999999999999998,
       "injurySeverity": 0
     },
@@ -2569,7 +2569,7 @@
         },
         "epNext": 10,
         "compositeTotal": 0.9836099423302951,
-        "effectiveOwnership": 0.435,
+        "effectiveOwnership": 0.439,
         "rotationRisk": 0,
         "injurySeverity": 0
       },
@@ -2587,7 +2587,7 @@
         },
         "epNext": 6,
         "compositeTotal": 0.7861789845538187,
-        "effectiveOwnership": 0.763,
+        "effectiveOwnership": 0.764,
         "rotationRisk": 0.09999999999999998,
         "injurySeverity": 0
       },
@@ -2605,7 +2605,7 @@
         },
         "epNext": 7.5,
         "compositeTotal": 0.915308838552561,
-        "effectiveOwnership": 0.223,
+        "effectiveOwnership": 0.22399999999999998,
         "rotationRisk": 0.09999999999999998,
         "injurySeverity": 0
       },
@@ -2623,7 +2623,7 @@
         },
         "epNext": 6,
         "compositeTotal": 0.5133927529120479,
-        "effectiveOwnership": 0.721,
+        "effectiveOwnership": 0.723,
         "rotationRisk": 0.09999999999999998,
         "injurySeverity": 0
       },
@@ -2641,7 +2641,7 @@
         },
         "epNext": 5,
         "compositeTotal": 0.9687008293083939,
-        "effectiveOwnership": 0.532,
+        "effectiveOwnership": 0.5329999999999999,
         "rotationRisk": 0.09999999999999998,
         "injurySeverity": 0
       },
@@ -2659,7 +2659,7 @@
         },
         "epNext": 1.5,
         "compositeTotal": 0.27739527694803806,
-        "effectiveOwnership": 0.313,
+        "effectiveOwnership": 0.31,
         "rotationRisk": 0.09999999999999998,
         "injurySeverity": 0
       },
@@ -2713,7 +2713,7 @@
         },
         "epNext": 1.5,
         "compositeTotal": 0.23072498604961783,
-        "effectiveOwnership": 0.191,
+        "effectiveOwnership": 0.19,
         "rotationRisk": 0.09999999999999998,
         "injurySeverity": 0
       },
@@ -2749,7 +2749,7 @@
         },
         "epNext": 1,
         "compositeTotal": 0.19941247699898057,
-        "effectiveOwnership": 0.159,
+        "effectiveOwnership": 0.156,
         "rotationRisk": 0.95,
         "injurySeverity": 0
       }
@@ -2761,7 +2761,7 @@
     "llm": {
       "used": true,
       "confidence": "high",
-      "narrativeSummary": "Groß is the clear captain call — top captain score (9.02), penalties, a home FDR 2 fixture, and strong form all stack up in his favour. At 43.5% EO he's not a differential, but he's also not the 76% template anchor Haaland is, meaning a Groß haul gives you a meaningful edge over the field without requiring a low-ownership gamble. For a falling rank with 32 GWs still to play, this is the right balance: enough upside to claw back ground, enough ownership to avoid a catastrophic bleed if Haaland or João Pedro fire instead. Hold the TC chip — no upcoming week (peak 7.37) clears the current 9.02 baseline."
+      "narrativeSummary": "Groß is the clear captain pick — he tops the captain score at 9.02, has penalties, strong form, and a FDR 2 home fixture. At 43.9% EO he's not quite full template, which suits a falling rank: you get meaningful upside without taking a wild differential swing. Haaland (76.4% EO) sits nicely as VC — if Groß misses his slot you fall back on the most-owned captain candidate in the game, limiting rank bleed. No TC this week; the peak horizon score (7.37, GW11) doesn't beat this week's baseline, so hold the chip."
     },
     "transfer": {
       "freeTransfersAssumed": 2,
@@ -2799,46 +2799,21 @@
         "breakEvenGw": null
       },
       "secondary": {
-        "type": "FREE",
-        "moves": [
-          {
-            "outId": 233,
-            "outName": "Mykolenko",
-            "inId": 115,
-            "inName": "De Cuyper",
-            "priceDelta": 0.6000000000000005,
-            "epOut": 1.2,
-            "epIn": 10.5,
-            "epDelta": 9.3,
-            "gw1Gain": 0.6091848321710567,
-            "gw5Gain": 0.6091848321710567
-          },
-          {
-            "outId": 15,
-            "outName": "Ødegaard",
-            "inId": 101,
-            "inName": "Henderson",
-            "priceDelta": -1.8999999999999995,
-            "epOut": 1.5,
-            "epIn": 10,
-            "epDelta": 8.5,
-            "gw1Gain": 0.7656032919071531,
-            "gw5Gain": 0.7656032919071531
-          }
-        ],
+        "type": "ROLL",
+        "moves": [],
         "netPointsCost": 0,
-        "netGain": 1.3747881240782098,
+        "netGain": 0,
         "breakEvenGw": null
       },
       "hitVerdict": {
         "recommended": false,
-        "reasoning": "No single or double hit options were surfaced by the model, and with 32 gameweeks remaining and a balanced risk profile, burning 4-8 points to accelerate a move that free transfers will cover next week is not justified. The gap is closable through smart free transfer sequencing — hits are for crises or elite restructures, not routine upgrades.",
+        "reasoning": "No hit options were flagged as viable by the model, and with 32 gameweeks remaining and a balanced risk profile, burning 4 points on a hit this early amplifies the break-even pressure unnecessarily. The free transfers already address the two highest-gain positions (Ødegaard and Wissa) without cost. Hits make sense when free transfers are exhausted or rank deficit is severe — neither condition applies here.",
         "breakEvenGw": null
       },
       "dataNotice": null,
       "alerts": [],
       "confidence": "medium",
-      "narrativeSummary": "Henderson over Ødegaard is the headline: the horizon data shows a SHORT_TERM tag with a near-edge advantage but a negative far-edge (-0.33), meaning this is an exploit window, not a long-term hold — you're buying form and fixtures, not a permanent upgrade. De Cuyper over Mykolenko frees up £0.6m in bank and adds a player the data rates consistently across both the 1-GW and 5-GW horizon, making it the tidier of the two moves with no downside risk. The key trade-off accepted here is that Henderson's value likely fades beyond the short horizon, so you're implicitly committing to revisiting that midfield slot in 3-4 weeks — that's fine with 32 GWs left and a wildcard still in the locker. Brobbey next week is the logical follow-up: BUY_NOW timing, a positive far-edge, and a cumulative 3.77-point gain over five weeks makes it the most compelling outstanding upgrade on the board."
+      "narrativeSummary": "Henderson's edge over Ødegaard is flagged as SHORT_TERM, meaning the fixture swing is the dominant argument rather than a long-run xG or role advantage — accept that you may need to revisit this in 3-4 weeks if Henderson's underlying numbers don't back the move up. Brobbey over Wissa is a BUY_NOW with a positive far-edge, suggesting cumulative value builds cleanly over the 5-GW horizon without a fixture cliff. The Mykolenko situation is the one left on the table: Mfuni has the best near-term fixture edge of any candidate (nearEdge +2.00, GW8 fixture edge +3.0) but the far-edge drops to zero, so banking the third transfer to reassess next week is smarter than committing now with £0.3m in the bank and no flex. At rank 4.17m and falling, you need gains over the field — both moves are template-adjacent enough to avoid differential risk while still generating positive EO-adjusted upside."
     },
     "pool": {
       "file": "pool/gw07.csv",

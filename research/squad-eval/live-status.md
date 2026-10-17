@@ -1,11 +1,11 @@
 # Live-eval status
 
-_Rewritten every tick by scripts/live-eval-tick.ts — 2026-10-17T08:45:51.586Z. Checkout: `main` @ ee06577._
+_Rewritten every tick by scripts/live-eval-tick.ts — 2026-10-17T09:47:59.943Z. Checkout: `main` @ ee06577._
 
 | | |
 |---|---|
-| Next deadline | GW 7 · 2026-10-17T10:00:00Z · 1.2h left · **IN CAPTURE WINDOW** |
-| Last capture | GW 7 at 2026-10-17T08:45:51.499Z · captain Groß · transfer Mykolenko→De Cuyper, Ødegaard→Henderson |
+| Next deadline | GW 7 · 2026-10-17T10:00:00Z · 0.2h left · **IN CAPTURE WINDOW** |
+| Last capture | GW 7 at 2026-10-17T09:47:59.723Z · captain Groß · transfer Mykolenko→De Cuyper, Ødegaard→Henderson |
 | Last scored GW | 6 (2026-10-13T21:04:51.206Z) |
 | Awaiting data_checked | — |
 | live-dataset.csv (universe) | 1982 rows, 656 complete-label |
