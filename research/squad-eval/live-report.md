@@ -1,35 +1,35 @@
-# Captain live-eval — full pipeline, 2026-27 (PROVISIONAL, n=5)
+# Captain live-eval — full pipeline, 2026-27 (PROVISIONAL, n=6)
 
 Prospective scoring of the app's full captain pipeline (live `ep_next` + LLM context),
 captured pre-deadline each gameweek and scored on realized `total_points` against the XI
 you actually locked (fetched post-deadline; the capture itself only sees the previous
 GW's locked squad — see "Squad drift").
-**Provisional:** 5 of ~38 gameweeks scored — read directionally, not conclusively.
+**Provisional:** 6 of ~38 gameweeks scored — read directionally, not conclusively.
 
-### All scored gameweeks — 5 gameweeks
+### All scored gameweeks — 6 gameweeks
 
-**Captain hit-rate** (app pick = realized top scorer in XI): **2/5 = 40%**
-**Points-captured ratio** (app captain ÷ best-in-XI): **64%**
+**Captain hit-rate** (app pick = realized top scorer in XI): **2/6 = 33%**
+**Points-captured ratio** (app captain ÷ best-in-XI): **60%**
 
-**Head-to-head vs your actual captain:** 3W / 1T / 1L · net **+20** captain-pts (×2 ⇒ +40 squad pts over the season)
+**Head-to-head vs your actual captain:** 3W / 2T / 1L · net **+20** captain-pts (×2 ⇒ +40 squad pts over the season)
 
 | predictor | mean captain pts/GW |
 |---|---|
-| Perfect (top scorer in XI) | 15.40 |
-| **App captain pipeline** | **10.80** |
-| Your actual captain | 6.80 |
-| Baseline: highest season-to-date PPG | 4.00 |
-| Baseline: highest ownership | 7.80 |
-| Baseline: random-in-XI (expected) | 4.93 |
+| Perfect (top scorer in XI) | 15.00 |
+| **App captain pipeline** | **9.83** |
+| Your actual captain | 6.50 |
+| Baseline: highest season-to-date PPG | 3.67 |
+| Baseline: highest ownership | 8.67 |
+| Baseline: random-in-XI (expected) | 4.97 |
 
 ## Full pipeline vs deterministic floor
 
-| | 2025-26 replay floor (ep_next absent, neutral LLM, 36 GWs) | Live full pipeline (n=5, provisional) |
+| | 2025-26 replay floor (ep_next absent, neutral LLM, 36 GWs) | Live full pipeline (n=6, provisional) |
 |---|---|---|
-| Captain hit-rate | 10/36 = 28% | 2/5 |
-| Points-captured | 57% | 64% |
-| Head-to-head vs actual | 6W / 26T / 4L · net +9 captain-pts (+18 squad pts) | 3W / 1T / 1L |
-| Mean app captain pts/GW | 7.06 | 10.80 |
+| Captain hit-rate | 10/36 = 28% | 2/6 |
+| Points-captured | 57% | 60% |
+| Head-to-head vs actual | 6W / 26T / 4L · net +9 captain-pts (+18 squad pts) | 3W / 2T / 1L |
+| Mean app captain pts/GW | 7.06 | 9.83 |
 
 ## Not scored
 
@@ -42,6 +42,7 @@ GW's locked squad — see "Squad drift").
 - GW 4: XI changed before lock (out: Ballard, Cash, M.Sangaré; in: Maguire, Ødegaard, João Pedro)
 - GW 5: XI changed before lock (out: Scherpen, Maguire, Ajer, João Pedro; in: Kinsky, Cash, Bogle, M.Sangaré)
 - GW 6: XI changed before lock (out: Kinsky, Cash, Gakpo, M.Sangaré; in: Verbruggen, Davis, King, João Pedro); armband moved Haaland → B.Fernandes before lock
+- GW 7: XI changed before lock (out: Davis, B.Fernandes; in: Konsa, Mbeumo); armband moved B.Fernandes → Groß before lock
 
 ## Per-gameweek detail
 
@@ -52,6 +53,7 @@ GW's locked squad — see "Squad drift").
 | 4 |  | Haaland | 9 | Haaland | 9 | 17 |
 | 5 |  | Groß | 14 | Haaland | 6 | 14 |
 | 6 | wildcard | Groß | 6 | B.Fernandes | 1 | 12 |
+| 7 |  | Groß | 5 | Groß | 5 | 13 |
 
 ## Season log — squads as locked
 
@@ -102,3 +104,11 @@ GW's locked squad — see "Squad drift").
 - Transfers for this GW: Ajer→Mykolenko, Scherpen→Verbruggen, Kinsky→Leno, Cash→Davis, M.Sangaré→King, Gakpo→Mbeumo, Ballard→Konsa
 - App: captain Groß (ep_next 15.5) · transfer FREE: Gakpo→Schade
 - Capture: pre-deadline capture 2026-10-10T05:02:33.305Z (squad as locked for GW 5)
+
+### GW 7
+- 62 pts (bench 7) · GW rank 5,006,366 · overall 4,093,198 · chip none · bank £4.2m · value £101.0m
+- XI: Verbruggen 6, Calafiori 6, Bogle 2, Konsa 9, Mbeumo 8, Ødegaard 3, King 2, Groß (C) 5, João Pedro 2, Wissa 1, Haaland (VC) 13
+- Bench: Leno 6, Cherki 0, Mykolenko 1, Davis 0
+- Transfers for this GW: B.Fernandes→Cherki
+- App: captain Groß (ep_next 10) · transfer FREE: Mykolenko→De Cuyper, Ødegaard→Henderson
+- Capture: pre-deadline capture 2026-10-17T09:47:59.723Z (squad as locked for GW 6)

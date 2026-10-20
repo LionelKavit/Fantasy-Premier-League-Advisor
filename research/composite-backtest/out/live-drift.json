@@ -6,15 +6,15 @@
     "by_position": {}
   },
   "saturation": {
-    "gw": 6,
-    "all": 0.006,
-    "eligible": 0.0205,
+    "gw": 7,
+    "all": 0.024,
+    "eligible": 0.0639,
     "n_all": 667,
-    "n_eligible": 195
+    "n_eligible": 219
   },
   "candidate_present": false,
   "gate": {
-    "at": "2026-10-13T21:04:59.026Z",
+    "at": "2026-10-20T16:26:58.744Z",
     "holdout_gws": [],
     "labelled_gws": [],
     "streak": 0,
@@ -50,5 +50,5 @@
       "EP_FLOOR": 0.9
     }
   },
-  "transfer_calibration": "Calibration (n=3): mean projected \u0394ep 8.70 vs mean realized next-1 (in \u2212 out, net of hit) 2.67."
+  "transfer_calibration": "Calibration (n=4): mean projected \u0394ep 10.97 vs mean realized next-1 (in \u2212 out, net of hit) 3.25."
 }
