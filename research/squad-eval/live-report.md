@@ -1,35 +1,35 @@
-# Captain live-eval — full pipeline, 2026-27 (PROVISIONAL, n=6)
+# Captain live-eval — full pipeline, 2026-27 (PROVISIONAL, n=7)
 
 Prospective scoring of the app's full captain pipeline (live `ep_next` + LLM context),
 captured pre-deadline each gameweek and scored on realized `total_points` against the XI
 you actually locked (fetched post-deadline; the capture itself only sees the previous
 GW's locked squad — see "Squad drift").
-**Provisional:** 6 of ~38 gameweeks scored — read directionally, not conclusively.
+**Provisional:** 7 of ~38 gameweeks scored — read directionally, not conclusively.
 
-### All scored gameweeks — 6 gameweeks
+### All scored gameweeks — 7 gameweeks
 
-**Captain hit-rate** (app pick = realized top scorer in XI): **2/6 = 33%**
+**Captain hit-rate** (app pick = realized top scorer in XI): **2/7 = 29%**
 **Points-captured ratio** (app captain ÷ best-in-XI): **60%**
 
-**Head-to-head vs your actual captain:** 3W / 2T / 1L · net **+20** captain-pts (×2 ⇒ +40 squad pts over the season)
+**Head-to-head vs your actual captain:** 4W / 2T / 1L · net **+28** captain-pts (×2 ⇒ +56 squad pts over the season)
 
 | predictor | mean captain pts/GW |
 |---|---|
-| Perfect (top scorer in XI) | 15.00 |
-| **App captain pipeline** | **9.83** |
-| Your actual captain | 6.50 |
-| Baseline: highest season-to-date PPG | 3.67 |
-| Baseline: highest ownership | 8.67 |
-| Baseline: random-in-XI (expected) | 4.97 |
+| Perfect (top scorer in XI) | 14.86 |
+| **App captain pipeline** | **9.57** |
+| Your actual captain | 5.57 |
+| Baseline: highest season-to-date PPG | 4.29 |
+| Baseline: highest ownership | 8.57 |
+| Baseline: random-in-XI (expected) | 4.88 |
 
 ## Full pipeline vs deterministic floor
 
-| | 2025-26 replay floor (ep_next absent, neutral LLM, 36 GWs) | Live full pipeline (n=6, provisional) |
+| | 2025-26 replay floor (ep_next absent, neutral LLM, 36 GWs) | Live full pipeline (n=7, provisional) |
 |---|---|---|
-| Captain hit-rate | 10/36 = 28% | 2/6 |
+| Captain hit-rate | 10/36 = 28% | 2/7 |
 | Points-captured | 57% | 60% |
-| Head-to-head vs actual | 6W / 26T / 4L · net +9 captain-pts (+18 squad pts) | 3W / 2T / 1L |
-| Mean app captain pts/GW | 7.06 | 9.83 |
+| Head-to-head vs actual | 6W / 26T / 4L · net +9 captain-pts (+18 squad pts) | 4W / 2T / 1L |
+| Mean app captain pts/GW | 7.06 | 9.57 |
 
 ## Not scored
 
@@ -43,6 +43,7 @@ GW's locked squad — see "Squad drift").
 - GW 5: XI changed before lock (out: Scherpen, Maguire, Ajer, João Pedro; in: Kinsky, Cash, Bogle, M.Sangaré)
 - GW 6: XI changed before lock (out: Kinsky, Cash, Gakpo, M.Sangaré; in: Verbruggen, Davis, King, João Pedro); armband moved Haaland → B.Fernandes before lock
 - GW 7: XI changed before lock (out: Davis, B.Fernandes; in: Konsa, Mbeumo); armband moved B.Fernandes → Groß before lock
+- GW 8: XI changed before lock (out: Verbruggen, João Pedro; in: Leno, Cherki); armband moved Groß → João Pedro before lock
 
 ## Per-gameweek detail
 
@@ -54,6 +55,7 @@ GW's locked squad — see "Squad drift").
 | 5 |  | Groß | 14 | Haaland | 6 | 14 |
 | 6 | wildcard | Groß | 6 | B.Fernandes | 1 | 12 |
 | 7 |  | Groß | 5 | Groß | 5 | 13 |
+| 8 |  | Haaland | 8 | João Pedro | 0 | 14 |
 
 ## Season log — squads as locked
 
@@ -112,3 +114,11 @@ GW's locked squad — see "Squad drift").
 - Transfers for this GW: B.Fernandes→Cherki
 - App: captain Groß (ep_next 10) · transfer FREE: Mykolenko→De Cuyper, Ødegaard→Henderson
 - Capture: pre-deadline capture 2026-10-17T09:47:59.723Z (squad as locked for GW 6)
+
+### GW 8
+- 56 pts (bench 4) · GW rank 1,919,912 · overall 3,431,942 · chip none · bank £4.2m · value £101.4m
+- XI: Leno 8, Calafiori 1, Bogle 5, Konsa 14, Cherki 0, Ødegaard 3, King 6, Groß 0, Mbeumo 2, Wissa 1, Haaland (VC) 8
+- Bench: Verbruggen 2, João Pedro (C) 0, Davis 2, Mykolenko 0
+- Transfers for this GW: none
+- App: captain Haaland (ep_next 9.5) · transfer FREE: Mykolenko→De Cuyper, Ødegaard→Henderson
+- Capture: pre-deadline capture 2026-10-23T17:06:35.119Z (squad as locked for GW 7)

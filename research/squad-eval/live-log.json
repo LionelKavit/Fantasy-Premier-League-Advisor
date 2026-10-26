@@ -38,7 +38,7 @@
     "llm": "unavailable — no pre-deadline capture — the public API exposes no picks before the GW1 deadline",
     "transfer": "unavailable — no pre-deadline capture — the public API exposes no picks before the GW1 deadline",
     "realized": {
-      "syncedAt": "2026-10-20T16:26:50.463Z",
+      "syncedAt": "2026-10-26T17:22:20.134Z",
       "chip": null,
       "xi": [
         {
@@ -449,7 +449,7 @@
       "narrativeSummary": "Fernandes is the clear captain call — highest captain score (5.11), penalty taker status raises his ceiling, and at 48.1% EO he sits right in the template sweet spot. At rank 2,201,654 with a balanced strategy and 37 gameweeks ahead, there's no urgency to chase a differential risk this early; captaining Fernandes means you move with half the field if he hauls and don't bleed rank if he doesn't. João Pedro (68.5% EO) is the natural vice-captain fallback — heavily owned enough that missing his points would hurt more than captaining Fernandes. Hold the Triple Captain chip; no upcoming week clears the bar meaningfully enough to burn it now."
     },
     "realized": {
-      "syncedAt": "2026-10-20T16:26:50.463Z",
+      "syncedAt": "2026-10-26T17:22:20.134Z",
       "chip": null,
       "xi": [
         {
@@ -868,7 +868,7 @@
       "narrativeSummary": "Fernandes is the clear captain call at rank 1,185,762 with 36 gameweeks remaining — a balanced stance means protecting rank without over-hedging. He leads all candidates on captain score (13.98), carries a penalty threat, and faces an FDR 2 home fixture; crucially, his 48.4% EO sits well below Haaland (72.4%) and João Pedro (69.0%), meaning he's a template pick without being a full crowded bet — you move with enough of the field to protect rank but still gain ground if he hauls while the bigger-EO names blank. VC falls to João Pedro as given, covering Chelsea's favourable home game. No TC case this week — Fernandes' own baseline outstrips anything on the near horizon."
     },
     "realized": {
-      "syncedAt": "2026-10-20T16:26:50.463Z",
+      "syncedAt": "2026-10-26T17:22:20.134Z",
       "chip": null,
       "xi": [
         {
@@ -1350,7 +1350,7 @@
       "universeRows": 656
     },
     "realized": {
-      "syncedAt": "2026-10-20T16:26:50.463Z",
+      "syncedAt": "2026-10-26T17:22:20.134Z",
       "chip": null,
       "xi": [
         {
@@ -1832,7 +1832,7 @@
       "universeRows": 659
     },
     "realized": {
-      "syncedAt": "2026-10-20T16:26:50.463Z",
+      "syncedAt": "2026-10-26T17:22:20.134Z",
       "chip": null,
       "xi": [
         {
@@ -2301,7 +2301,7 @@
       "universeRows": 667
     },
     "realized": {
-      "syncedAt": "2026-10-20T16:26:50.463Z",
+      "syncedAt": "2026-10-26T17:22:20.134Z",
       "chip": "wildcard",
       "xi": [
         {
@@ -2824,7 +2824,7 @@
       "universeRows": 667
     },
     "realized": {
-      "syncedAt": "2026-10-20T16:26:50.463Z",
+      "syncedAt": "2026-10-26T17:22:20.134Z",
       "chip": null,
       "xi": [
         {
@@ -3328,6 +3328,144 @@
       "candidateRows": 40,
       "universeFile": "pool/gw08.universe.csv",
       "universeRows": 668
+    },
+    "realized": {
+      "syncedAt": "2026-10-26T17:22:20.134Z",
+      "chip": null,
+      "xi": [
+        {
+          "id": 250,
+          "webName": "Leno",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 8
+        },
+        {
+          "id": 8,
+          "webName": "Calafiori",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 330,
+          "webName": "Bogle",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 5
+        },
+        {
+          "id": 31,
+          "webName": "Konsa",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 14
+        },
+        {
+          "id": 399,
+          "webName": "Cherki",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        },
+        {
+          "id": 15,
+          "webName": "Ødegaard",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 3
+        },
+        {
+          "id": 268,
+          "webName": "King",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 6
+        },
+        {
+          "id": 124,
+          "webName": "Groß",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        },
+        {
+          "id": 427,
+          "webName": "Mbeumo",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 464,
+          "webName": "Wissa",
+          "multiplier": 1,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 1
+        },
+        {
+          "id": 411,
+          "webName": "Haaland",
+          "multiplier": 2,
+          "isCaptain": false,
+          "isVice": true,
+          "points": 8
+        }
+      ],
+      "bench": [
+        {
+          "id": 109,
+          "webName": "Verbruggen",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 165,
+          "webName": "João Pedro",
+          "multiplier": 0,
+          "isCaptain": true,
+          "isVice": false,
+          "points": 0
+        },
+        {
+          "id": 305,
+          "webName": "Davis",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 2
+        },
+        {
+          "id": 233,
+          "webName": "Mykolenko",
+          "multiplier": 0,
+          "isCaptain": false,
+          "isVice": false,
+          "points": 0
+        }
+      ],
+      "captainId": 165,
+      "viceId": 411,
+      "gwPoints": 56,
+      "pointsOnBench": 4,
+      "gwRank": 1919912,
+      "overallRank": 3431942,
+      "transfers": [],
+      "transfersCost": 0,
+      "bank": 4.2,
+      "squadValue": 101.4
     }
   }
 ]

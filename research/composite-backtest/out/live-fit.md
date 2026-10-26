@@ -1,8 +1,8 @@
 # Live refit (composite-refit-gate)
 
-Rows 2649 · eligible 0 · labelled GWs — · train — · holdout —
+Rows 3317 · eligible 0 · labelled GWs — · train — · holdout —
 
-Excluded 2649 rows: fixture_gw missing or ≠ gw (captured before target-gameweek-alignment)
+Excluded 3317 rows: fixture_gw missing or ≠ gw (captured before target-gameweek-alignment)
 
 | position | status | n_train | n_heldout | alpha | heldout ρ |
 |---|---|---|---|---|---|
